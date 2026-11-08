@@ -147,7 +147,7 @@
             <div>
               <div class="flex justify-between text-xs mb-1">
                 <span class="text-gray-200">פלוואו וכתיבה (<span id="skill-flow-val">10</span>)</span>
-                <button onclick="upgradeSkill('flow')" class="text-spotifyGreen font-semibold hover:underline text-[11px]">אימון (4 <i class="fa-solid fa-bolt"></i> / ₪150)</button>
+                <button onclick="upgradeSkill('flow')" id="skill-flow-btn" class="text-spotifyGreen font-semibold hover:underline text-[11px]">אימון (4 <i class="fa-solid fa-bolt"></i> / ₪<span id="skill-flow-cost">150</span>)</button>
               </div>
               <div class="w-full bg-gray-900 h-2.5 rounded-full overflow-hidden border border-gray-800">
                 <div class="bg-spotifyGreen h-full transition-all duration-300" id="skill-flow-bar" style="width: 20%"></div>
@@ -157,7 +157,7 @@
             <div>
               <div class="flex justify-between text-xs mb-1">
                 <span class="text-gray-200">כריזמה ונוכחות (<span id="skill-charisma-val">10</span>)</span>
-                <button onclick="upgradeSkill('charisma')" class="text-spotifyGreen font-semibold hover:underline text-[11px]">אימון (4 <i class="fa-solid fa-bolt"></i> / ₪150)</button>
+                <button onclick="upgradeSkill('charisma')" id="skill-charisma-btn" class="text-spotifyGreen font-semibold hover:underline text-[11px]">אימון (4 <i class="fa-solid fa-bolt"></i> / ₪<span id="skill-charisma-cost">150</span>)</button>
               </div>
               <div class="w-full bg-gray-900 h-2.5 rounded-full overflow-hidden border border-gray-800">
                 <div class="bg-accentOrange h-full transition-all duration-300" id="skill-charisma-bar" style="width: 20%"></div>
@@ -167,7 +167,7 @@
             <div>
               <div class="flex justify-between text-xs mb-1">
                 <span class="text-gray-200">ויראליות וגימיקים (<span id="skill-viral-val">5</span>)</span>
-                <button onclick="upgradeSkill('viral')" class="text-spotifyGreen font-semibold hover:underline text-[11px]">אימון (3 <i class="fa-solid fa-bolt"></i> / ₪100)</button>
+                <button onclick="upgradeSkill('viral')" id="skill-viral-btn" class="text-spotifyGreen font-semibold hover:underline text-[11px]">אימון (3 <i class="fa-solid fa-bolt"></i> / ₪<span id="skill-viral-cost">100</span>)</button>
               </div>
               <div class="w-full bg-gray-900 h-2.5 rounded-full overflow-hidden border border-gray-800">
                 <div class="bg-purple-500 h-full transition-all duration-300" id="skill-viral-bar" style="width: 10%"></div>
@@ -177,7 +177,7 @@
             <div>
               <div class="flex justify-between text-xs mb-1">
                 <span class="text-gray-200">בימוי וידאו וקליפים (<span id="skill-video-val">5</span>)</span>
-                <button onclick="upgradeSkill('video')" class="text-spotifyGreen font-semibold hover:underline text-[11px]">אימון (3 <i class="fa-solid fa-bolt"></i> / ₪120)</button>
+                <button onclick="upgradeSkill('video')" id="skill-video-btn" class="text-spotifyGreen font-semibold hover:underline text-[11px]">אימון (3 <i class="fa-solid fa-bolt"></i> / ₪<span id="skill-video-cost">120</span>)</button>
               </div>
               <div class="w-full bg-gray-900 h-2.5 rounded-full overflow-hidden border border-gray-800">
                 <div class="bg-blue-500 h-full transition-all duration-300" id="skill-video-bar" style="width: 10%"></div>
@@ -361,7 +361,7 @@
           <div class="bg-cardDark p-3 rounded-xl border border-gray-800 flex justify-between items-center">
             <div>
               <div class="text-xs font-bold text-white">מועדון האזור / האוזן</div>
-              <div class="text-[11px] text-gray-400">דרישה: 300 עוקבים | רווח: ₪800</div>
+              <div class="text-[11px] text-gray-400">דרישה: 300 עוקבים | רווח: עד ₪800</div>
             </div>
             <button id="btn-gig-ozar" onclick="performGig('האוזן', 300, 800, 8)" class="bg-gray-800 text-gray-400 text-xs font-bold px-3 py-1.5 rounded-xl transition">
               הופע (8 <i class="fa-solid fa-bolt text-[9px]"></i>)
@@ -371,7 +371,7 @@
           <div class="bg-cardDark p-3 rounded-xl border border-gray-800 flex justify-between items-center">
             <div>
               <div class="text-xs font-bold text-white">מועדון כולי עלמא</div>
-              <div class="text-[11px] text-gray-400">דרישה: 1,500 עוקבים | רווח: ₪3,000</div>
+              <div class="text-[11px] text-gray-400">דרישה: 1,500 עוקבים | רווח: עד ₪3,000</div>
             </div>
             <button id="btn-gig-kulie" onclick="performGig('כולי עלמא', 1500, 3000, 10)" class="bg-gray-800 text-gray-400 text-xs font-bold px-3 py-1.5 rounded-xl transition">
               הופע (10 <i class="fa-solid fa-bolt text-[9px]"></i>)
@@ -381,9 +381,9 @@
           <div class="bg-cardDark p-3 rounded-xl border border-gray-800 flex justify-between items-center">
             <div>
               <div class="text-xs font-bold text-white">מועדון הבארבי</div>
-              <div class="text-[11px] text-gray-400">דרישה: 10,000 עוקבים | רווח: ₪18,000</div>
+              <div class="text-[11px] text-gray-400">דרישה: 10,000 עוקבים | רווח: עד ₪12,000</div>
             </div>
-            <button id="btn-gig-barby" onclick="performGig('מועדון הבארבי', 10000, 18000, 15)" class="bg-gray-800 text-gray-400 text-xs font-bold px-3 py-1.5 rounded-xl transition">
+            <button id="btn-gig-barby" onclick="performGig('מועדון הבארבי', 10000, 12000, 15)" class="bg-gray-800 text-gray-400 text-xs font-bold px-3 py-1.5 rounded-xl transition">
               הופע (15 <i class="fa-solid fa-bolt text-[9px]"></i>)
             </button>
           </div>
@@ -391,9 +391,9 @@
           <div class="bg-cardDark p-3 rounded-xl border border-gray-800 flex justify-between items-center">
             <div>
               <div class="text-xs font-bold text-white">האנגר 11 / מנורה מבטחים</div>
-              <div class="text-[11px] text-gray-400">דרישה: 60,000 עוקבים | רווח: ₪140,000</div>
+              <div class="text-[11px] text-gray-400">דרישה: 60,000 עוקבים | רווח: עד ₪45,000</div>
             </div>
-            <button id="btn-gig-menora" onclick="performGig('מנורה מבטחים', 60000, 140000, 20)" class="bg-gray-800 text-gray-400 text-xs font-bold px-3 py-1.5 rounded-xl transition">
+            <button id="btn-gig-menora" onclick="performGig('מנורה מבטחים', 60000, 45000, 20)" class="bg-gray-800 text-gray-400 text-xs font-bold px-3 py-1.5 rounded-xl transition">
               הופע (20 <i class="fa-solid fa-bolt text-[9px]"></i>)
             </button>
           </div>
@@ -524,7 +524,7 @@
             <label class="block text-gray-400 mb-1">סוג היצירה:</label>
             <select id="input-song-type" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white focus:outline-none">
               <option value="single">סינגל בודד</option>
-              <option value="album">אלבום מלא (משקע + בונוס מאזינים)</option>
+              <option value="album">אלבום מלא (20 אנרגיה, אחרי 3 סינגלים)</option>
             </select>
           </div>
 
@@ -563,7 +563,7 @@
         </div>
 
         <button onclick="confirmCreateSong()" class="w-full bg-spotifyGreen text-black font-bold py-2.5 rounded-xl hover:bg-green-600 transition text-xs shadow">
-          שחרר לרשת! (10 אנרגיה)
+          שחרר לרשת! (סינגל 10 / אלבום 20 אנרגיה)
         </button>
       </div>
     </div>
@@ -620,6 +620,31 @@
 
     let currentTinderIdx = 0;
 
+    // ---- Balance constants ----
+    const ROYALTY_PER_STREAM = 0.03;   // ₪ per stream
+    const BASE_RENT = 600;             // weekly living costs
+    const SKILL_CAP = { flow: 50, charisma: 50, viral: 25, video: 25 };
+
+    const SKILL_BASE_COST = { flow: 150, charisma: 150, viral: 100, video: 120 };
+    function skillCost(skill) {
+      return SKILL_BASE_COST[skill] + (state.skills[skill] || 5) * 25;
+    }
+
+    // Repeating the same post type in one week has diminishing returns (1, 1/2, 1/3...)
+    function socialFatigue(kind) {
+      state.socialThisWeek = state.socialThisWeek || {};
+      const n = state.socialThisWeek[kind] || 0;
+      state.socialThisWeek[kind] = n + 1;
+      return 1 / (n + 1);
+    }
+
+    function weeklyRent() {
+      // Owning the Florentin flat cuts rent; the penthouse has its own upkeep
+      if (state.inventory.includes('פנטהאוז במגדלים')) return 4000;
+      if (state.inventory.includes('דירה בפלורנטין')) return 250;
+      return BASE_RENT;
+    }
+
     function saveState() {
       try { localStorage.setItem('il_rap_star_save', JSON.stringify(state)); } catch (e) {}
     }
@@ -640,7 +665,10 @@
     }
 
     function updateUI() {
-      document.getElementById('top-money').innerText = '₪' + state.money.toLocaleString();
+      const moneyEl = document.getElementById('top-money');
+      moneyEl.innerText = (state.money < 0 ? '-₪' : '₪') + Math.abs(state.money).toLocaleString();
+      moneyEl.classList.toggle('text-red-500', state.money < 0);
+      moneyEl.classList.toggle('text-spotifyGreen', state.money >= 0);
       document.getElementById('top-energy').innerHTML = `<i class="fa-solid fa-bolt text-xs ml-0.5"></i>${state.energy}/${state.maxEnergy}`;
       document.getElementById('top-date').innerText = `שבוע ${state.week}, ${state.year}`;
 
@@ -675,6 +703,13 @@
       document.getElementById('skill-charisma-bar').style.width = Math.min(100, state.skills.charisma * 2) + '%';
       document.getElementById('skill-viral-bar').style.width = Math.min(100, state.skills.viral * 4) + '%';
       document.getElementById('skill-video-bar').style.width = Math.min(100, (state.skills.video || 5) * 4) + '%';
+
+      Object.keys(SKILL_CAP).forEach(k => {
+        const maxed = (state.skills[k] || 5) >= SKILL_CAP[k];
+        document.getElementById(`skill-${k}-btn`).innerHTML = maxed
+          ? 'מקסימום ✓'
+          : `אימון (${k === 'viral' || k === 'video' ? 3 : 4} <i class="fa-solid fa-bolt"></i> / ₪<span>${skillCost(k).toLocaleString()}</span>)`;
+      });
 
       // Gig Buttons State
       document.getElementById('btn-gig-ozar').className = state.followers >= 300 ? "bg-spotifyGreen text-black text-xs font-bold px-3 py-1.5 rounded-xl hover:bg-green-600 transition" : "bg-gray-800 text-gray-500 text-xs font-bold px-3 py-1.5 rounded-xl cursor-not-allowed";
@@ -789,7 +824,13 @@
     }
 
     function upgradeSkill(skill) {
-      const cost = skill === 'viral' || skill === 'video' ? 100 : 150;
+      const level = state.skills[skill] || 5;
+      if (level >= SKILL_CAP[skill]) {
+        showToast("המיומנות כבר במקסימום!", false);
+        return;
+      }
+      // Each level costs more than the last
+      const cost = skillCost(skill);
       const energy = skill === 'viral' || skill === 'video' ? 3 : 4;
 
       if (state.money < cost || state.energy < energy) {
@@ -799,7 +840,7 @@
 
       state.money -= cost;
       state.energy -= energy;
-      state.skills[skill] = (state.skills[skill] || 5) + 2;
+      state.skills[skill] = Math.min(SKILL_CAP[skill], level + 2);
       showToast(`המיומנות שודרגה ל-${state.skills[skill]}!`);
       updateUI();
     }
@@ -814,11 +855,20 @@
         return;
       }
 
+      state.gigsThisWeek = state.gigsThisWeek || [];
+      if (state.gigsThisWeek.includes(venue)) {
+        showToast(`כבר הופעת ב-${venue} השבוע!`, false);
+        return;
+      }
+      state.gigsThisWeek.push(venue);
       state.energy -= energyCost;
+      // A charismatic performer earns more and wins more fans
+      const perf = 0.6 + Math.min(state.skills.charisma, 50) / 50 * 0.6 + Math.random() * 0.2;
+      pay = Math.floor(pay * perf);
       state.money += pay;
-      state.followers += Math.floor(reqFollowers * 0.12);
-      state.logs.push(`הופעת ב-${venue}! הקהל היה באוויר. הרווחת ₪${pay.toLocaleString()}.`);
-      showToast(`הופעה מטורפת ב-${venue}! +₪${pay.toLocaleString()}`);
+      state.followers += Math.floor(reqFollowers * 0.06 * perf);
+      state.logs.push(`הופעת ב-${venue}! הרווחת ₪${pay.toLocaleString()}.`);
+      showToast(`הופעה ב-${venue}! +₪${pay.toLocaleString()}`);
       updateUI();
     }
 
@@ -868,18 +918,28 @@
       let clipCost = clipTier === 'lyric' ? 400 : (clipTier === 'pro' ? 5000 : 0);
       let totalCost = producerCost + clipCost;
 
+      const energyCost = type === 'album' ? 20 : 10;
+      const singles = state.songs.filter(s => !s.isAlbum).length;
+      if (type === 'album' && singles < 3) {
+        showToast("צריך לפחות 3 סינגלים לפני אלבום!", false);
+        return;
+      }
+      if (state.energy < energyCost) {
+        showToast(`נדרשת ${energyCost} אנרגיה!`, false);
+        return;
+      }
       if (state.money < totalCost) {
         showToast("אין מספיק כסף להפקה!", false);
         return;
       }
 
       state.money -= totalCost;
-      state.energy -= 10;
+      state.energy -= energyCost;
 
       let qualityMultiplier = producerTier === 'top' ? 3.8 : (producerTier === 'indie' ? 2.2 : 1.0);
       if (type === 'album') qualityMultiplier *= 2.5;
 
-      let initialStreams = Math.floor((state.skills.flow * 220 + state.skills.charisma * 160) * qualityMultiplier * (Math.random() * 0.5 + 0.8));
+      let initialStreams = Math.floor((state.skills.flow * 120 + state.skills.charisma * 80 + state.followers * 0.15) * qualityMultiplier * (Math.random() * 0.5 + 0.8));
       
       let ytViews = 0;
       if (clipTier === 'lyric') ytViews = Math.floor(initialStreams * 0.5);
@@ -890,6 +950,7 @@
         genre,
         isAlbum: type === 'album',
         streams: initialStreams,
+        base: initialStreams,
         ytViews: ytViews,
         releaseWeek: state.week,
         releaseTotalWeek: state.totalWeeks || state.week
@@ -898,7 +959,8 @@
       state.songs.push(newSong);
       state.listeners += Math.floor(initialStreams / 3.5);
       state.youtubeViews += ytViews;
-      state.followers += Math.floor(initialStreams / 12);
+      state.followers += Math.floor(initialStreams / 15);
+      state.money += Math.floor(initialStreams * ROYALTY_PER_STREAM);
 
       state.logs.push(`ה${type === 'album' ? 'אלבום' : 'סינגל'} "${title}" שוחרר! צבר ${initialStreams.toLocaleString()} השמעות.`);
       showToast(`"${title}" שוחרר לרשת! 🎉`);
@@ -914,7 +976,7 @@
         return;
       }
       state.energy -= 3;
-      let gain = Math.floor(Math.random() * 90 + 30 + state.skills.charisma * 6);
+      let gain = Math.floor((Math.random() * 40 + 20 + state.skills.charisma * 2 + Math.sqrt(state.followers) * 2) * socialFatigue('story'));
       state.followers += gain;
       showToast(`העלית סטורי! +${gain} עוקבים`);
       updateUI();
@@ -929,13 +991,14 @@
       const targets = ["ראפר מתחרה מנתניה", "מפיק מוזיקלי מוכר", "טיקטוקר תל אביבי"];
       const target = targets[Math.floor(Math.random() * targets.length)];
 
-      if (Math.random() > 0.35) {
-        let gain = Math.floor(Math.random() * 950 + 350);
+      const beefFatigue = socialFatigue('beef');
+      if (Math.random() > 0.4) {
+        let gain = Math.floor((Math.random() * 300 + 150 + Math.sqrt(state.followers) * 12) * beefFatigue);
         state.followers += gain;
         state.logs.push(`העלת דיס חריף על ${target}! כל הרשת מדברת עליך (+${gain} עוקבים).`);
         showToast(`הדיס הפך לויראלי! 🔥`);
       } else {
-        let loss = Math.floor(Math.random() * 220 + 60);
+        let loss = Math.floor(Math.random() * 100 + 50 + Math.sqrt(state.followers) * 8);
         state.followers = Math.max(0, state.followers - loss);
         state.logs.push(`הדיס מול ${target} פגע בך בחזרה (-${loss} עוקבים).`);
         showToast(`הדיס חזר אליך כבומרנג...`, false);
@@ -949,7 +1012,7 @@
         return;
       }
       state.energy -= 4;
-      let boost = Math.floor(state.skills.viral * 180 * (Math.random() + 0.5));
+      let boost = Math.floor((state.skills.viral * 15 + Math.sqrt(state.followers) * 5) * (Math.random() + 0.5) * socialFatigue('tiktok'));
       state.followers += boost;
       showToast(`אתגר הטיקטוק תפס! +${boost} עוקבים 🎵`);
       updateUI();
@@ -1032,23 +1095,36 @@
 
       let weeklyRoyalties = 0;
       let newListeners = 0;
+      let totalWeeklyStreams = 0;
+      state.gigsThisWeek = [];
+      state.socialThisWeek = {};
 
       state.songs.forEach(song => {
         let age = (state.totalWeeks || state.week) - (song.releaseTotalWeek || song.releaseWeek);
-        let decay = Math.max(0.15, 1 - (age * 0.04));
-        let weeklyStreams = Math.floor((song.streams * 0.08) * decay + (state.followers * 1.8));
+        // Songs fade ~15% a week, with a small long tail for catalogue plays
+        let decay = Math.max(0.03, Math.pow(0.85, age));
+        let base = song.base || song.streams * 0.1;
+        let weeklyStreams = Math.floor((base * 0.35 + state.followers * 0.4) * decay * (0.85 + Math.random() * 0.3));
         song.streams += weeklyStreams;
-        weeklyRoyalties += Math.floor(weeklyStreams * 0.04);
+        totalWeeklyStreams += weeklyStreams;
+        weeklyRoyalties += Math.floor(weeklyStreams * ROYALTY_PER_STREAM);
         newListeners += Math.floor(weeklyStreams * 0.18);
       });
 
       state.money += weeklyRoyalties;
       state.listeners = Math.floor(state.listeners * 0.88) + newListeners;
+      // Some listeners follow you; without new content, ~1% unfollow each week
+      state.followers += Math.floor(totalWeeklyStreams * 0.01);
+      state.followers -= Math.floor(state.followers * 0.01);
+
+      const rent = weeklyRent();
+      state.money -= rent;
+      if (state.money < 0) state.logs.push(`⚠️ החשבון במינוס (₪${state.money.toLocaleString()}). צא לעבוד!`);
 
       triggerRandomEvent();
 
       updateUI();
-      showToast(`שבוע ${state.week} התחיל! +₪${weeklyRoyalties.toLocaleString()} תמלוגים`);
+      showToast(`שבוע ${state.week}: +₪${weeklyRoyalties.toLocaleString()} תמלוגים, -₪${rent.toLocaleString()} מחיה`, state.money >= 0);
     }
 
     function triggerRandomEvent() {
@@ -1059,15 +1135,15 @@
         },
         {
           text: "גלגלצ הכניסו את השיר שלך לפלייליסט לילה!",
-          action: () => { state.listeners += 3000; state.followers += 800; }
+          action: () => { state.listeners += 1000 + Math.floor(state.listeners * 0.2); state.followers += 150 + Math.floor(state.followers * 0.04); }
         },
         {
           text: "הודעה בוואטסאפ מהמפיק: 'בוא זריז יש ביט חולה!'",
-          action: () => { state.skills.flow += 1; }
+          action: () => { state.skills.flow = Math.min(SKILL_CAP.flow, state.skills.flow + 1); }
         },
         {
           text: "כתבה מפרגנת בעמוד אינסטגרם מוביל עליך!",
-          action: () => { state.followers += 1500; }
+          action: () => { state.followers += 200 + Math.floor(state.followers * 0.06); }
         }
       ];
 
