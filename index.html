@@ -2,1065 +2,1085 @@
 <html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ישראל ראפ סטאר - IL Rap Simulator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ישראל ראפ סטאר - IL Rap Star Simulator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    if (window.tailwind) tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            bgDark: '#0b0f12',
+            cardDark: '#161c22',
+            cardHover: '#1f2730',
+            spotifyGreen: '#1DB954',
+            youtubeRed: '#FF0000',
+            instaPink: '#E1306C',
+            tinderFlame: '#FE3C72',
+            goldAccent: '#ecc94b',
+            accentOrange: '#f6ad55'
+          },
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Hebrew', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    :root {
-      --bg-dark: #121619;
-      --card-bg: #1c2329;
-      --card-header: #263038;
-      --accent-green: #48bb78;
-      --accent-orange: #ed8936;
-      --accent-red: #e53e3e;
-      --accent-blue: #3182ce;
-      --accent-purple: #9f7aea;
-      --text-main: #edf2f7;
-      --text-sub: #a0aec0;
-      --border: #2d3748;
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #0b0f12; }
+    ::-webkit-scrollbar-thumb { background: #2d3748; border-radius: 4px; }
+    .no-select { user-select: none; -webkit-user-select: none; }
+    .nav-active { color: #1DB954 !important; border-top: 2px solid #1DB954; }
+    
+    @keyframes swipeRight {
+      0% { transform: translateX(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateX(250px) rotate(25deg); opacity: 0; }
     }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Hebrew, sans-serif;
-      display: flex;
-      justify-content: center;
+    @keyframes swipeLeft {
+      0% { transform: translateX(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateX(-250px) rotate(-25deg); opacity: 0; }
     }
-
-    .app-container {
-      width: 100%;
-      max-width: 430px;
-      height: 100vh;
-      height: 100dvh;
-      background-color: var(--bg-dark);
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 0 25px rgba(0,0,0,0.8);
-    }
-
-    /* Top Bar */
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 18px;
-      background-color: #171d22;
-      border-bottom: 1px solid var(--border);
-      z-index: 10;
-      gap: 8px;
-    }
-
-    .stat-badge {
-      display: flex;
-      flex-direction: column;
-      font-size: 0.8rem;
-      color: var(--text-sub);
-    }
-
-    .stat-val {
-      font-weight: bold;
-      font-size: 1.05rem;
-      color: var(--accent-green);
-    }
-
-    .stat-val.fans { color: var(--accent-orange); }
-    .stat-val.week { color: var(--text-main); }
-
-    .btn-end-week {
-      background-color: var(--accent-green);
-      color: #111;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 0.9rem;
-      transition: transform 0.1s;
-      white-space: nowrap;
-    }
-
-    .btn-end-week:active { transform: scale(0.95); }
-
-    /* Energy bar */
-    .energy-wrap {
-      padding: 8px 18px;
-      background: #171d22;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.78rem;
-      color: var(--text-sub);
-    }
-    .bar {
-      height: 8px;
-      background: #2d3748;
-      border-radius: 6px;
-      overflow: hidden;
-      margin-top: 4px;
-    }
-    .bar > div {
-      height: 100%;
-      background: var(--accent-blue);
-      transition: width 0.3s;
-    }
-
-    /* Content Area */
-    .content-area {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px;
-      padding-bottom: 90px;
-    }
-
-    .screen { display: none; }
-    .screen.active { display: block; }
-
-    h2 {
-      margin-top: 0;
-      font-size: 1.4rem;
-      border-bottom: 2px solid var(--border);
-      padding-bottom: 8px;
-      color: #fff;
-    }
-
-    h3 {
-      font-size: 1.1rem;
-      margin-top: 15px;
-      color: var(--text-sub);
-    }
-
-    /* Card UI */
-    .card {
-      background-color: var(--card-bg);
-      border-radius: 14px;
-      padding: 14px;
-      margin-bottom: 14px;
-      border: 1px solid var(--border);
-    }
-
-    .card-title {
-      font-weight: bold;
-      font-size: 1rem;
-      margin-bottom: 6px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .card-sub {
-      font-size: 0.85rem;
-      color: var(--text-sub);
-      line-height: 1.45;
-    }
-
-    .row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .mini-stat {
-      background: var(--card-header);
-      border-radius: 10px;
-      padding: 10px;
-      text-align: center;
-    }
-    .mini-stat .lbl { font-size: 0.75rem; color: var(--text-sub); }
-    .mini-stat .val { font-size: 1.15rem; font-weight: bold; margin-top: 2px; }
-
-    .btn {
-      background: var(--accent-blue);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      padding: 9px 14px;
-      font-weight: bold;
-      font-size: 0.88rem;
-      cursor: pointer;
-      white-space: nowrap;
-      font-family: inherit;
-    }
-    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    .btn.green { background: var(--accent-green); color: #111; }
-    .btn.orange { background: var(--accent-orange); color: #111; }
-    .btn.red { background: var(--accent-red); }
-    .btn.ghost { background: var(--card-header); color: var(--text-main); }
-    .btn.full { width: 100%; margin-top: 10px; }
-
-    .tag {
-      font-size: 0.72rem;
-      padding: 3px 8px;
-      border-radius: 10px;
-      background: var(--card-header);
-      color: var(--text-sub);
-      white-space: nowrap;
-    }
-    .tag.hit { background: rgba(72,187,120,0.2); color: var(--accent-green); }
-    .tag.flop { background: rgba(229,62,62,0.2); color: #fc8181; }
-    .tag.mid { background: rgba(237,137,54,0.2); color: var(--accent-orange); }
-
-    .skill-row { margin-bottom: 10px; }
-    .skill-row .row { font-size: 0.88rem; }
-    .skill-row .bar > div { background: var(--accent-purple); }
-
-    input[type=text], select {
-      width: 100%;
-      background: var(--card-header);
-      border: 1px solid var(--border);
-      color: var(--text-main);
-      padding: 10px;
-      border-radius: 10px;
-      font-size: 0.95rem;
-      font-family: inherit;
-      margin-top: 6px;
-    }
-
-    label { font-size: 0.85rem; color: var(--text-sub); display: block; margin-top: 10px; }
-
-    .chart-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 0;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.88rem;
-    }
-    .chart-item:last-child { border-bottom: none; }
-    .chart-pos {
-      width: 28px; height: 28px;
-      border-radius: 50%;
-      background: var(--card-header);
-      display: flex; align-items: center; justify-content: center;
-      font-weight: bold; font-size: 0.8rem;
-      flex-shrink: 0;
-    }
-    .chart-item.me { color: var(--accent-green); font-weight: bold; }
-    .chart-item.me .chart-pos { background: var(--accent-green); color: #111; }
-    .chart-info { flex: 1; min-width: 0; }
-    .chart-info .artist { font-size: 0.75rem; color: var(--text-sub); }
-
-    .log-item {
-      font-size: 0.85rem;
-      padding: 6px 0;
-      border-bottom: 1px dashed var(--border);
-      color: var(--text-sub);
-    }
-    .log-item b { color: var(--text-main); }
-
-    /* Bottom Nav */
-    .bottom-nav {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      display: flex;
-      background: #171d22;
-      border-top: 1px solid var(--border);
-      z-index: 10;
-    }
-    .nav-btn {
-      flex: 1;
-      background: none;
-      border: none;
-      color: var(--text-sub);
-      padding: 10px 0 12px;
-      font-size: 0.72rem;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
-      font-family: inherit;
-    }
-    .nav-btn .ico { font-size: 1.3rem; }
-    .nav-btn.active { color: var(--accent-green); }
-
-    /* Modal */
-    .modal-bg {
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,0.7);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 50;
-      padding: 20px;
-    }
-    .modal-bg.show { display: flex; }
-    .modal {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 18px;
-      width: 100%;
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-    .modal h3 { margin-top: 0; color: #fff; }
-    .modal .btns { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
-
-    /* Toast */
-    .toast {
-      position: absolute;
-      top: 70px;
-      left: 50%;
-      transform: translateX(-50%) translateY(-20px);
-      background: var(--card-header);
-      border: 1px solid var(--border);
-      padding: 10px 16px;
-      border-radius: 12px;
-      font-size: 0.88rem;
-      opacity: 0;
-      pointer-events: none;
-      transition: all 0.25s;
-      z-index: 60;
-      max-width: 90%;
-      text-align: center;
-    }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    /* Start screen */
-    .start-screen {
-      position: absolute;
-      inset: 0;
-      background: var(--bg-dark);
-      z-index: 100;
-      padding: 30px 20px;
-      overflow-y: auto;
-    }
-    .start-screen h1 {
-      text-align: center;
-      font-size: 2rem;
-      margin: 10px 0 4px;
-      color: var(--accent-green);
-    }
-    .start-screen .subtitle { text-align: center; color: var(--text-sub); margin-bottom: 24px; }
-
-    .choice-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-top: 6px;
-    }
-    .choice {
-      background: var(--card-header);
-      border: 2px solid transparent;
-      border-radius: 10px;
-      padding: 10px;
-      text-align: center;
-      cursor: pointer;
-      font-size: 0.85rem;
-    }
-    .choice.sel { border-color: var(--accent-green); }
-    .choice small { display: block; color: var(--text-sub); font-size: 0.72rem; margin-top: 3px; }
-
-    .empty { text-align: center; color: var(--text-sub); font-size: 0.9rem; padding: 20px 0; }
+    .anim-swipe-right { animation: swipeRight 0.3s forwards ease-out; }
+    .anim-swipe-left { animation: swipeLeft 0.3s forwards ease-out; }
   </style>
 </head>
-<body>
-<div class="app-container">
+<body class="bg-black text-gray-100 font-sans antialiased flex justify-center items-center min-h-screen p-0 m-0 no-select">
 
-  <!-- Start Screen -->
-  <div class="start-screen" id="startScreen">
-    <h1>🎤 ישראל ראפ סטאר</h1>
-    <div class="subtitle">מהשכונה לפסגת המצעד</div>
-    <div class="card">
-      <label>שם במה</label>
-      <input type="text" id="inpName" maxlength="20" placeholder="למשל: MC שכונה">
-      <label>עיר מוצא</label>
-      <select id="inpCity">
-        <option>תל אביב</option>
-        <option>חיפה</option>
-        <option>ירושלים</option>
-        <option>באר שבע</option>
-        <option>אשדוד</option>
-        <option>נתניה</option>
-        <option>בת ים</option>
-        <option>קריית שמונה</option>
-      </select>
-      <label>סגנון</label>
-      <div class="choice-grid" id="styleChoices"></div>
-      <button class="btn green full" onclick="startGame()">יאללה, מתחילים 🚀</button>
-    </div>
-    <div class="card" id="continueCard" style="display:none">
-      <div class="card-title">יש משחק שמור</div>
-      <div class="card-sub" id="continueInfo"></div>
-      <button class="btn full" onclick="continueGame()">המשך משחק</button>
-    </div>
-  </div>
+  <!-- Mobile Viewport Container -->
+  <div class="w-full max-w-md h-screen max-h-[932px] bg-bgDark flex flex-col justify-between relative shadow-2xl overflow-hidden md:rounded-3xl border border-gray-800">
 
-  <!-- Top Bar -->
-  <div class="top-bar">
-    <div class="stat-badge">כסף<span class="stat-val" id="tMoney">₪0</span></div>
-    <div class="stat-badge">מעריצים<span class="stat-val fans" id="tFans">0</span></div>
-    <div class="stat-badge">שבוע<span class="stat-val week" id="tWeek">1</span></div>
-    <button class="btn-end-week" onclick="endWeek()">סיים שבוע ⏭</button>
-  </div>
-  <div class="energy-wrap">
-    <div class="row"><span>⚡ אנרגיה</span><span id="tEnergyTxt">100/100</span></div>
-    <div class="bar"><div id="tEnergy" style="width:100%"></div></div>
-  </div>
-
-  <!-- Content -->
-  <div class="content-area" id="content">
-
-    <!-- Home -->
-    <div class="screen active" id="screen-home">
-      <h2 id="homeTitle">הקריירה שלי</h2>
-      <div class="card">
-        <div class="grid-2">
-          <div class="mini-stat"><div class="lbl">מוניטין</div><div class="val" id="hRep">0</div></div>
-          <div class="mini-stat"><div class="lbl">דרגה</div><div class="val" id="hTier" style="font-size:0.95rem">מתחיל</div></div>
-          <div class="mini-stat"><div class="lbl">שירים שיצאו</div><div class="val" id="hSongs">0</div></div>
-          <div class="mini-stat"><div class="lbl">השמעות סה״כ</div><div class="val" id="hStreams">0</div></div>
+    <!-- TOP STATUS BAR -->
+    <header class="bg-cardDark px-4 py-3 border-b border-gray-800 flex justify-between items-center z-20 shrink-0">
+      <div class="flex items-center space-x-3 space-x-reverse">
+        <div>
+          <div class="text-[10px] text-gray-400">מאזן:</div>
+          <div class="text-sm font-bold text-spotifyGreen" id="top-money">₪1,500</div>
+        </div>
+        <div class="h-6 w-px bg-gray-700"></div>
+        <div>
+          <div class="text-[10px] text-gray-400">אנרגיה:</div>
+          <div class="text-sm font-bold text-accentOrange" id="top-energy"><i class="fa-solid fa-bolt text-xs ml-0.5"></i>20/20</div>
         </div>
       </div>
-      <div class="card">
-        <div class="card-title">כישורים</div>
-        <div id="skillsList"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">אימון <span class="tag">-20 ⚡</span></div>
-        <div class="card-sub">שפר כישור אחד. ככה בונים ראפר.</div>
-        <div class="grid-2" style="margin-top:10px" id="trainBtns"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">מה קרה לאחרונה</div>
-        <div id="logList"></div>
-      </div>
-    </div>
 
-    <!-- Studio -->
-    <div class="screen" id="screen-studio">
-      <h2>🎧 אולפן</h2>
-      <div class="card">
-        <div class="card-title">שיר חדש <span class="tag">-30 ⚡</span></div>
-        <label>שם השיר</label>
-        <input type="text" id="songName" maxlength="28" placeholder="שם השיר">
-        <label>ביט</label>
-        <select id="songBeat"></select>
-        <label>נושא</label>
-        <select id="songTopic">
-          <option value="street">השכונה והרחוב</option>
-          <option value="love">אהבה ושברון לב</option>
-          <option value="party">מסיבות וחיי לילה</option>
-          <option value="money">כסף והצלחה</option>
-          <option value="social">ביקורת חברתית</option>
-          <option value="diss">דיס (מסוכן!)</option>
-        </select>
-        <label>פיצ׳ר</label>
-        <select id="songFeat"></select>
-        <div class="card-sub" style="margin-top:10px" id="songCost">עלות: ₪0</div>
-        <button class="btn green full" onclick="recordSong()">הקלט ושחרר 🎙</button>
+      <div class="flex items-center space-x-3 space-x-reverse">
+        <div class="text-left">
+          <div class="text-xs font-semibold text-gray-300" id="top-date">שבוע 1, 2026</div>
+          <div class="text-[10px] text-gray-400" id="top-fame">Fame: F</div>
+        </div>
+        <button onclick="nextWeek()" class="bg-spotifyGreen hover:bg-green-600 text-black text-xs font-bold px-3 py-2 rounded-xl transition shadow flex items-center gap-1 active:scale-95">
+          <span>סיים שבוע</span>
+          <i class="fa-solid fa-chevron-left text-[10px]"></i>
+        </button>
       </div>
-      <h3>הדיסקוגרפיה שלי</h3>
-      <div id="discList"></div>
-    </div>
+    </header>
 
-    <!-- Shows -->
-    <div class="screen" id="screen-shows">
-      <h2>🎪 הופעות</h2>
-      <div class="card-sub" style="margin-bottom:12px">אפשר להופיע פעמיים בשבוע. מקומות גדולים נפתחים עם יותר מעריצים.</div>
-      <div id="venueList"></div>
-    </div>
+    <!-- MAIN CONTENT SCREENS CONTAINER -->
+    <main class="flex-1 overflow-y-auto p-4 pb-20 relative" id="main-content">
 
-    <!-- Social -->
-    <div class="screen" id="screen-social">
-      <h2>📱 רשתות</h2>
-      <div class="card">
-        <div class="row">
+      <!-- SCREEN 1: DASHBOARD / OVERVIEW -->
+      <section id="screen-dashboard" class="space-y-4">
+        <!-- Artist Banner -->
+        <div class="bg-gradient-to-r from-cardDark via-gray-900 to-gray-950 rounded-2xl p-4 border border-gray-800 relative overflow-hidden shadow">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3 space-x-reverse">
+              <div class="w-14 h-14 rounded-full bg-gray-800 border-2 border-spotifyGreen flex items-center justify-center text-2xl text-spotifyGreen shadow">
+                <i class="fa-solid fa-microphone-lines"></i>
+              </div>
+              <div>
+                <h1 class="text-lg font-bold text-white flex items-center gap-1" id="dash-artist-name">
+                  MC IL <i class="fa-solid fa-circle-check text-blue-500 text-xs hidden" id="dash-verified"></i>
+                </h1>
+                <p class="text-xs text-gray-400" id="dash-stage-title">ראפר מתחיל מהמרכז</p>
+                <div class="text-[11px] text-spotifyGreen mt-1 font-medium flex items-center gap-1">
+                  <i class="fa-brands fa-spotify"></i><span id="dash-listeners">0</span> מאזינים חודשיים
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Stats Grid -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-cardDark p-3 rounded-xl border border-gray-800">
+            <div class="text-xs text-gray-400 mb-1"><i class="fa-brands fa-instagram text-instaPink ml-1"></i>אינסטגרם</div>
+            <div class="text-base font-bold text-white" id="dash-insta-followers">120 עוקבים</div>
+          </div>
+          <div class="bg-cardDark p-3 rounded-xl border border-gray-800">
+            <div class="text-xs text-gray-400 mb-1"><i class="fa-brands fa-youtube text-youtubeRed ml-1"></i>צפיות ביוטיוב</div>
+            <div class="text-base font-bold text-white" id="dash-yt-views">0 צפיות</div>
+          </div>
+        </div>
+
+        <!-- Live Spotify Top 5 Israel Chart -->
+        <div class="bg-cardDark p-4 rounded-2xl border border-gray-800">
+          <div class="flex justify-between items-center mb-3">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i class="fa-brands fa-spotify text-spotifyGreen text-base"></i> Top 5 ספטיפיי ישראל
+            </h3>
+            <span class="text-[10px] text-gray-400">מתעדכן שבועית</span>
+          </div>
+          <div class="space-y-2" id="dash-chart-list"></div>
+        </div>
+
+        <!-- News Feed & Events -->
+        <div class="bg-cardDark p-4 rounded-2xl border border-gray-800">
+          <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+            <i class="fa-solid fa-newspaper text-accentOrange"></i> חדשות, וואטסאפ ואירועים
+          </h3>
+          <ul class="space-y-2 text-xs text-gray-300" id="dash-logs">
+            <li class="bg-gray-900/60 p-2.5 rounded-lg border border-gray-800">ברוכים הבאים ל-IL Rap Star! התחל ליצור מוזיקה ולהעלות תוכן.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- SCREEN 2: TALENT & SKILLS -->
+      <section id="screen-talent" class="space-y-4 hidden">
+        <h2 class="text-lg font-bold text-white">כישורים ויכולות</h2>
+
+        <div class="bg-cardDark p-4 rounded-2xl border border-gray-800 space-y-4">
+          <div class="space-y-3">
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-gray-200">פלוואו וכתיבה (<span id="skill-flow-val">10</span>)</span>
+                <button onclick="upgradeSkill('flow')" class="text-spotifyGreen font-semibold hover:underline text-[11px]">אימון (4 <i class="fa-solid fa-bolt"></i> / ₪150)</button>
+              </div>
+              <div class="w-full bg-gray-900 h-2.5 rounded-full overflow-hidden border border-gray-800">
+                <div class="bg-spotifyGreen h-full transition-all duration-300" id="skill-flow-bar" style="width: 20%"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-gray-200">כריזמה ונוכחות (<span id="skill-charisma-val">10</span>)</span>
+                <button onclick="upgradeSkill('charisma')" class="text-spotifyGreen font-semibold hover:underline text-[11px]">אימון (4 <i class="fa-solid fa-bolt"></i> / ₪150)</button>
+              </div>
+              <div class="w-full bg-gray-900 h-2.5 rounded-full overflow-hidden border border-gray-800">
+                <div class="bg-accentOrange h-full transition-all duration-300" id="skill-charisma-bar" style="width: 20%"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-gray-200">ויראליות וגימיקים (<span id="skill-viral-val">5</span>)</span>
+                <button onclick="upgradeSkill('viral')" class="text-spotifyGreen font-semibold hover:underline text-[11px]">אימון (3 <i class="fa-solid fa-bolt"></i> / ₪100)</button>
+              </div>
+              <div class="w-full bg-gray-900 h-2.5 rounded-full overflow-hidden border border-gray-800">
+                <div class="bg-purple-500 h-full transition-all duration-300" id="skill-viral-bar" style="width: 10%"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-gray-200">בימוי וידאו וקליפים (<span id="skill-video-val">5</span>)</span>
+                <button onclick="upgradeSkill('video')" class="text-spotifyGreen font-semibold hover:underline text-[11px]">אימון (3 <i class="fa-solid fa-bolt"></i> / ₪120)</button>
+              </div>
+              <div class="w-full bg-gray-900 h-2.5 rounded-full overflow-hidden border border-gray-800">
+                <div class="bg-blue-500 h-full transition-all duration-300" id="skill-video-bar" style="width: 10%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCREEN 3: STUDIO & MUSIC -->
+      <section id="screen-studio" class="space-y-4 hidden">
+        <div class="flex justify-between items-center">
+          <h2 class="text-lg font-bold text-white">אולפן הקלטות</h2>
+          <button onclick="openNewSongModal()" class="bg-spotifyGreen text-black text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1 hover:bg-green-600 transition shadow">
+            <i class="fa-solid fa-plus"></i> יצירת יצירה (10 <i class="fa-solid fa-bolt text-[10px]"></i>)
+          </button>
+        </div>
+
+        <!-- Discography -->
+        <div class="space-y-2">
+          <h3 class="text-sm font-bold text-gray-300">דיסקוגרפיה ושירים</h3>
+          <div id="studio-songs-list" class="space-y-2">
+            <div class="bg-cardDark p-4 rounded-xl border border-gray-800 text-center text-xs text-gray-500 py-6">
+              עדיין לא הקלטת שירים. לחץ על "יצירת יצירה" להתחלה.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCREEN 4: SOCIAL & TINDER -->
+      <section id="screen-social" class="space-y-4 hidden">
+        <div class="flex bg-cardDark p-1 rounded-xl border border-gray-800">
+          <button id="btn-subtab-insta" onclick="switchSocialTab('insta')" class="flex-1 py-1.5 text-xs font-bold rounded-lg bg-gray-800 text-white transition">
+            <i class="fa-brands fa-instagram text-instaPink ml-1"></i> Instagram & TikTok
+          </button>
+          <button id="btn-subtab-tinder" onclick="switchSocialTab('tinder')" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-gray-400 hover:text-white transition">
+            <i class="fa-solid fa-fire text-tinderFlame ml-1"></i> Tinder Israel
+          </button>
+        </div>
+
+        <!-- SUBTAB 1: INSTAGRAM & TIKTOK -->
+        <div id="subtab-insta" class="space-y-4">
+          <div class="bg-cardDark p-4 rounded-2xl border border-gray-800 space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2 space-x-reverse">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600 p-0.5">
+                  <div class="w-full h-full bg-black rounded-full flex items-center justify-center text-white text-sm">
+                    <i class="fa-brands fa-instagram"></i>
+                  </div>
+                </div>
+                <div>
+                  <div class="text-xs font-bold text-white flex items-center gap-1">
+                    <span id="insta-username">@artist_il</span>
+                  </div>
+                  <div class="text-[11px] text-gray-400"><span id="insta-followers-count">120</span> עוקבים</div>
+                </div>
+              </div>
+              <button onclick="postInstaStory()" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs font-bold px-3 py-1.5 rounded-xl hover:opacity-90 transition">
+                העלה סטורי (3 <i class="fa-solid fa-bolt text-[10px]"></i>)
+              </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 pt-2">
+              <button onclick="startBeef()" class="bg-red-950/60 border border-red-800/60 text-red-300 text-xs p-2.5 rounded-xl hover:bg-red-900/50 transition text-right">
+                <div class="font-bold flex items-center gap-1"><i class="fa-solid fa-fire text-red-500"></i> התחל דיס (Beef)</div>
+                <div class="text-[10px] text-red-400/80 mt-0.5">מעלה הייפ אך מסוכן</div>
+              </button>
+              <button onclick="tiktokChallenge()" class="bg-gray-800 border border-gray-700 text-gray-200 text-xs p-2.5 rounded-xl hover:bg-gray-700/60 transition text-right">
+                <div class="font-bold flex items-center gap-1"><i class="fa-brands fa-tiktok text-cyan-400"></i> אתגר טיקטוק</div>
+                <div class="text-[10px] text-gray-400 mt-0.5">קידום ויראלי לשירים</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Instagram Feed & Fan Comments -->
+          <div class="bg-cardDark p-4 rounded-2xl border border-gray-800 space-y-3">
+            <h3 class="text-xs font-bold text-gray-300 flex items-center gap-1.5">
+              <i class="fa-regular fa-comments text-instaPink"></i> תגובות מעריצים בפיד
+            </h3>
+            <div id="insta-comments-feed" class="space-y-2 text-xs">
+              <div class="bg-gray-900/60 p-2.5 rounded-xl border border-gray-800">
+                <span class="font-bold text-spotifyGreen">@guy_yefet:</span> אחי השיר הזה שרוף ברמות! 💥
+              </div>
+              <div class="bg-gray-900/60 p-2.5 rounded-xl border border-gray-800">
+                <span class="font-bold text-instaPink">@noa_kirel_fan:</span> מחכים לאלבום מלא כבר! 🎤
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUBTAB 2: TINDER ISRAEL -->
+        <div id="subtab-tinder" class="space-y-4 hidden">
+          <div class="bg-cardDark p-4 rounded-2xl border border-gray-800 text-center relative overflow-hidden" id="tinder-container">
+            <div class="flex justify-between items-center mb-3">
+              <div class="text-xs font-bold text-tinderFlame flex items-center gap-1">
+                <i class="fa-solid fa-fire"></i> Tinder Israel
+              </div>
+              <div class="text-xs text-gray-400">מאצ'ים: <span id="tinder-matches-count" class="text-white font-bold">0</span></div>
+            </div>
+
+            <!-- Tinder Profile Card -->
+            <div id="tinder-card" class="bg-gray-900 border border-gray-800 rounded-xl p-4 text-right space-y-2 relative shadow-lg">
+              <div class="w-full h-44 bg-gray-800 rounded-lg flex items-center justify-center text-4xl text-gray-600 relative overflow-hidden" id="tinder-avatar-bg">
+                <i class="fa-solid fa-user-ninja" id="tinder-avatar-icon"></i>
+                <div class="absolute bottom-2 right-2 bg-black/70 px-2.5 py-1 rounded-lg text-xs text-white backdrop-blur-sm" id="tinder-age-loc">תל אביב, 22</div>
+              </div>
+              <div>
+                <h4 class="text-base font-bold text-white" id="tinder-name">עדי, 22</h4>
+                <p class="text-xs text-gray-300" id="tinder-bio">"רק מחפשת מישהו שיביא אותי למאחורי הקלעים 🎧"</p>
+              </div>
+
+              <div class="flex justify-center space-x-6 space-x-reverse pt-2">
+                <button onclick="swipeTinder(false)" class="w-12 h-12 rounded-full bg-gray-800 border border-red-500 text-red-500 flex items-center justify-center text-lg hover:bg-red-500 hover:text-white transition shadow active:scale-90">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+                <button onclick="swipeTinder(true)" class="w-12 h-12 rounded-full bg-gray-800 border border-green-500 text-green-500 flex items-center justify-center text-lg hover:bg-green-500 hover:text-white transition shadow active:scale-90">
+                  <i class="fa-solid fa-heart"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Relationship Info & Dates -->
+            <div id="tinder-relationship-box" class="mt-4 pt-3 border-t border-gray-800 text-right space-y-3 hidden">
+              <div class="text-xs font-bold text-gray-300">בת הזוג הנוכחית שלך:</div>
+              <div class="bg-gray-900 p-3 rounded-xl border border-gray-800 space-y-2">
+                <div class="flex justify-between items-center">
+                  <div>
+                    <div class="text-sm font-bold text-white" id="rel-partner-name">שיראל</div>
+                    <div class="text-[10px] text-gray-400">נאמנות: <span id="rel-partner-loyalty">100%</span> | דרמה: <span id="rel-partner-drama">נמוכה</span></div>
+                  </div>
+                  <button onclick="breakUp()" class="text-red-400 text-xs hover:underline font-bold">הפרד</button>
+                </div>
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                  <button onclick="goOnDate('coffee')" class="bg-gray-800 text-xs py-2 rounded-xl text-gray-200 border border-gray-700 hover:bg-gray-700">קפה ברוטשילד (₪150)</button>
+                  <button onclick="goOnDate('bar')" class="bg-gray-800 text-xs py-2 rounded-xl text-gray-200 border border-gray-700 hover:bg-gray-700">דרינק בד' גאז (₪350)</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- SCREEN 5: JOBS & GIGS -->
+      <section id="screen-jobs" class="space-y-4 hidden">
+        <h2 class="text-lg font-bold text-white">עבודה והופעות</h2>
+        
+        <!-- Day Jobs -->
+        <div class="space-y-2">
+          <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">עבודות מזדמנות (לכסף מהיר)</h3>
+          
+          <div class="bg-cardDark p-3 rounded-xl border border-gray-800 flex justify-between items-center">
+            <div>
+              <div class="text-xs font-bold text-white flex items-center gap-1.5">
+                <i class="fa-solid fa-motorcycle text-cyan-400"></i> שליח Wolt בתל אביב
+              </div>
+              <div class="text-[11px] text-gray-400">הכנסה: ₪700 | עלות: 8 אנרגיה</div>
+            </div>
+            <button onclick="doJob('wolt', 8, 700)" class="bg-spotifyGreen text-black text-xs font-bold px-3 py-1.5 rounded-xl hover:bg-green-600 transition">
+              עבוד
+            </button>
+          </div>
+
+          <div class="bg-cardDark p-3 rounded-xl border border-gray-800 flex justify-between items-center">
+            <div>
+              <div class="text-xs font-bold text-white flex items-center gap-1.5">
+                <i class="fa-solid fa-wine-glass text-purple-400"></i> ברמן במועדון אברקסס
+              </div>
+              <div class="text-[11px] text-gray-400">הכנסה: ₪1,300 | עלות: 12 אנרגיה</div>
+            </div>
+            <button onclick="doJob('bar', 12, 1300)" class="bg-spotifyGreen text-black text-xs font-bold px-3 py-1.5 rounded-xl hover:bg-green-600 transition">
+              עבוד
+            </button>
+          </div>
+        </div>
+
+        <!-- Live Venues & Gigs -->
+        <div class="space-y-2 pt-2">
+          <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">הופעות חיות ומועדונים</h3>
+          
+          <div class="bg-cardDark p-3 rounded-xl border border-gray-800 flex justify-between items-center">
+            <div>
+              <div class="text-xs font-bold text-white">מועדון האזור / האוזן</div>
+              <div class="text-[11px] text-gray-400">דרישה: 300 עוקבים | רווח: ₪800</div>
+            </div>
+            <button id="btn-gig-ozar" onclick="performGig('האוזן', 300, 800, 8)" class="bg-gray-800 text-gray-400 text-xs font-bold px-3 py-1.5 rounded-xl transition">
+              הופע (8 <i class="fa-solid fa-bolt text-[9px]"></i>)
+            </button>
+          </div>
+
+          <div class="bg-cardDark p-3 rounded-xl border border-gray-800 flex justify-between items-center">
+            <div>
+              <div class="text-xs font-bold text-white">מועדון כולי עלמא</div>
+              <div class="text-[11px] text-gray-400">דרישה: 1,500 עוקבים | רווח: ₪3,000</div>
+            </div>
+            <button id="btn-gig-kulie" onclick="performGig('כולי עלמא', 1500, 3000, 10)" class="bg-gray-800 text-gray-400 text-xs font-bold px-3 py-1.5 rounded-xl transition">
+              הופע (10 <i class="fa-solid fa-bolt text-[9px]"></i>)
+            </button>
+          </div>
+
+          <div class="bg-cardDark p-3 rounded-xl border border-gray-800 flex justify-between items-center">
+            <div>
+              <div class="text-xs font-bold text-white">מועדון הבארבי</div>
+              <div class="text-[11px] text-gray-400">דרישה: 10,000 עוקבים | רווח: ₪18,000</div>
+            </div>
+            <button id="btn-gig-barby" onclick="performGig('מועדון הבארבי', 10000, 18000, 15)" class="bg-gray-800 text-gray-400 text-xs font-bold px-3 py-1.5 rounded-xl transition">
+              הופע (15 <i class="fa-solid fa-bolt text-[9px]"></i>)
+            </button>
+          </div>
+
+          <div class="bg-cardDark p-3 rounded-xl border border-gray-800 flex justify-between items-center">
+            <div>
+              <div class="text-xs font-bold text-white">האנגר 11 / מנורה מבטחים</div>
+              <div class="text-[11px] text-gray-400">דרישה: 60,000 עוקבים | רווח: ₪140,000</div>
+            </div>
+            <button id="btn-gig-menora" onclick="performGig('מנורה מבטחים', 60000, 140000, 20)" class="bg-gray-800 text-gray-400 text-xs font-bold px-3 py-1.5 rounded-xl transition">
+              הופע (20 <i class="fa-solid fa-bolt text-[9px]"></i>)
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCREEN 6: SHOP & LIFESTYLE -->
+      <section id="screen-shop" class="space-y-4 hidden">
+        <h2 class="text-lg font-bold text-white">סגנון חיים וציוד</h2>
+
+        <div class="bg-cardDark p-3 rounded-xl border border-gray-800">
+          <div class="text-xs font-bold text-gray-400 mb-2">הרכוש שלך:</div>
+          <div id="shop-owned-items" class="text-xs text-gray-300 flex flex-wrap gap-1.5">
+            <span class="bg-gray-800 px-2 py-1 rounded-lg border border-gray-700">אין רכוש עדיין</span>
+          </div>
+        </div>
+
+        <!-- Catalog Categories -->
+        <div class="space-y-2">
+          <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">תכשיטים ובלינג</h3>
+          
+          <div class="bg-cardDark p-3 rounded-xl border border-gray-800 flex justify-between items-center">
+            <div>
+              <div class="text-xs font-bold text-white">שרשרת גורמט כסף</div>
+              <div class="text-[11px] text-spotifyGreen font-semibold">₪3,500 (+80 עוקבים)</div>
+            </div>
+            <button onclick="buyItem('שרשרת גורמט כסף', 3500, 80)" class="bg-spotifyGreen text-black text-xs font-bold px-3 py-1.5 rounded-xl hover:bg-green-600 transition">
+              קנה
+            </button>
+          </div>
+
+          <div class="bg-cardDark p-3 rounded-xl border border-gray-800 flex justify-between items-center">
+            <div>
+              <div class="text-xs font-bold text-white">שעון רולקס מצופה זהב</div>
+              <div class="text-[11px] text-spotifyGreen font-semibold">₪45,000 (+1,500 עוקבים)</div>
+            </div>
+            <button onclick="buyItem('רולקס זהב', 45000, 1500)" class="bg-spotifyGreen text-black text-xs font-bold px-3 py-1.5 rounded-xl hover:bg-green-600 transition">
+              קנה
+            </button>
+          </div>
+        </div>
+
+        <div class="space-y-2 pt-2">
+          <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">רכבים ונדל"ן</h3>
+          
+          <div class="bg-cardDark p-3 rounded-xl border border-gray-800 flex justify-between items-center">
+            <div>
+              <div class="text-xs font-bold text-white">קורקינט חשמלי Xiaomi</div>
+              <div class="text-[11px] text-spotifyGreen font-semibold">₪2,200 (+40 עוקבים)</div>
+            </div>
+            <button onclick="buyItem('קורקינט חשמלי', 2200, 40)" class="bg-spotifyGreen text-black text-xs font-bold px-3 py-1.5 rounded-xl hover:bg-green-600 transition">
+              קנה
+            </button>
+          </div>
+
+          <div class="bg-cardDark p-3 rounded-xl border border-gray-800 flex justify-between items-center">
+            <div>
+              <div class="text-xs font-bold text-white">הונדה סיוויק משופרת</div>
+              <div class="text-[11px] text-spotifyGreen font-semibold">₪35,000 (+600 עוקבים)</div>
+            </div>
+            <button onclick="buyItem('הונדה סיוויק', 35000, 600)" class="bg-spotifyGreen text-black text-xs font-bold px-3 py-1.5 rounded-xl hover:bg-green-600 transition">
+              קנה
+            </button>
+          </div>
+
+          <div class="bg-cardDark p-3 rounded-xl border border-gray-800 flex justify-between items-center">
+            <div>
+              <div class="text-xs font-bold text-white">דירת שותפים בפלורנטין</div>
+              <div class="text-[11px] text-spotifyGreen font-semibold">₪120,000 (+3,000 עוקבים)</div>
+            </div>
+            <button onclick="buyItem('דירה בפלורנטין', 120000, 3000)" class="bg-spotifyGreen text-black text-xs font-bold px-3 py-1.5 rounded-xl hover:bg-green-600 transition">
+              קנה
+            </button>
+          </div>
+
+          <div class="bg-cardDark p-3 rounded-xl border border-gray-800 flex justify-between items-center">
+            <div>
+              <div class="text-xs font-bold text-white">פנטהאוז במגדלי תל אביב</div>
+              <div class="text-[11px] text-spotifyGreen font-semibold">₪850,000 (+25,000 עוקבים)</div>
+            </div>
+            <button onclick="buyItem('פנטהאוז במגדלים', 850000, 25000)" class="bg-spotifyGreen text-black text-xs font-bold px-3 py-1.5 rounded-xl hover:bg-green-600 transition">
+              קנה
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- BOTTOM NAVIGATION BAR -->
+    <nav class="bg-cardDark border-t border-gray-800 px-2 py-1 flex justify-around items-center z-20 shrink-0">
+      <button onclick="navTo('dashboard')" id="nav-dashboard" class="nav-active flex-1 flex flex-col items-center py-2 text-gray-400 transition">
+        <i class="fa-solid fa-house text-base"></i>
+        <span class="text-[10px] mt-1">בית</span>
+      </button>
+      <button onclick="navTo('talent')" id="nav-talent" class="flex-1 flex flex-col items-center py-2 text-gray-400 transition">
+        <i class="fa-solid fa-dumbbell text-base"></i>
+        <span class="text-[10px] mt-1">כישורים</span>
+      </button>
+      <button onclick="navTo('studio')" id="nav-studio" class="flex-1 flex flex-col items-center py-2 text-gray-400 transition">
+        <i class="fa-solid fa-compact-disc text-base"></i>
+        <span class="text-[10px] mt-1">סטודיו</span>
+      </button>
+      <button onclick="navTo('social')" id="nav-social" class="flex-1 flex flex-col items-center py-2 text-gray-400 transition">
+        <i class="fa-solid fa-heart text-base"></i>
+        <span class="text-[10px] mt-1">סושיאל</span>
+      </button>
+      <button onclick="navTo('jobs')" id="nav-jobs" class="flex-1 flex flex-col items-center py-2 text-gray-400 transition">
+        <i class="fa-solid fa-briefcase text-base"></i>
+        <span class="text-[10px] mt-1">הופעות</span>
+      </button>
+      <button onclick="navTo('shop')" id="nav-shop" class="flex-1 flex flex-col items-center py-2 text-gray-400 transition">
+        <i class="fa-solid fa-store text-base"></i>
+        <span class="text-[10px] mt-1">חנות</span>
+      </button>
+    </nav>
+
+    <!-- MODAL: CREATE SONG OR ALBUM -->
+    <div id="modal-song" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+      <div class="bg-cardDark border border-gray-800 rounded-2xl p-5 w-full max-w-xs space-y-4 shadow-2xl">
+        <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+          <h3 class="text-base font-bold text-white">הקלטת יצירה חדשה</h3>
+          <button onclick="closeModal('modal-song')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <div class="space-y-3 text-xs">
           <div>
-            <div class="card-title">עוקבים</div>
-            <div class="stat-val fans" id="sFollowers" style="font-size:1.4rem">0</div>
+            <label class="block text-gray-400 mb-1">סוג היצירה:</label>
+            <select id="input-song-type" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white focus:outline-none">
+              <option value="single">סינגל בודד</option>
+              <option value="album">אלבום מלא (משקע + בונוס מאזינים)</option>
+            </select>
           </div>
-          <div style="text-align:left">
-            <div class="card-sub">באזז השבוע</div>
-            <div class="stat-val" id="sHype">0%</div>
+
+          <div>
+            <label class="block text-gray-400 mb-1">שם היצירה:</label>
+            <input type="text" id="input-song-title" placeholder="למשל: סטרייט מאוטה רמת גן" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white focus:outline-none focus:border-spotifyGreen">
+          </div>
+
+          <div>
+            <label class="block text-gray-400 mb-1">ז'אנר מוזיקלי:</label>
+            <select id="input-song-genre" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white focus:outline-none">
+              <option value="ישראלי דריל">ישראלי דריל (Drill)</option>
+              <option value="היפ הופ מזרחי">היפ הופ מזרחי / חפלה</option>
+              <option value="טראפ עברי">טראפ עברי (Trap)</option>
+              <option value="פופ ראפ">פופ-ראפ מועדונים</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-gray-400 mb-1">מפיק מוזיקלי:</label>
+            <select id="input-song-producer" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white focus:outline-none">
+              <option value="self">הפקה עצמית / חבר מהשכונה (חינם)</option>
+              <option value="indie">מפיק אינדי מוכר (₪1,500)</option>
+              <option value="top">מפיק צמרת ארצי (₪7,000)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-gray-400 mb-1">קליפ ליוטיוב:</label>
+            <select id="input-song-clip" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white focus:outline-none">
+              <option value="none">ללא קליפ</option>
+              <option value="lyric">קליפ מילים (₪400)</option>
+              <option value="pro">קליפ קולנועי מושקע (₪5,000)</option>
+            </select>
           </div>
         </div>
-      </div>
-      <div id="socialActions"></div>
-      <h3>🏆 מצעד השבוע</h3>
-      <div class="card" id="chartList"></div>
-    </div>
 
-    <!-- Shop -->
-    <div class="screen" id="screen-shop">
-      <h2>🛒 שדרוגים</h2>
-      <div id="shopList"></div>
-      <h3>הגדרות</h3>
-      <div class="card">
-        <button class="btn red full" onclick="resetGame()">מחק משחק והתחל מחדש</button>
+        <button onclick="confirmCreateSong()" class="w-full bg-spotifyGreen text-black font-bold py-2.5 rounded-xl hover:bg-green-600 transition text-xs shadow">
+          שחרר לרשת! (10 אנרגיה)
+        </button>
       </div>
     </div>
-  </div>
 
-  <!-- Bottom Nav -->
-  <nav class="bottom-nav">
-    <button class="nav-btn active" data-screen="home"><span class="ico">🏠</span>בית</button>
-    <button class="nav-btn" data-screen="studio"><span class="ico">🎧</span>אולפן</button>
-    <button class="nav-btn" data-screen="shows"><span class="ico">🎪</span>הופעות</button>
-    <button class="nav-btn" data-screen="social"><span class="ico">📱</span>רשתות</button>
-    <button class="nav-btn" data-screen="shop"><span class="ico">🛒</span>שדרוגים</button>
-  </nav>
-
-  <!-- Modal -->
-  <div class="modal-bg" id="modalBg">
-    <div class="modal">
-      <h3 id="modalTitle"></h3>
-      <div class="card-sub" id="modalBody"></div>
-      <div class="btns" id="modalBtns"></div>
+    <!-- NOTIFICATION TOAST -->
+    <div id="toast" class="absolute top-16 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-4 py-2.5 rounded-xl border border-gray-700 shadow-xl transition-all duration-300 opacity-0 pointer-events-none z-50 flex items-center gap-2">
+      <i class="fa-solid fa-circle-info text-spotifyGreen" id="toast-icon"></i>
+      <span id="toast-msg">הודעה</span>
     </div>
+
   </div>
 
-  <div class="toast" id="toast"></div>
-</div>
+  <!-- GAME ENGINE LOGIC -->
+  <script>
+    const defaultState = {
+      money: 1500,
+      energy: 20,
+      maxEnergy: 20,
+      week: 1,
+      year: 2026,
+      artistName: "MC IL",
+      stageTitle: "ראפר מתחיל מהמרכז",
+      verified: false,
+      listeners: 0,
+      followers: 120,
+      youtubeViews: 0,
+      fameScore: 10,
+      skills: { flow: 10, charisma: 10, viral: 5, video: 5 },
+      songs: [],
+      inventory: [],
+      logs: ["ברוכים הבאים ל-IL Rap Star! התחל ליצור מוזיקה ולהעלות תוכן."],
+      tinderMatches: [],
+      relationship: null
+    };
 
-<script>
-// ---------- Data ----------
-const STYLES = [
-  { id: 'trap',   name: 'טראפ',        desc: '+הפקה, +ויב',      bonus: { production: 10, charisma: 5 } },
-  { id: 'boom',   name: 'בום באפ',     desc: '+כתיבה',           bonus: { lyrics: 15 } },
-  { id: 'drill',  name: 'דריל',        desc: '+פלואו, +רחוב',    bonus: { flow: 12, street: 5 } },
-  { id: 'mizrahi',name: 'מזרחי-ראפ',   desc: '+כריזמה, +מיינסטרים', bonus: { charisma: 15 } },
-];
+    let state;
+    try { state = JSON.parse(localStorage.getItem('il_rap_star_save')); } catch (e) { state = null; }
+    if (!state) state = JSON.parse(JSON.stringify(defaultState));
 
-const SKILLS = {
-  flow:       'פלואו',
-  lyrics:     'כתיבה',
-  charisma:   'כריזמה',
-  production: 'הפקה',
-};
+    const defaultChart = [
+      { name: "טונה", song: "סהרה (לייב)", streams: 850000 },
+      { name: "רביד פלוטניק", song: "בור ועם הארץ", streams: 790000 },
+      { name: "אושר כהן", song: "תרקדי", streams: 720000 },
+      { name: "ליעד מאיר", song: "פרחים", streams: 640000 },
+      { name: "עדן חסון", song: "שקיעות אדומות", streams: 580000 }
+    ];
 
-const BEATS = [
-  { id: 'free',  name: 'ביט חינמי מיוטיוב', cost: 0,     q: 0 },
-  { id: 'local', name: 'ביטמייקר מהשכונה',  cost: 400,   q: 8 },
-  { id: 'pro',   name: 'מפיק מקצועי',        cost: 2500,  q: 18 },
-  { id: 'top',   name: 'מפיק צמרת',          cost: 12000, q: 30, minFans: 20000 },
-];
+    const tinderPool = [
+      { name: "נועה", age: 21, city: "תל אביב", bio: "מחפשת מישהו שיכניס אותי למאחורי הקלעים בבארבי 🎧", icon: "fa-user-ninja", loyalty: 90, drama: "נמוכה" },
+      { name: "מאי", age: 23, city: "הרצליה", bio: "משפיענית לייפסטייל. אם אין לך וי כחול באינסטגרם אל תפנה 😉", icon: "fa-user-astronaut", loyalty: 60, drama: "גבוהה" },
+      { name: "עמית", age: 20, city: "ראשון לציון", bio: "סטודנטית למשפטים, שומעת רק היפ הופ ישראלי קלאסי 🎙️", icon: "fa-user-tie", loyalty: 95, drama: "אפסית" },
+      { name: "רוני", age: 24, city: "רמת גן", bio: "רקדנית קליפים, מחפשת מוזיקאי רציני 💃", icon: "fa-person-dancing", loyalty: 80, drama: "בינונית" }
+    ];
 
-const FEATS = [
-  { id: 'none',  name: 'בלי פיצ׳ר',               cost: 0,     boost: 0,   minFans: 0 },
-  { id: 'local', name: 'חבר מהשכונה',             cost: 200,   boost: 0.1, minFans: 0 },
-  { id: 'rising',name: 'ראפר עולה (ג׳וני 9)',  cost: 3000,  boost: 0.4, minFans: 5000 },
-  { id: 'singer',name: 'זמרת פופ (שירה לב)',     cost: 15000, boost: 0.9, minFans: 30000 },
-  { id: 'legend',name: 'אגדה (ה-OG מהדרום)',     cost: 50000, boost: 1.6, minFans: 120000 },
-];
+    let currentTinderIdx = 0;
 
-const TOPICS = {
-  street: { name: 'השכונה', skill: 'lyrics',     mult: 1.0 },
-  love:   { name: 'אהבה',   skill: 'charisma',   mult: 1.1 },
-  party:  { name: 'מסיבות', skill: 'flow',       mult: 1.2 },
-  money:  { name: 'כסף',    skill: 'production', mult: 1.0 },
-  social: { name: 'חברתי',  skill: 'lyrics',     mult: 0.9 },
-  diss:   { name: 'דיס',    skill: 'flow',       mult: 1.5 },
-};
-
-const VENUES = [
-  { id: 'park',    name: 'פארק שכונתי',          minFans: 0,      energy: 20, pay: [50, 200],       fans: [10, 40],     rep: 1 },
-  { id: 'bar',     name: 'בר קטן בפלורנטין',     minFans: 300,    energy: 25, pay: [300, 900],      fans: [40, 150],    rep: 2 },
-  { id: 'club',    name: 'מועדון (הבארבי)',       minFans: 3000,   energy: 30, pay: [2000, 6000],    fans: [200, 800],   rep: 4 },
-  { id: 'fest',    name: 'פסטיבל קיץ באילת',      minFans: 20000,  energy: 40, pay: [12000, 30000],  fans: [1500, 5000], rep: 8 },
-  { id: 'arena',   name: 'היכל מנורה',            minFans: 100000, energy: 50, pay: [80000, 200000], fans: [8000, 25000],rep: 15 },
-  { id: 'park_ha', name: 'פארק הירקון',           minFans: 400000, energy: 60, pay: [400000, 900000],fans: [30000, 80000],rep: 30 },
-];
-
-const SHOP = [
-  { id: 'mic',     name: 'מיקרופון USB',            cost: 600,    desc: '+5 לאיכות כל שיר' ,           eff: { songQ: 5 } },
-  { id: 'laptop',  name: 'לפטופ + תוכנת הפקה',      cost: 3500,   desc: '+10 הפקה',                    eff: { production: 10 } },
-  { id: 'chain',   name: 'שרשרת זהב',               cost: 8000,   desc: '+10 כריזמה, +3 מוניטין',      eff: { charisma: 10, rep: 3 } },
-  { id: 'manager', name: 'מנהל אישי',               cost: 15000,  desc: '+30% תשלום על הופעות',        eff: { showPay: 0.3 } },
-  { id: 'studio',  name: 'אולפן ביתי',              cost: 40000,  desc: '+12 לאיכות כל שיר',          eff: { songQ: 12 } },
-  { id: 'pr',      name: 'יחצ״ן',                   cost: 60000,  desc: '+25% השמעות לכל השירים',     eff: { streamMult: 0.25 } },
-  { id: 'label',   name: 'חוזה עם לייבל',           cost: 150000, desc: '+50% השמעות, +10 מוניטין',   eff: { streamMult: 0.5, rep: 10 } },
-];
-
-const RIVALS = [
-  { name: 'גל דרבי',   song: 'לילות בדרום',    power: 85 },
-  { name: 'סטילה',     song: 'אין עליי',        power: 80 },
-  { name: 'MC תשליך', song: 'מהבלוק',          power: 72 },
-  { name: 'נוי בלאק',  song: 'קיר זכוכית',     power: 68 },
-  { name: 'ליל עמי',   song: 'וואלה ככה',      power: 60 },
-  { name: 'דודו טריפ', song: 'אמא אמרה',       power: 55 },
-  { name: 'יאסו',      song: 'ים של כסף',       power: 50 },
-  { name: 'ההוד',      song: 'ריקוד מלחמה',    power: 45 },
-  { name: 'שחר 052',   song: 'שבת בבוקר',       power: 40 },
-  { name: 'קפטן חומוס',song: 'פיתה מלאה',      power: 35 },
-];
-
-const RANDOM_EVENTS = [
-  {
-    title: '📺 הזמנה לתוכנית בוקר',
-    body: 'מתקשרים מתוכנית בוקר בערוץ 12. רוצים שתבוא לראיון ותבצע שיר בלייב.',
-    options: [
-      { text: 'ברור! (-15 ⚡)', run: s => { s.energy = Math.max(0, s.energy - 15); const f = rnd(200, 900) + Math.floor(s.fans * 0.03); s.fans += f; return `הופעת בטלוויזיה! +${fmt(f)} מעריצים`; } },
-      { text: 'לא, אני מחתרתי', run: s => { s.rep += 2; return 'הקהל של הרחוב מעריך את זה. +2 מוניטין'; } },
-    ],
-  },
-  {
-    title: '🥊 ראפר מתגרה בך',
-    body: 'ראפר מוכר העליב אותך בסטורי. כולם מחכים לתגובה.',
-    options: [
-      { text: 'מגיב בדיס חריף', run: s => { if (Math.random() < 0.5 + s.skills.lyrics / 250) { const f = rnd(500, 2000) + Math.floor(s.fans * 0.08); s.fans += f; s.rep += 5; return `ניצחת בביף! +${fmt(f)} מעריצים, +5 מוניטין`; } else { const f = Math.floor(s.fans * 0.05); s.fans -= f; s.rep = Math.max(0, s.rep - 3); return `הדיס נפל. -${fmt(f)} מעריצים`; } } },
-      { text: 'מתעלם, מעל זה', run: s => { s.rep += 1; return 'בגרות. +1 מוניטין'; } },
-    ],
-  },
-  {
-    title: '💸 מותג אנרגיה מציע חסות',
-    body: 'מותג משקאות אנרגיה רוצה שתפרסם אותו ברשתות.',
-    options: [
-      { text: 'לוקח את הכסף', run: s => { const m = 1000 + Math.floor(s.fans * 0.2); s.money += m; s.rep = Math.max(0, s.rep - 1); return `+₪${fmt(m)}, אבל קצת "מכרת את עצמך". -1 מוניטין`; } },
-      { text: 'לא מתאים לי', run: s => 'נשארת נאמן לעצמך.' },
-    ],
-  },
-  {
-    title: '🚔 בלגן אחרי הופעה',
-    body: 'אחרי הופעה היה בלגן מחוץ למועדון, והתקשורת מחפשת אשמים.',
-    options: [
-      { text: 'מוציא הודעה רשמית (₪1,000)', run: s => { if (s.money < 1000) { s.rep = Math.max(0, s.rep - 3); return 'לא היה לך כסף ליחצ״ן. -3 מוניטין'; } s.money -= 1000; return 'הסערה נרגעה.'; } },
-      { text: 'שותק', run: s => { if (Math.random() < 0.5) { s.rep += 2; return 'דווקא עשה לך שם של קשוח. +2 מוניטין'; } s.rep = Math.max(0, s.rep - 4); return 'התקשורת קרעה אותך. -4 מוניטין'; } },
-    ],
-  },
-  {
-    title: '🎹 ביטמייקר צעיר שולח ביט',
-    body: 'ביטמייקר בן 17 שלח לך ביט מטורף בחינם, רק מבקש קרדיט.',
-    options: [
-      { text: 'נותן לו קרדיט', run: s => { s.skills.production = Math.min(100, s.skills.production + 4); s.rep += 1; return '+4 הפקה, +1 מוניטין'; } },
-    ],
-  },
-  {
-    title: '🤒 נפלת למיטה',
-    body: 'תפסת שפעת קשה אחרי שבוע מטורף.',
-    options: [
-      { text: 'נח בבית', run: s => { s.energy = Math.max(0, s.energy - 30); return '-30 אנרגיה בשבוע הבא'; } },
-    ],
-  },
-  {
-    title: '🎬 קליפ ויראלי בטיקטוק',
-    body: 'מישהו עשה טרנד בטיקטוק על אחד השירים שלך!',
-    cond: s => s.songs.length > 0,
-    options: [
-      { text: 'מצטרף לטרנד', run: s => { const song = s.songs[rnd(0, s.songs.length - 1)]; song.hype += 1.5; const f = rnd(300, 1500) + Math.floor(s.fans * 0.05); s.fans += f; return `"${song.name}" חוזר לחיים! +${fmt(f)} מעריצים`; } },
-    ],
-  },
-];
-
-// ---------- State ----------
-let S = null;
-let selectedStyle = 'trap';
-const SAVE_KEY = 'ilRapStarSave_v1';
-
-function newState(name, city, styleId) {
-  const style = STYLES.find(x => x.id === styleId);
-  const skills = { flow: 10, lyrics: 10, charisma: 10, production: 5 };
-  for (const k in style.bonus) if (skills[k] !== undefined) skills[k] += style.bonus[k];
-  return {
-    name, city, style: styleId,
-    week: 1,
-    money: 500,
-    fans: 20,
-    followers: 50,
-    rep: 0,
-    energy: 100,
-    maxEnergy: 100,
-    hype: 0,
-    showsThisWeek: 0,
-    postsThisWeek: 0,
-    skills,
-    songs: [],
-    owned: [],
-    log: [`<b>שבוע 1:</b> ${name} מ${city} מתחיל את הדרך. הרחוב מחכה.`],
-  };
-}
-
-// ---------- Utils ----------
-function rnd(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
-function fmt(n) {
-  n = Math.floor(n);
-  if (n >= 1e6) return (n / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
-  if (n >= 1e4) return (n / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
-  return n.toLocaleString('he-IL');
-}
-function $(id) { return document.getElementById(id); }
-function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) {} }
-function load() { try { const r = localStorage.getItem(SAVE_KEY); return r ? JSON.parse(r) : null; } catch (e) { return null; } }
-function addLog(msg) { S.log.unshift(`<b>שבוע ${S.week}:</b> ${msg}`); S.log = S.log.slice(0, 25); }
-function eff(key) { return S.owned.reduce((sum, id) => sum + (SHOP.find(x => x.id === id).eff[key] || 0), 0); }
-
-let toastTimer;
-function toast(msg) {
-  const t = $('toast');
-  t.innerHTML = msg;
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
-}
-
-function modal(title, body, buttons) {
-  $('modalTitle').textContent = title;
-  $('modalBody').innerHTML = body;
-  const box = $('modalBtns');
-  box.innerHTML = '';
-  buttons.forEach(b => {
-    const el = document.createElement('button');
-    el.className = 'btn ' + (b.cls || '');
-    el.textContent = b.text;
-    el.onclick = () => { $('modalBg').classList.remove('show'); b.run && b.run(); };
-    box.appendChild(el);
-  });
-  $('modalBg').classList.add('show');
-}
-
-function useEnergy(n) {
-  if (S.energy < n) { toast('⚡ אין מספיק אנרגיה. סיים את השבוע כדי לנוח.'); return false; }
-  S.energy -= n;
-  return true;
-}
-
-function tier() {
-  const f = S.fans;
-  if (f >= 1000000) return 'אגדה 👑';
-  if (f >= 300000) return 'כוכב-על ⭐';
-  if (f >= 80000) return 'כוכב';
-  if (f >= 20000) return 'שם מוכר';
-  if (f >= 3000) return 'עולה';
-  if (f >= 300) return 'מקומי';
-  return 'מתחיל';
-}
-
-// ---------- Actions ----------
-function train(skill) {
-  if (S.skills[skill] >= 100) { toast('הכישור כבר במקסימום!'); return; }
-  if (!useEnergy(20)) return;
-  const gain = Math.max(1, Math.round(rnd(3, 6) * (1 - S.skills[skill] / 140)));
-  S.skills[skill] = Math.min(100, S.skills[skill] + gain);
-  toast(`💪 ${SKILLS[skill]} +${gain}`);
-  render();
-}
-
-function songQuality(beat, topicKey) {
-  const sk = S.skills;
-  const topic = TOPICS[topicKey];
-  let q = sk.flow * 0.3 + sk.lyrics * 0.3 + sk.production * 0.2 + sk.charisma * 0.2;
-  q += sk[topic.skill] * 0.15;
-  q += beat.q + eff('songQ');
-  q += rnd(-12, 12);
-  return Math.max(1, Math.min(100, Math.round(q)));
-}
-
-function recordSong() {
-  const name = $('songName').value.trim() || `טראק #${S.songs.length + 1}`;
-  const beat = BEATS.find(b => b.id === $('songBeat').value);
-  const feat = FEATS.find(f => f.id === $('songFeat').value);
-  const topicKey = $('songTopic').value;
-  const cost = beat.cost + feat.cost;
-  if (S.money < cost) { toast('💸 אין לך מספיק כסף'); return; }
-  if (!useEnergy(30)) return;
-  S.money -= cost;
-
-  const q = songQuality(beat, topicKey);
-  const topic = TOPICS[topicKey];
-  let hype = (q / 50) * topic.mult * (1 + feat.boost);
-
-  if (topicKey === 'diss' && Math.random() < 0.35) {
-    const lost = Math.floor(S.fans * 0.04);
-    S.fans -= lost;
-    addLog(`הדיס "${name}" יצר תגובת נגד. -${fmt(lost)} מעריצים`);
-  }
-
-  const song = { name, q, hype, week: S.week, streams: 0, lastStreams: 0, topic: topic.name, feat: feat.id !== 'none' ? feat.name : null };
-  S.songs.unshift(song);
-  const gainFans = Math.floor(q * (1 + feat.boost) * rnd(1, 3) + S.fans * 0.02 * (q / 50));
-  S.fans += gainFans;
-  S.rep += q >= 75 ? 2 : q >= 50 ? 1 : 0;
-  addLog(`שחררת את "${name}" (איכות ${q}). +${fmt(gainFans)} מעריצים`);
-  $('songName').value = '';
-  modal('🎶 השיר בחוץ!', `<b>"${name}"</b><br>ציון איכות: <b>${q}/100</b><br>${q >= 80 ? 'זה להיט פוטנציאלי! 🔥' : q >= 55 ? 'שיר סולידי.' : 'הקהל לא בטוח לגבי זה...'}<br><br>+${fmt(gainFans)} מעריצים`, [{ text: 'סבבה', cls: 'green' }]);
-  render();
-}
-
-function playShow(vid) {
-  const v = VENUES.find(x => x.id === vid);
-  if (S.fans < v.minFans) return;
-  if (S.showsThisWeek >= 2) { toast('כבר הופעת פעמיים השבוע'); return; }
-  if (!useEnergy(v.energy)) return;
-  S.showsThisWeek++;
-  const perf = (S.skills.charisma * 0.5 + S.skills.flow * 0.5) / 100;
-  const roll = Math.random() * 0.6 + perf * 0.7;
-  const success = Math.min(1.3, roll);
-  const pay = Math.floor(rnd(v.pay[0], v.pay[1]) * (0.5 + success) * (1 + eff('showPay')));
-  const fans = Math.floor(rnd(v.fans[0], v.fans[1]) * (0.4 + success));
-  S.money += pay;
-  S.fans += fans;
-  const repGain = success > 0.8 ? v.rep : success > 0.5 ? Math.ceil(v.rep / 2) : 0;
-  S.rep += repGain;
-  const verdict = success > 0.9 ? 'הקהל השתגע! 🔥🔥' : success > 0.6 ? 'הופעה טובה 👍' : 'הקהל היה קר... 😬';
-  addLog(`הופעה ב${v.name}: ${verdict} +₪${fmt(pay)}, +${fmt(fans)} מעריצים`);
-  modal(`🎤 ${v.name}`, `${verdict}<br><br>💰 +₪${fmt(pay)}<br>👥 +${fmt(fans)} מעריצים${repGain ? `<br>⭐ +${repGain} מוניטין` : ''}`, [{ text: 'מעולה', cls: 'green' }]);
-  render();
-}
-
-const SOCIAL_ACTIONS = [
-  { id: 'story',  name: 'סטורי מהאולפן',  desc: 'עלות: 5 ⚡. עוקבים קלים.', energy: 5,  cost: 0,    run: () => { const f = rnd(10, 40) + Math.floor(S.followers * 0.02); S.followers += f; S.hype += 3; return `+${fmt(f)} עוקבים`; } },
-  { id: 'tiktok', name: 'סרטון טיקטוק',   desc: 'עלות: 15 ⚡. סיכוי לוויראלי.', energy: 15, cost: 0, run: () => {
-      if (Math.random() < 0.12 + S.skills.charisma / 500) { const f = rnd(500, 3000) + Math.floor(S.followers * 0.25); S.followers += f; S.fans += Math.floor(f * 0.3); S.hype += 20; return `🚀 ויראלי! +${fmt(f)} עוקבים`; }
-      const f = rnd(20, 120) + Math.floor(S.followers * 0.03); S.followers += f; S.hype += 6; return `+${fmt(f)} עוקבים`; } },
-  { id: 'live',   name: 'לייב באינסטגרם', desc: 'עלות: 20 ⚡. מחבר מעריצים.', energy: 20, cost: 0,  run: () => { const f = Math.floor(S.followers * 0.05) + rnd(20, 80); S.fans += f; S.hype += 8; return `+${fmt(f)} מעריצים נאמנים`; } },
-  { id: 'ads',    name: 'קמפיין ממומן',   desc: 'עלות: ₪2,000. עוקבים בטוחים.', energy: 0, cost: 2000, run: () => { const f = rnd(800, 1600); S.followers += f; S.fans += Math.floor(f * 0.2); S.hype += 10; return `+${fmt(f)} עוקבים`; } },
-];
-
-function doSocial(id) {
-  const a = SOCIAL_ACTIONS.find(x => x.id === id);
-  if (S.postsThisWeek >= 4) { toast('הפוסטים השבוע נגמרו (4 מקסימום)'); return; }
-  if (S.money < a.cost) { toast('💸 אין מספיק כסף'); return; }
-  if (a.energy && !useEnergy(a.energy)) return;
-  S.money -= a.cost;
-  S.postsThisWeek++;
-  S.hype = Math.min(100, S.hype);
-  const r = a.run();
-  S.hype = Math.min(100, S.hype);
-  toast(`📱 ${r}`);
-  render();
-}
-
-function buy(id) {
-  const item = SHOP.find(x => x.id === id);
-  if (S.owned.includes(id) || S.money < item.cost) return;
-  S.money -= item.cost;
-  S.owned.push(id);
-  for (const k of ['flow', 'lyrics', 'charisma', 'production']) if (item.eff[k]) S.skills[k] = Math.min(100, S.skills[k] + item.eff[k]);
-  if (item.eff.rep) S.rep += item.eff.rep;
-  addLog(`קנית: ${item.name}`);
-  toast(`✅ ${item.name}`);
-  render();
-}
-
-// ---------- Week ----------
-function endWeek() {
-  const streamMult = 1 + eff('streamMult');
-  let totalStreams = 0;
-  S.songs.forEach(song => {
-    const age = S.week - song.week;
-    const decay = Math.pow(0.82, age);
-    const base = (S.fans * 0.6 + S.followers * 0.2 + 100) * song.hype * decay * (1 + S.hype / 100);
-    const st = Math.floor(base * rnd(80, 120) / 100 * streamMult);
-    song.lastStreams = st;
-    song.streams += st;
-    totalStreams += st;
-    song.hype = Math.max(0.05, song.hype * 0.97);
-  });
-  const income = Math.floor(totalStreams * 0.012);
-  S.money += income;
-  const fanGrowth = Math.floor(totalStreams * 0.004);
-  S.fans += fanGrowth;
-  S.followers += Math.floor(fanGrowth * 0.6);
-
-  const living = 300 + Math.floor(S.week * 5);
-  S.money -= living;
-
-  const summary = [];
-  if (S.songs.length) summary.push(`🎧 ${fmt(totalStreams)} השמעות → ₪${fmt(income)}`);
-  summary.push(`🏠 הוצאות מחיה: -₪${fmt(living)}`);
-
-  if (S.money < 0) {
-    S.fans = Math.floor(S.fans * 0.97);
-    summary.push('⚠️ אתה בחובות! מעריצים מתחילים לאבד אמון.');
-  }
-
-  S.week++;
-  S.energy = S.maxEnergy;
-  S.showsThisWeek = 0;
-  S.postsThisWeek = 0;
-  S.hype = Math.floor(S.hype * 0.5);
-  if (S.songs.length) addLog(`${fmt(totalStreams)} השמעות השבוע, +₪${fmt(income)}`);
-
-  checkMilestones(summary);
-  save();
-  render();
-
-  const showEvent = () => {
-    const pool = RANDOM_EVENTS.filter(e => !e.cond || e.cond(S));
-    if (Math.random() < 0.4 && pool.length) {
-      const ev = pool[rnd(0, pool.length - 1)];
-      modal(ev.title, ev.body, ev.options.map(o => ({
-        text: o.text,
-        run: () => { const res = o.run(S); addLog(res); save(); render(); toast(res); },
-      })));
+    function saveState() {
+      try { localStorage.setItem('il_rap_star_save', JSON.stringify(state)); } catch (e) {}
     }
-  };
 
-  modal(`📅 סיכום שבוע ${S.week - 1}`, summary.join('<br>') + `<br><br>מיקום במצעד: <b>${myChartPos() || '—'}</b>`, [{ text: 'לשבוע הבא', cls: 'green', run: () => setTimeout(showEvent, 150) }]);
-}
+    function showToast(msg, isSuccess = true) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-msg');
+      const toastIcon = document.getElementById('toast-icon');
 
-const MILESTONES = [300, 3000, 20000, 80000, 300000, 1000000];
-function checkMilestones(summary) {
-  S.reached = S.reached || [];
-  MILESTONES.forEach(m => {
-    if (S.fans >= m && !S.reached.includes(m)) {
-      S.reached.push(m);
-      summary.push(`🎉 <b>הגעת ל-${fmt(m)} מעריצים! דרגה: ${tier()}</b>`);
-      addLog(`🎉 הגעת ל-${fmt(m)} מעריצים!`);
+      toastMsg.innerText = msg;
+      toastIcon.className = isSuccess ? "fa-solid fa-circle-check text-spotifyGreen" : "fa-solid fa-circle-xmark text-red-500";
+      
+      toast.classList.remove('opacity-0', 'pointer-events-none');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => {
+        toast.classList.add('opacity-0', 'pointer-events-none');
+      }, 2500);
     }
-  });
-}
 
-// ---------- Chart ----------
-function buildChart() {
-  const seed = S.week;
-  const rivals = RIVALS.map((r, i) => {
-    const wobble = Math.sin(seed * 1.7 + i * 2.3) * 12;
-    return { name: r.song, artist: r.name, score: Math.pow(10, (r.power + wobble) / 20), me: false };
-  });
-  const mine = S.songs.filter(s => s.lastStreams > 0).slice(0, 3).map(s => ({ name: s.name, artist: S.name, score: s.lastStreams / 120, me: true }));
-  return rivals.concat(mine).sort((a, b) => b.score - a.score).slice(0, 10);
-}
-function myChartPos() {
-  const c = buildChart();
-  const i = c.findIndex(x => x.me);
-  return i >= 0 ? `#${i + 1}` : null;
-}
+    function updateUI() {
+      document.getElementById('top-money').innerText = '₪' + state.money.toLocaleString();
+      document.getElementById('top-energy').innerHTML = `<i class="fa-solid fa-bolt text-xs ml-0.5"></i>${state.energy}/${state.maxEnergy}`;
+      document.getElementById('top-date').innerText = `שבוע ${state.week}, ${state.year}`;
 
-// ---------- Render ----------
-function render() {
-  $('tMoney').textContent = (S.money < 0 ? '-₪' : '₪') + fmt(Math.abs(S.money));
-  $('tMoney').style.color = S.money < 0 ? 'var(--accent-red)' : '';
-  $('tFans').textContent = fmt(S.fans);
-  $('tWeek').textContent = S.week;
-  $('tEnergy').style.width = (S.energy / S.maxEnergy * 100) + '%';
-  $('tEnergyTxt').textContent = `${S.energy}/${S.maxEnergy}`;
+      let fameRank = 'F';
+      if (state.followers > 100000) fameRank = 'S+';
+      else if (state.followers > 50000) fameRank = 'A';
+      else if (state.followers > 10000) fameRank = 'B';
+      else if (state.followers > 2500) fameRank = 'C';
+      else if (state.followers > 500) fameRank = 'D';
+      document.getElementById('top-fame').innerText = `Fame: ${fameRank}`;
 
-  // Home
-  $('homeTitle').textContent = `${S.name} · ${S.city}`;
-  $('hRep').textContent = S.rep;
-  $('hTier').textContent = tier();
-  $('hSongs').textContent = S.songs.length;
-  $('hStreams').textContent = fmt(S.songs.reduce((a, s) => a + s.streams, 0));
-  $('skillsList').innerHTML = Object.keys(SKILLS).map(k => `
-    <div class="skill-row">
-      <div class="row"><span>${SKILLS[k]}</span><span>${S.skills[k]}/100</span></div>
-      <div class="bar"><div style="width:${S.skills[k]}%"></div></div>
-    </div>`).join('');
-  $('trainBtns').innerHTML = Object.keys(SKILLS).map(k => `<button class="btn ghost" onclick="train('${k}')">${SKILLS[k]}</button>`).join('');
-  $('logList').innerHTML = S.log.slice(0, 8).map(l => `<div class="log-item">${l}</div>`).join('');
+      document.getElementById('dash-artist-name').childNodes[0].nodeValue = state.artistName + " ";
+      document.getElementById('dash-stage-title').innerText = state.stageTitle;
+      document.getElementById('dash-listeners').innerText = state.listeners.toLocaleString();
+      document.getElementById('dash-insta-followers').innerText = state.followers.toLocaleString() + ' עוקבים';
+      document.getElementById('dash-yt-views').innerText = state.youtubeViews.toLocaleString() + ' צפיות';
+      document.getElementById('insta-followers-count').innerText = state.followers.toLocaleString();
 
-  // Studio
-  const beatSel = $('songBeat'), featSel = $('songFeat');
-  const pb = beatSel.value, pf = featSel.value;
-  beatSel.innerHTML = BEATS.map(b => `<option value="${b.id}" ${b.minFans && S.fans < b.minFans ? 'disabled' : ''}>${b.name} — ₪${fmt(b.cost)}${b.minFans && S.fans < b.minFans ? ` (🔒 ${fmt(b.minFans)})` : ''}</option>`).join('');
-  featSel.innerHTML = FEATS.map(f => `<option value="${f.id}" ${S.fans < f.minFans ? 'disabled' : ''}>${f.name} — ₪${fmt(f.cost)}${S.fans < f.minFans ? ` (🔒 ${fmt(f.minFans)})` : ''}</option>`).join('');
-  if (pb && !beatSel.querySelector(`option[value="${pb}"]`).disabled) beatSel.value = pb;
-  if (pf && !featSel.querySelector(`option[value="${pf}"]`).disabled) featSel.value = pf;
-  updateCost();
+      if (state.followers >= 10000 && !state.verified) {
+        state.verified = true;
+        showToast("מזל טוב! קיבלת וי כחול באינסטגרם!");
+      }
+      document.getElementById('dash-verified').classList.toggle('hidden', !state.verified);
 
-  $('discList').innerHTML = S.songs.length ? S.songs.map(s => {
-    const cls = s.q >= 75 ? 'hit' : s.q >= 50 ? 'mid' : 'flop';
-    const lbl = s.q >= 75 ? 'להיט' : s.q >= 50 ? 'סביר' : 'פלופ';
-    return `<div class="card">
-      <div class="card-title">${s.name}<span class="tag ${cls}">${lbl} · ${s.q}</span></div>
-      <div class="card-sub">${s.topic}${s.feat ? ' · פיט׳ ' + s.feat : ''} · שבוע ${s.week}<br>
-      🎧 ${fmt(s.streams)} השמעות (${fmt(s.lastStreams)} בשבוע האחרון)</div>
-    </div>`;
-  }).join('') : '<div class="empty">עוד לא הקלטת כלום. הזמן להתחיל!</div>';
+      // Skills Bar
+      document.getElementById('skill-flow-val').innerText = state.skills.flow;
+      document.getElementById('skill-charisma-val').innerText = state.skills.charisma;
+      document.getElementById('skill-viral-val').innerText = state.skills.viral;
+      document.getElementById('skill-video-val').innerText = state.skills.video || 5;
 
-  // Shows
-  $('venueList').innerHTML = VENUES.map(v => {
-    const locked = S.fans < v.minFans;
-    return `<div class="card" style="${locked ? 'opacity:0.5' : ''}">
-      <div class="card-title">${v.name}<span class="tag">-${v.energy} ⚡</span></div>
-      <div class="card-sub">💰 ₪${fmt(v.pay[0])}–${fmt(v.pay[1])} · 👥 ${fmt(v.fans[0])}–${fmt(v.fans[1])}</div>
-      ${locked ? `<div class="card-sub" style="margin-top:6px">🔒 נדרשים ${fmt(v.minFans)} מעריצים</div>` :
-      `<button class="btn orange full" onclick="playShow('${v.id}')" ${S.showsThisWeek >= 2 ? 'disabled' : ''}>הופע</button>`}
-    </div>`;
-  }).join('');
+      document.getElementById('skill-flow-bar').style.width = Math.min(100, state.skills.flow * 2) + '%';
+      document.getElementById('skill-charisma-bar').style.width = Math.min(100, state.skills.charisma * 2) + '%';
+      document.getElementById('skill-viral-bar').style.width = Math.min(100, state.skills.viral * 4) + '%';
+      document.getElementById('skill-video-bar').style.width = Math.min(100, (state.skills.video || 5) * 4) + '%';
 
-  // Social
-  $('sFollowers').textContent = fmt(S.followers);
-  $('sHype').textContent = S.hype + '%';
-  $('socialActions').innerHTML = SOCIAL_ACTIONS.map(a => `
-    <div class="card"><div class="row">
-      <div><div class="card-title">${a.name}</div><div class="card-sub">${a.desc}</div></div>
-      <button class="btn" onclick="doSocial('${a.id}')" ${S.postsThisWeek >= 4 ? 'disabled' : ''}>פרסם</button>
-    </div></div>`).join('') + `<div class="card-sub" style="margin-bottom:10px">פוסטים השבוע: ${S.postsThisWeek}/4</div>`;
-  $('chartList').innerHTML = buildChart().map((c, i) => `
-    <div class="chart-item ${c.me ? 'me' : ''}">
-      <div class="chart-pos">${i + 1}</div>
-      <div class="chart-info"><div>${c.name}</div><div class="artist">${c.artist}</div></div>
-    </div>`).join('');
+      // Gig Buttons State
+      document.getElementById('btn-gig-ozar').className = state.followers >= 300 ? "bg-spotifyGreen text-black text-xs font-bold px-3 py-1.5 rounded-xl hover:bg-green-600 transition" : "bg-gray-800 text-gray-500 text-xs font-bold px-3 py-1.5 rounded-xl cursor-not-allowed";
+      document.getElementById('btn-gig-kulie').className = state.followers >= 1500 ? "bg-spotifyGreen text-black text-xs font-bold px-3 py-1.5 rounded-xl hover:bg-green-600 transition" : "bg-gray-800 text-gray-500 text-xs font-bold px-3 py-1.5 rounded-xl cursor-not-allowed";
+      document.getElementById('btn-gig-barby').className = state.followers >= 10000 ? "bg-spotifyGreen text-black text-xs font-bold px-3 py-1.5 rounded-xl hover:bg-green-600 transition" : "bg-gray-800 text-gray-500 text-xs font-bold px-3 py-1.5 rounded-xl cursor-not-allowed";
+      document.getElementById('btn-gig-menora').className = state.followers >= 60000 ? "bg-spotifyGreen text-black text-xs font-bold px-3 py-1.5 rounded-xl hover:bg-green-600 transition" : "bg-gray-800 text-gray-500 text-xs font-bold px-3 py-1.5 rounded-xl cursor-not-allowed";
 
-  // Shop
-  $('shopList').innerHTML = SHOP.map(it => {
-    const own = S.owned.includes(it.id);
-    return `<div class="card"><div class="row">
-      <div><div class="card-title">${it.name}</div><div class="card-sub">${it.desc}</div></div>
-      ${own ? '<span class="tag hit">✓ בבעלותך</span>' : `<button class="btn green" onclick="buy('${it.id}')" ${S.money < it.cost ? 'disabled' : ''}>₪${fmt(it.cost)}</button>`}
-    </div></div>`;
-  }).join('');
+      renderSongs();
 
-  save();
-}
+      const logsContainer = document.getElementById('dash-logs');
+      logsContainer.innerHTML = state.logs.slice(-5).reverse().map(l => `<li class="bg-gray-900/60 p-2.5 rounded-lg border border-gray-800">${l}</li>`).join('');
 
-function updateCost() {
-  if (!S) return;
-  const b = BEATS.find(x => x.id === $('songBeat').value) || BEATS[0];
-  const f = FEATS.find(x => x.id === $('songFeat').value) || FEATS[0];
-  $('songCost').textContent = `עלות: ₪${fmt(b.cost + f.cost)}`;
-}
-$('songBeat').addEventListener('change', updateCost);
-$('songFeat').addEventListener('change', updateCost);
+      const invContainer = document.getElementById('shop-owned-items');
+      if (state.inventory.length === 0) {
+        invContainer.innerHTML = `<span class="bg-gray-800 px-2 py-1 rounded-lg border border-gray-700 text-gray-500">אין רכוש עדיין</span>`;
+      } else {
+        invContainer.innerHTML = state.inventory.map(item => `<span class="bg-gray-800 px-2 py-1 rounded-lg border border-gray-700 text-spotifyGreen font-semibold">${item}</span>`).join('');
+      }
 
-// ---------- Nav ----------
-document.querySelectorAll('.nav-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    btn.classList.add('active');
-    $('screen-' + btn.dataset.screen).classList.add('active');
-    $('content').scrollTop = 0;
-  });
-});
+      renderSpotifyChart();
+      saveState();
+    }
 
-// ---------- Start ----------
-function renderStyles() {
-  $('styleChoices').innerHTML = STYLES.map(s => `<div class="choice ${s.id === selectedStyle ? 'sel' : ''}" onclick="pickStyle('${s.id}')">${s.name}<small>${s.desc}</small></div>`).join('');
-}
-function pickStyle(id) { selectedStyle = id; renderStyles(); }
+    function renderSpotifyChart() {
+      const container = document.getElementById('dash-chart-list');
+      let combined = [...defaultChart];
 
-function startGame() {
-  const name = $('inpName').value.trim() || 'MC אנונימי';
-  S = newState(name, $('inpCity').value, selectedStyle);
-  $('startScreen').style.display = 'none';
-  render();
-}
-function continueGame() {
-  S = load();
-  $('startScreen').style.display = 'none';
-  render();
-}
-function resetGame() {
-  modal('למחוק את המשחק?', 'כל ההתקדמות תימחק לצמיתות.', [
-    { text: 'כן, מחק', cls: 'red', run: () => { try { localStorage.removeItem(SAVE_KEY); } catch (e) {} location.reload(); } },
-    { text: 'ביטול', cls: 'ghost' },
-  ]);
-}
+      if (state.songs.length > 0) {
+        const topSong = [...state.songs].sort((a,b) => b.streams - a.streams)[0];
+        if (topSong && topSong.streams > 80000) {
+          combined.push({ name: state.artistName, song: topSong.title, streams: topSong.streams, isPlayer: true });
+        }
+      }
 
-(function init() {
-  renderStyles();
-  const saved = load();
-  if (saved && saved.name) {
-    $('continueCard').style.display = 'block';
-    $('continueInfo').textContent = `${saved.name} · שבוע ${saved.week} · ${fmt(saved.fans)} מעריצים`;
-  }
-})();
-</script>
+      combined.sort((a,b) => b.streams - a.streams);
+      combined = combined.slice(0, 5);
+
+      container.innerHTML = combined.map((item, idx) => `
+        <div class="flex items-center justify-between bg-gray-900/60 p-2 rounded-xl text-xs ${item.isPlayer ? 'border border-spotifyGreen/50' : ''}">
+          <div class="flex items-center space-x-2 space-x-reverse">
+            <span class="font-bold text-gray-400 w-4">${idx + 1}</span>
+            <div>
+              <div class="font-bold ${item.isPlayer ? 'text-spotifyGreen' : 'text-white'}">${item.song}</div>
+              <div class="text-[10px] text-gray-400">${item.name}</div>
+            </div>
+          </div>
+          <div class="text-[11px] text-gray-300 font-medium">${(item.streams / 1000).toFixed(1)}K השמעות</div>
+        </div>
+      `).join('');
+    }
+
+    function renderSongs() {
+      const container = document.getElementById('studio-songs-list');
+      if (state.songs.length === 0) {
+        container.innerHTML = `<div class="bg-cardDark p-4 rounded-xl border border-gray-800 text-center text-xs text-gray-500 py-6">עדיין לא הקלטת שירים. לחץ על "יצירת יצירה" להתחלה.</div>`;
+        return;
+      }
+
+      container.innerHTML = state.songs.map((song) => `
+        <div class="bg-cardDark p-3 rounded-xl border border-gray-800 flex justify-between items-center">
+          <div>
+            <div class="text-xs font-bold text-white flex items-center gap-1.5">
+              <i class="fa-solid fa-music text-spotifyGreen"></i> ${song.title} <span class="text-[10px] bg-gray-800 px-1.5 py-0.5 rounded text-gray-400">${song.isAlbum ? 'אלבום' : 'סינגל'}</span>
+            </div>
+            <div class="text-[10px] text-gray-400 mt-0.5">
+              ז'אנר: ${song.genre} | 
+              <span class="text-spotifyGreen">${song.streams.toLocaleString()} השמעות</span> | 
+              <span class="text-youtubeRed">${song.ytViews.toLocaleString()} צפיות</span>
+            </div>
+          </div>
+          <div class="text-xs font-bold text-spotifyGreen">
+            +₪${Math.floor(song.streams * 0.04).toLocaleString()}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function navTo(screen) {
+      document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+      document.querySelectorAll('nav > button').forEach(b => { b.classList.remove('nav-active'); b.classList.add('text-gray-400'); });
+      
+      document.getElementById(`screen-${screen}`).classList.remove('hidden');
+      document.getElementById(`nav-${screen}`).classList.add('nav-active');
+    }
+
+    function switchSocialTab(sub) {
+      if (sub === 'insta') {
+        document.getElementById('subtab-insta').classList.remove('hidden');
+        document.getElementById('subtab-tinder').classList.add('hidden');
+        document.getElementById('btn-subtab-insta').className = "flex-1 py-1.5 text-xs font-bold rounded-lg bg-gray-800 text-white transition";
+        document.getElementById('btn-subtab-tinder').className = "flex-1 py-1.5 text-xs font-bold rounded-lg text-gray-400 hover:text-white transition";
+      } else {
+        document.getElementById('subtab-insta').classList.add('hidden');
+        document.getElementById('subtab-tinder').classList.remove('hidden');
+        document.getElementById('btn-subtab-tinder').className = "flex-1 py-1.5 text-xs font-bold rounded-lg bg-gray-800 text-white transition";
+        document.getElementById('btn-subtab-insta').className = "flex-1 py-1.5 text-xs font-bold rounded-lg text-gray-400 hover:text-white transition";
+        renderTinderCard();
+      }
+    }
+
+    function doJob(type, energyCost, pay) {
+      if (state.energy < energyCost) {
+        showToast("אין מספיק אנרגיה השבוע!", false);
+        return;
+      }
+      state.energy -= energyCost;
+      state.money += pay;
+      const jobName = type === 'wolt' ? "משלוח Wolt" : "משמרת בר";
+      state.logs.push(`עבדת ב-${jobName} והרווחת ₪${pay}.`);
+      showToast(`עבדת בהצלחה! +₪${pay}`);
+      updateUI();
+    }
+
+    function upgradeSkill(skill) {
+      const cost = skill === 'viral' || skill === 'video' ? 100 : 150;
+      const energy = skill === 'viral' || skill === 'video' ? 3 : 4;
+
+      if (state.money < cost || state.energy < energy) {
+        showToast("אין מספיק כסף או אנרגיה!", false);
+        return;
+      }
+
+      state.money -= cost;
+      state.energy -= energy;
+      state.skills[skill] = (state.skills[skill] || 5) + 2;
+      showToast(`המיומנות שודרגה ל-${state.skills[skill]}!`);
+      updateUI();
+    }
+
+    function performGig(venue, reqFollowers, pay, energyCost) {
+      if (state.followers < reqFollowers) {
+        showToast(`נדרשים לפחות ${reqFollowers.toLocaleString()} עוקבים למועדון זה!`, false);
+        return;
+      }
+      if (state.energy < energyCost) {
+        showToast("אין מספיק אנרגיה להופעה!", false);
+        return;
+      }
+
+      state.energy -= energyCost;
+      state.money += pay;
+      state.followers += Math.floor(reqFollowers * 0.12);
+      state.logs.push(`הופעת ב-${venue}! הקהל היה באוויר. הרווחת ₪${pay.toLocaleString()}.`);
+      showToast(`הופעה מטורפת ב-${venue}! +₪${pay.toLocaleString()}`);
+      updateUI();
+    }
+
+    function buyItem(name, cost, followerBoost) {
+      if (state.inventory.includes(name)) {
+        showToast("כבר רכשת פריט זה!", false);
+        return;
+      }
+      if (state.money < cost) {
+        showToast("אין מספיק בחשבון הבנק!", false);
+        return;
+      }
+
+      state.money -= cost;
+      state.inventory.push(name);
+      state.followers += followerBoost;
+      state.logs.push(`תתחדש! קנית ${name} והעלית את ה-Flex שלך.`);
+      showToast(`תתחדש על ה-${name}!`);
+      updateUI();
+    }
+
+    function openNewSongModal() {
+      if (state.energy < 10) {
+        showToast("נדרשת לפחות 10 אנרגיה להקלטה!", false);
+        return;
+      }
+      document.getElementById('modal-song').classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+    function confirmCreateSong() {
+      const type = document.getElementById('input-song-type').value;
+      const title = document.getElementById('input-song-title').value.trim();
+      const genre = document.getElementById('input-song-genre').value;
+      const producerTier = document.getElementById('input-song-producer').value;
+      const clipTier = document.getElementById('input-song-clip').value;
+
+      if (!title) {
+        showToast("חובה להזין שם!", false);
+        return;
+      }
+
+      let producerCost = producerTier === 'indie' ? 1500 : (producerTier === 'top' ? 7000 : 0);
+      let clipCost = clipTier === 'lyric' ? 400 : (clipTier === 'pro' ? 5000 : 0);
+      let totalCost = producerCost + clipCost;
+
+      if (state.money < totalCost) {
+        showToast("אין מספיק כסף להפקה!", false);
+        return;
+      }
+
+      state.money -= totalCost;
+      state.energy -= 10;
+
+      let qualityMultiplier = producerTier === 'top' ? 3.8 : (producerTier === 'indie' ? 2.2 : 1.0);
+      if (type === 'album') qualityMultiplier *= 2.5;
+
+      let initialStreams = Math.floor((state.skills.flow * 220 + state.skills.charisma * 160) * qualityMultiplier * (Math.random() * 0.5 + 0.8));
+      
+      let ytViews = 0;
+      if (clipTier === 'lyric') ytViews = Math.floor(initialStreams * 0.5);
+      if (clipTier === 'pro') ytViews = Math.floor(initialStreams * 2.0 + (state.skills.video || 5) * 600);
+
+      const newSong = {
+        title,
+        genre,
+        isAlbum: type === 'album',
+        streams: initialStreams,
+        ytViews: ytViews,
+        releaseWeek: state.week,
+        releaseTotalWeek: state.totalWeeks || state.week
+      };
+
+      state.songs.push(newSong);
+      state.listeners += Math.floor(initialStreams / 3.5);
+      state.youtubeViews += ytViews;
+      state.followers += Math.floor(initialStreams / 12);
+
+      state.logs.push(`ה${type === 'album' ? 'אלבום' : 'סינגל'} "${title}" שוחרר! צבר ${initialStreams.toLocaleString()} השמעות.`);
+      showToast(`"${title}" שוחרר לרשת! 🎉`);
+
+      closeModal('modal-song');
+      document.getElementById('input-song-title').value = '';
+      updateUI();
+    }
+
+    function postInstaStory() {
+      if (state.energy < 3) {
+        showToast("אין מספיק אנרגיה!", false);
+        return;
+      }
+      state.energy -= 3;
+      let gain = Math.floor(Math.random() * 90 + 30 + state.skills.charisma * 6);
+      state.followers += gain;
+      showToast(`העלית סטורי! +${gain} עוקבים`);
+      updateUI();
+    }
+
+    function startBeef() {
+      if (state.energy < 5) {
+        showToast("אין מספיק אנרגיה!", false);
+        return;
+      }
+      state.energy -= 5;
+      const targets = ["ראפר מתחרה מנתניה", "מפיק מוזיקלי מוכר", "טיקטוקר תל אביבי"];
+      const target = targets[Math.floor(Math.random() * targets.length)];
+
+      if (Math.random() > 0.35) {
+        let gain = Math.floor(Math.random() * 950 + 350);
+        state.followers += gain;
+        state.logs.push(`העלת דיס חריף על ${target}! כל הרשת מדברת עליך (+${gain} עוקבים).`);
+        showToast(`הדיס הפך לויראלי! 🔥`);
+      } else {
+        let loss = Math.floor(Math.random() * 220 + 60);
+        state.followers = Math.max(0, state.followers - loss);
+        state.logs.push(`הדיס מול ${target} פגע בך בחזרה (-${loss} עוקבים).`);
+        showToast(`הדיס חזר אליך כבומרנג...`, false);
+      }
+      updateUI();
+    }
+
+    function tiktokChallenge() {
+      if (state.energy < 4) {
+        showToast("אין מספיק אנרגיה!", false);
+        return;
+      }
+      state.energy -= 4;
+      let boost = Math.floor(state.skills.viral * 180 * (Math.random() + 0.5));
+      state.followers += boost;
+      showToast(`אתגר הטיקטוק תפס! +${boost} עוקבים 🎵`);
+      updateUI();
+    }
+
+    function renderTinderCard() {
+      document.getElementById('tinder-matches-count').innerText = state.tinderMatches.length;
+      if (state.relationship) {
+        document.getElementById('tinder-card').classList.add('hidden');
+        document.getElementById('tinder-relationship-box').classList.remove('hidden');
+        document.getElementById('rel-partner-name').innerText = state.relationship.name + `, ${state.relationship.age} (${state.relationship.city})`;
+        document.getElementById('rel-partner-loyalty').innerText = state.relationship.loyalty + '%';
+        document.getElementById('rel-partner-drama').innerText = state.relationship.drama;
+        return;
+      }
+
+      document.getElementById('tinder-card').classList.remove('hidden');
+      document.getElementById('tinder-relationship-box').classList.add('hidden');
+
+      const profile = tinderPool[currentTinderIdx % tinderPool.length];
+      document.getElementById('tinder-name').innerText = `${profile.name}, ${profile.age}`;
+      document.getElementById('tinder-bio').innerText = `"${profile.bio}"`;
+      document.getElementById('tinder-age-loc').innerText = `${profile.city}, ${profile.age}`;
+      document.getElementById('tinder-avatar-icon').className = `fa-solid ${profile.icon}`;
+      document.getElementById('tinder-matches-count').innerText = state.tinderMatches.length;
+    }
+
+    function swipeTinder(isLike) {
+      const profile = tinderPool[currentTinderIdx % tinderPool.length];
+      const card = document.getElementById('tinder-card');
+
+      card.classList.add(isLike ? 'anim-swipe-right' : 'anim-swipe-left');
+
+      setTimeout(() => {
+        card.classList.remove('anim-swipe-right', 'anim-swipe-left');
+        if (isLike) {
+          if (Math.random() > 0.3) {
+            state.tinderMatches.push(profile);
+            state.relationship = profile;
+            state.logs.push(`מאצ' חדש! התחלת לצאת עם ${profile.name}.`);
+            showToast(`Match! 🔥 יצאת לדרך עם ${profile.name}`);
+          } else {
+            showToast("אין מאצ'...", false);
+          }
+        }
+        currentTinderIdx++;
+        renderTinderCard();
+        updateUI();
+      }, 250);
+    }
+
+    function goOnDate(type) {
+      const cost = type === 'coffee' ? 150 : 350;
+      if (state.money < cost) {
+        showToast("אין מספיק כסף לדייט!", false);
+        return;
+      }
+      state.money -= cost;
+      state.energy = Math.min(state.maxEnergy, state.energy + (type === 'coffee' ? 4 : 7));
+      showToast(`יצאתם לדייט! האנרגיה התחדשה 🍷`);
+      updateUI();
+    }
+
+    function breakUp() {
+      state.relationship = null;
+      showToast("נפרדתם... חזרת לשוק!", false);
+      renderTinderCard();
+      updateUI();
+    }
+
+    function nextWeek() {
+      state.totalWeeks = (state.totalWeeks || state.week) + 1;
+      state.week++;
+      if (state.week > 52) {
+        state.week = 1;
+        state.year++;
+      }
+
+      state.energy = state.maxEnergy;
+
+      let weeklyRoyalties = 0;
+      let newListeners = 0;
+
+      state.songs.forEach(song => {
+        let age = (state.totalWeeks || state.week) - (song.releaseTotalWeek || song.releaseWeek);
+        let decay = Math.max(0.15, 1 - (age * 0.04));
+        let weeklyStreams = Math.floor((song.streams * 0.08) * decay + (state.followers * 1.8));
+        song.streams += weeklyStreams;
+        weeklyRoyalties += Math.floor(weeklyStreams * 0.04);
+        newListeners += Math.floor(weeklyStreams * 0.18);
+      });
+
+      state.money += weeklyRoyalties;
+      state.listeners = Math.floor(state.listeners * 0.88) + newListeners;
+
+      triggerRandomEvent();
+
+      updateUI();
+      showToast(`שבוע ${state.week} התחיל! +₪${weeklyRoyalties.toLocaleString()} תמלוגים`);
+    }
+
+    function triggerRandomEvent() {
+      const events = [
+        {
+          text: "צו מילואים פתאומי! עצרת את הפילטרים וההקלטות לשבוע (-5 אנרגיה).",
+          action: () => { state.energy = Math.max(0, state.energy - 5); }
+        },
+        {
+          text: "גלגלצ הכניסו את השיר שלך לפלייליסט לילה!",
+          action: () => { state.listeners += 3000; state.followers += 800; }
+        },
+        {
+          text: "הודעה בוואטסאפ מהמפיק: 'בוא זריז יש ביט חולה!'",
+          action: () => { state.skills.flow += 1; }
+        },
+        {
+          text: "כתבה מפרגנת בעמוד אינסטגרם מוביל עליך!",
+          action: () => { state.followers += 1500; }
+        }
+      ];
+
+      if (Math.random() < 0.5) {
+        const ev = events[Math.floor(Math.random() * events.length)];
+        ev.action();
+        state.logs.push(`⚡ אירוע שבועי: ${ev.text}`);
+      }
+    }
+
+    window.onload = function() {
+      updateUI();
+    };
+  </script>
 </body>
 </html>
