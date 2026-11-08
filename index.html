@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ישראל ראפ סטאר - IL Rap Simulator</title>
+  <style>
+    :root {
+      --bg-dark: #121619;
+      --card-bg: #1c2329;
+      --card-header: #263038;
+      --accent-green: #48bb78;
+      --accent-orange: #ed8936;
+      --accent-red: #e53e3e;
+      --accent-blue: #3182ce;
+      --accent-purple: #9f7aea;
+      --text-main: #edf2f7;
+      --text-sub: #a0aec0;
+      --border: #2d3748;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Hebrew, sans-serif;
+      display: flex;
+      justify-content: center;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 430px;
+      height: 100vh;
+      height: 100dvh;
+      background-color: var(--bg-dark);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 25px rgba(0,0,0,0.8);
+    }
+
+    /* Top Bar */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 18px;
+      background-color: #171d22;
+      border-bottom: 1px solid var(--border);
+      z-index: 10;
+      gap: 8px;
+    }
+
+    .stat-badge {
+      display: flex;
+      flex-direction: column;
+      font-size: 0.8rem;
+      color: var(--text-sub);
+    }
+
+    .stat-val {
+      font-weight: bold;
+      font-size: 1.05rem;
+      color: var(--accent-green);
+    }
+
+    .stat-val.fans { color: var(--accent-orange); }
+    .stat-val.week { color: var(--text-main); }
+
+    .btn-end-week {
+      background-color: var(--accent-green);
+      color: #111;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: transform 0.1s;
+      white-space: nowrap;
+    }
+
+    .btn-end-week:active { transform: scale(0.95); }
+
+    /* Energy bar */
+    .energy-wrap {
+      padding: 8px 18px;
+      background: #171d22;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.78rem;
+      color: var(--text-sub);
+    }
+    .bar {
+      height: 8px;
+      background: #2d3748;
+      border-radius: 6px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    .bar > div {
+      height: 100%;
+      background: var(--accent-blue);
+      transition: width 0.3s;
+    }
+
+    /* Content Area */
+    .content-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      padding-bottom: 90px;
+    }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    h2 {
+      margin-top: 0;
+      font-size: 1.4rem;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 8px;
+      color: #fff;
+    }
+
+    h3 {
+      font-size: 1.1rem;
+      margin-top: 15px;
+      color: var(--text-sub);
+    }
+
+    /* Card UI */
+    .card {
+      background-color: var(--card-bg);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 14px;
+      border: 1px solid var(--border);
+    }
+
+    .card-title {
+      font-weight: bold;
+      font-size: 1rem;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-sub {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      line-height: 1.45;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .mini-stat {
+      background: var(--card-header);
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+    }
+    .mini-stat .lbl { font-size: 0.75rem; color: var(--text-sub); }
+    .mini-stat .val { font-size: 1.15rem; font-weight: bold; margin-top: 2px; }
+
+    .btn {
+      background: var(--accent-blue);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 9px 14px;
+      font-weight: bold;
+      font-size: 0.88rem;
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn.green { background: var(--accent-green); color: #111; }
+    .btn.orange { background: var(--accent-orange); color: #111; }
+    .btn.red { background: var(--accent-red); }
+    .btn.ghost { background: var(--card-header); color: var(--text-main); }
+    .btn.full { width: 100%; margin-top: 10px; }
+
+    .tag {
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border-radius: 10px;
+      background: var(--card-header);
+      color: var(--text-sub);
+      white-space: nowrap;
+    }
+    .tag.hit { background: rgba(72,187,120,0.2); color: var(--accent-green); }
+    .tag.flop { background: rgba(229,62,62,0.2); color: #fc8181; }
+    .tag.mid { background: rgba(237,137,54,0.2); color: var(--accent-orange); }
+
+    .skill-row { margin-bottom: 10px; }
+    .skill-row .row { font-size: 0.88rem; }
+    .skill-row .bar > div { background: var(--accent-purple); }
+
+    input[type=text], select {
+      width: 100%;
+      background: var(--card-header);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      margin-top: 6px;
+    }
+
+    label { font-size: 0.85rem; color: var(--text-sub); display: block; margin-top: 10px; }
+
+    .chart-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.88rem;
+    }
+    .chart-item:last-child { border-bottom: none; }
+    .chart-pos {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--card-header);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: bold; font-size: 0.8rem;
+      flex-shrink: 0;
+    }
+    .chart-item.me { color: var(--accent-green); font-weight: bold; }
+    .chart-item.me .chart-pos { background: var(--accent-green); color: #111; }
+    .chart-info { flex: 1; min-width: 0; }
+    .chart-info .artist { font-size: 0.75rem; color: var(--text-sub); }
+
+    .log-item {
+      font-size: 0.85rem;
+      padding: 6px 0;
+      border-bottom: 1px dashed var(--border);
+      color: var(--text-sub);
+    }
+    .log-item b { color: var(--text-main); }
+
+    /* Bottom Nav */
+    .bottom-nav {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      display: flex;
+      background: #171d22;
+      border-top: 1px solid var(--border);
+      z-index: 10;
+    }
+    .nav-btn {
+      flex: 1;
+      background: none;
+      border: none;
+      color: var(--text-sub);
+      padding: 10px 0 12px;
+      font-size: 0.72rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      font-family: inherit;
+    }
+    .nav-btn .ico { font-size: 1.3rem; }
+    .nav-btn.active { color: var(--accent-green); }
+
+    /* Modal */
+    .modal-bg {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      padding: 20px;
+    }
+    .modal-bg.show { display: flex; }
+    .modal {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .modal h3 { margin-top: 0; color: #fff; }
+    .modal .btns { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+
+    /* Toast */
+    .toast {
+      position: absolute;
+      top: 70px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      background: var(--card-header);
+      border: 1px solid var(--border);
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 0.88rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s;
+      z-index: 60;
+      max-width: 90%;
+      text-align: center;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* Start screen */
+    .start-screen {
+      position: absolute;
+      inset: 0;
+      background: var(--bg-dark);
+      z-index: 100;
+      padding: 30px 20px;
+      overflow-y: auto;
+    }
+    .start-screen h1 {
+      text-align: center;
+      font-size: 2rem;
+      margin: 10px 0 4px;
+      color: var(--accent-green);
+    }
+    .start-screen .subtitle { text-align: center; color: var(--text-sub); margin-bottom: 24px; }
+
+    .choice-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .choice {
+      background: var(--card-header);
+      border: 2px solid transparent;
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .choice.sel { border-color: var(--accent-green); }
+    .choice small { display: block; color: var(--text-sub); font-size: 0.72rem; margin-top: 3px; }
+
+    .empty { text-align: center; color: var(--text-sub); font-size: 0.9rem; padding: 20px 0; }
+  </style>
+</head>
+<body>
+<div class="app-container">
+
+  <!-- Start Screen -->
+  <div class="start-screen" id="startScreen">
+    <h1>🎤 ישראל ראפ סטאר</h1>
+    <div class="subtitle">מהשכונה לפסגת המצעד</div>
+    <div class="card">
+      <label>שם במה</label>
+      <input type="text" id="inpName" maxlength="20" placeholder="למשל: MC שכונה">
+      <label>עיר מוצא</label>
+      <select id="inpCity">
+        <option>תל אביב</option>
+        <option>חיפה</option>
+        <option>ירושלים</option>
+        <option>באר שבע</option>
+        <option>אשדוד</option>
+        <option>נתניה</option>
+        <option>בת ים</option>
+        <option>קריית שמונה</option>
+      </select>
+      <label>סגנון</label>
+      <div class="choice-grid" id="styleChoices"></div>
+      <button class="btn green full" onclick="startGame()">יאללה, מתחילים 🚀</button>
+    </div>
+    <div class="card" id="continueCard" style="display:none">
+      <div class="card-title">יש משחק שמור</div>
+      <div class="card-sub" id="continueInfo"></div>
+      <button class="btn full" onclick="continueGame()">המשך משחק</button>
+    </div>
+  </div>
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="stat-badge">כסף<span class="stat-val" id="tMoney">₪0</span></div>
+    <div class="stat-badge">מעריצים<span class="stat-val fans" id="tFans">0</span></div>
+    <div class="stat-badge">שבוע<span class="stat-val week" id="tWeek">1</span></div>
+    <button class="btn-end-week" onclick="endWeek()">סיים שבוע ⏭</button>
+  </div>
+  <div class="energy-wrap">
+    <div class="row"><span>⚡ אנרגיה</span><span id="tEnergyTxt">100/100</span></div>
+    <div class="bar"><div id="tEnergy" style="width:100%"></div></div>
+  </div>
+
+  <!-- Content -->
+  <div class="content-area" id="content">
+
+    <!-- Home -->
+    <div class="screen active" id="screen-home">
+      <h2 id="homeTitle">הקריירה שלי</h2>
+      <div class="card">
+        <div class="grid-2">
+          <div class="mini-stat"><div class="lbl">מוניטין</div><div class="val" id="hRep">0</div></div>
+          <div class="mini-stat"><div class="lbl">דרגה</div><div class="val" id="hTier" style="font-size:0.95rem">מתחיל</div></div>
+          <div class="mini-stat"><div class="lbl">שירים שיצאו</div><div class="val" id="hSongs">0</div></div>
+          <div class="mini-stat"><div class="lbl">השמעות סה״כ</div><div class="val" id="hStreams">0</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">כישורים</div>
+        <div id="skillsList"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">אימון <span class="tag">-20 ⚡</span></div>
+        <div class="card-sub">שפר כישור אחד. ככה בונים ראפר.</div>
+        <div class="grid-2" style="margin-top:10px" id="trainBtns"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">מה קרה לאחרונה</div>
+        <div id="logList"></div>
+      </div>
+    </div>
+
+    <!-- Studio -->
+    <div class="screen" id="screen-studio">
+      <h2>🎧 אולפן</h2>
+      <div class="card">
+        <div class="card-title">שיר חדש <span class="tag">-30 ⚡</span></div>
+        <label>שם השיר</label>
+        <input type="text" id="songName" maxlength="28" placeholder="שם השיר">
+        <label>ביט</label>
+        <select id="songBeat"></select>
+        <label>נושא</label>
+        <select id="songTopic">
+          <option value="street">השכונה והרחוב</option>
+          <option value="love">אהבה ושברון לב</option>
+          <option value="party">מסיבות וחיי לילה</option>
+          <option value="money">כסף והצלחה</option>
+          <option value="social">ביקורת חברתית</option>
+          <option value="diss">דיס (מסוכן!)</option>
+        </select>
+        <label>פיצ׳ר</label>
+        <select id="songFeat"></select>
+        <div class="card-sub" style="margin-top:10px" id="songCost">עלות: ₪0</div>
+        <button class="btn green full" onclick="recordSong()">הקלט ושחרר 🎙</button>
+      </div>
+      <h3>הדיסקוגרפיה שלי</h3>
+      <div id="discList"></div>
+    </div>
+
+    <!-- Shows -->
+    <div class="screen" id="screen-shows">
+      <h2>🎪 הופעות</h2>
+      <div class="card-sub" style="margin-bottom:12px">אפשר להופיע פעמיים בשבוע. מקומות גדולים נפתחים עם יותר מעריצים.</div>
+      <div id="venueList"></div>
+    </div>
+
+    <!-- Social -->
+    <div class="screen" id="screen-social">
+      <h2>📱 רשתות</h2>
+      <div class="card">
+        <div class="row">
+          <div>
+            <div class="card-title">עוקבים</div>
+            <div class="stat-val fans" id="sFollowers" style="font-size:1.4rem">0</div>
+          </div>
+          <div style="text-align:left">
+            <div class="card-sub">באזז השבוע</div>
+            <div class="stat-val" id="sHype">0%</div>
+          </div>
+        </div>
+      </div>
+      <div id="socialActions"></div>
+      <h3>🏆 מצעד השבוע</h3>
+      <div class="card" id="chartList"></div>
+    </div>
+
+    <!-- Shop -->
+    <div class="screen" id="screen-shop">
+      <h2>🛒 שדרוגים</h2>
+      <div id="shopList"></div>
+      <h3>הגדרות</h3>
+      <div class="card">
+        <button class="btn red full" onclick="resetGame()">מחק משחק והתחל מחדש</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-screen="home"><span class="ico">🏠</span>בית</button>
+    <button class="nav-btn" data-screen="studio"><span class="ico">🎧</span>אולפן</button>
+    <button class="nav-btn" data-screen="shows"><span class="ico">🎪</span>הופעות</button>
+    <button class="nav-btn" data-screen="social"><span class="ico">📱</span>רשתות</button>
+    <button class="nav-btn" data-screen="shop"><span class="ico">🛒</span>שדרוגים</button>
+  </nav>
+
+  <!-- Modal -->
+  <div class="modal-bg" id="modalBg">
+    <div class="modal">
+      <h3 id="modalTitle"></h3>
+      <div class="card-sub" id="modalBody"></div>
+      <div class="btns" id="modalBtns"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+// ---------- Data ----------
+const STYLES = [
+  { id: 'trap',   name: 'טראפ',        desc: '+הפקה, +ויב',      bonus: { production: 10, charisma: 5 } },
+  { id: 'boom',   name: 'בום באפ',     desc: '+כתיבה',           bonus: { lyrics: 15 } },
+  { id: 'drill',  name: 'דריל',        desc: '+פלואו, +רחוב',    bonus: { flow: 12, street: 5 } },
+  { id: 'mizrahi',name: 'מזרחי-ראפ',   desc: '+כריזמה, +מיינסטרים', bonus: { charisma: 15 } },
+];
+
+const SKILLS = {
+  flow:       'פלואו',
+  lyrics:     'כתיבה',
+  charisma:   'כריזמה',
+  production: 'הפקה',
+};
+
+const BEATS = [
+  { id: 'free',  name: 'ביט חינמי מיוטיוב', cost: 0,     q: 0 },
+  { id: 'local', name: 'ביטמייקר מהשכונה',  cost: 400,   q: 8 },
+  { id: 'pro',   name: 'מפיק מקצועי',        cost: 2500,  q: 18 },
+  { id: 'top',   name: 'מפיק צמרת',          cost: 12000, q: 30, minFans: 20000 },
+];
+
+const FEATS = [
+  { id: 'none',  name: 'בלי פיצ׳ר',               cost: 0,     boost: 0,   minFans: 0 },
+  { id: 'local', name: 'חבר מהשכונה',             cost: 200,   boost: 0.1, minFans: 0 },
+  { id: 'rising',name: 'ראפר עולה (ג׳וני 9)',  cost: 3000,  boost: 0.4, minFans: 5000 },
+  { id: 'singer',name: 'זמרת פופ (שירה לב)',     cost: 15000, boost: 0.9, minFans: 30000 },
+  { id: 'legend',name: 'אגדה (ה-OG מהדרום)',     cost: 50000, boost: 1.6, minFans: 120000 },
+];
+
+const TOPICS = {
+  street: { name: 'השכונה', skill: 'lyrics',     mult: 1.0 },
+  love:   { name: 'אהבה',   skill: 'charisma',   mult: 1.1 },
+  party:  { name: 'מסיבות', skill: 'flow',       mult: 1.2 },
+  money:  { name: 'כסף',    skill: 'production', mult: 1.0 },
+  social: { name: 'חברתי',  skill: 'lyrics',     mult: 0.9 },
+  diss:   { name: 'דיס',    skill: 'flow',       mult: 1.5 },
+};
+
+const VENUES = [
+  { id: 'park',    name: 'פארק שכונתי',          minFans: 0,      energy: 20, pay: [50, 200],       fans: [10, 40],     rep: 1 },
+  { id: 'bar',     name: 'בר קטן בפלורנטין',     minFans: 300,    energy: 25, pay: [300, 900],      fans: [40, 150],    rep: 2 },
+  { id: 'club',    name: 'מועדון (הבארבי)',       minFans: 3000,   energy: 30, pay: [2000, 6000],    fans: [200, 800],   rep: 4 },
+  { id: 'fest',    name: 'פסטיבל קיץ באילת',      minFans: 20000,  energy: 40, pay: [12000, 30000],  fans: [1500, 5000], rep: 8 },
+  { id: 'arena',   name: 'היכל מנורה',            minFans: 100000, energy: 50, pay: [80000, 200000], fans: [8000, 25000],rep: 15 },
+  { id: 'park_ha', name: 'פארק הירקון',           minFans: 400000, energy: 60, pay: [400000, 900000],fans: [30000, 80000],rep: 30 },
+];
+
+const SHOP = [
+  { id: 'mic',     name: 'מיקרופון USB',            cost: 600,    desc: '+5 לאיכות כל שיר' ,           eff: { songQ: 5 } },
+  { id: 'laptop',  name: 'לפטופ + תוכנת הפקה',      cost: 3500,   desc: '+10 הפקה',                    eff: { production: 10 } },
+  { id: 'chain',   name: 'שרשרת זהב',               cost: 8000,   desc: '+10 כריזמה, +3 מוניטין',      eff: { charisma: 10, rep: 3 } },
+  { id: 'manager', name: 'מנהל אישי',               cost: 15000,  desc: '+30% תשלום על הופעות',        eff: { showPay: 0.3 } },
+  { id: 'studio',  name: 'אולפן ביתי',              cost: 40000,  desc: '+12 לאיכות כל שיר',          eff: { songQ: 12 } },
+  { id: 'pr',      name: 'יחצ״ן',                   cost: 60000,  desc: '+25% השמעות לכל השירים',     eff: { streamMult: 0.25 } },
+  { id: 'label',   name: 'חוזה עם לייבל',           cost: 150000, desc: '+50% השמעות, +10 מוניטין',   eff: { streamMult: 0.5, rep: 10 } },
+];
+
+const RIVALS = [
+  { name: 'גל דרבי',   song: 'לילות בדרום',    power: 85 },
+  { name: 'סטילה',     song: 'אין עליי',        power: 80 },
+  { name: 'MC תשליך', song: 'מהבלוק',          power: 72 },
+  { name: 'נוי בלאק',  song: 'קיר זכוכית',     power: 68 },
+  { name: 'ליל עמי',   song: 'וואלה ככה',      power: 60 },
+  { name: 'דודו טריפ', song: 'אמא אמרה',       power: 55 },
+  { name: 'יאסו',      song: 'ים של כסף',       power: 50 },
+  { name: 'ההוד',      song: 'ריקוד מלחמה',    power: 45 },
+  { name: 'שחר 052',   song: 'שבת בבוקר',       power: 40 },
+  { name: 'קפטן חומוס',song: 'פיתה מלאה',      power: 35 },
+];
+
+const RANDOM_EVENTS = [
+  {
+    title: '📺 הזמנה לתוכנית בוקר',
+    body: 'מתקשרים מתוכנית בוקר בערוץ 12. רוצים שתבוא לראיון ותבצע שיר בלייב.',
+    options: [
+      { text: 'ברור! (-15 ⚡)', run: s => { s.energy = Math.max(0, s.energy - 15); const f = rnd(200, 900) + Math.floor(s.fans * 0.03); s.fans += f; return `הופעת בטלוויזיה! +${fmt(f)} מעריצים`; } },
+      { text: 'לא, אני מחתרתי', run: s => { s.rep += 2; return 'הקהל של הרחוב מעריך את זה. +2 מוניטין'; } },
+    ],
+  },
+  {
+    title: '🥊 ראפר מתגרה בך',
+    body: 'ראפר מוכר העליב אותך בסטורי. כולם מחכים לתגובה.',
+    options: [
+      { text: 'מגיב בדיס חריף', run: s => { if (Math.random() < 0.5 + s.skills.lyrics / 250) { const f = rnd(500, 2000) + Math.floor(s.fans * 0.08); s.fans += f; s.rep += 5; return `ניצחת בביף! +${fmt(f)} מעריצים, +5 מוניטין`; } else { const f = Math.floor(s.fans * 0.05); s.fans -= f; s.rep = Math.max(0, s.rep - 3); return `הדיס נפל. -${fmt(f)} מעריצים`; } } },
+      { text: 'מתעלם, מעל זה', run: s => { s.rep += 1; return 'בגרות. +1 מוניטין'; } },
+    ],
+  },
+  {
+    title: '💸 מותג אנרגיה מציע חסות',
+    body: 'מותג משקאות אנרגיה רוצה שתפרסם אותו ברשתות.',
+    options: [
+      { text: 'לוקח את הכסף', run: s => { const m = 1000 + Math.floor(s.fans * 0.2); s.money += m; s.rep = Math.max(0, s.rep - 1); return `+₪${fmt(m)}, אבל קצת "מכרת את עצמך". -1 מוניטין`; } },
+      { text: 'לא מתאים לי', run: s => 'נשארת נאמן לעצמך.' },
+    ],
+  },
+  {
+    title: '🚔 בלגן אחרי הופעה',
+    body: 'אחרי הופעה היה בלגן מחוץ למועדון, והתקשורת מחפשת אשמים.',
+    options: [
+      { text: 'מוציא הודעה רשמית (₪1,000)', run: s => { if (s.money < 1000) { s.rep = Math.max(0, s.rep - 3); return 'לא היה לך כסף ליחצ״ן. -3 מוניטין'; } s.money -= 1000; return 'הסערה נרגעה.'; } },
+      { text: 'שותק', run: s => { if (Math.random() < 0.5) { s.rep += 2; return 'דווקא עשה לך שם של קשוח. +2 מוניטין'; } s.rep = Math.max(0, s.rep - 4); return 'התקשורת קרעה אותך. -4 מוניטין'; } },
+    ],
+  },
+  {
+    title: '🎹 ביטמייקר צעיר שולח ביט',
+    body: 'ביטמייקר בן 17 שלח לך ביט מטורף בחינם, רק מבקש קרדיט.',
+    options: [
+      { text: 'נותן לו קרדיט', run: s => { s.skills.production = Math.min(100, s.skills.production + 4); s.rep += 1; return '+4 הפקה, +1 מוניטין'; } },
+    ],
+  },
+  {
+    title: '🤒 נפלת למיטה',
+    body: 'תפסת שפעת קשה אחרי שבוע מטורף.',
+    options: [
+      { text: 'נח בבית', run: s => { s.energy = Math.max(0, s.energy - 30); return '-30 אנרגיה בשבוע הבא'; } },
+    ],
+  },
+  {
+    title: '🎬 קליפ ויראלי בטיקטוק',
+    body: 'מישהו עשה טרנד בטיקטוק על אחד השירים שלך!',
+    cond: s => s.songs.length > 0,
+    options: [
+      { text: 'מצטרף לטרנד', run: s => { const song = s.songs[rnd(0, s.songs.length - 1)]; song.hype += 1.5; const f = rnd(300, 1500) + Math.floor(s.fans * 0.05); s.fans += f; return `"${song.name}" חוזר לחיים! +${fmt(f)} מעריצים`; } },
+    ],
+  },
+];
+
+// ---------- State ----------
+let S = null;
+let selectedStyle = 'trap';
+const SAVE_KEY = 'ilRapStarSave_v1';
+
+function newState(name, city, styleId) {
+  const style = STYLES.find(x => x.id === styleId);
+  const skills = { flow: 10, lyrics: 10, charisma: 10, production: 5 };
+  for (const k in style.bonus) if (skills[k] !== undefined) skills[k] += style.bonus[k];
+  return {
+    name, city, style: styleId,
+    week: 1,
+    money: 500,
+    fans: 20,
+    followers: 50,
+    rep: 0,
+    energy: 100,
+    maxEnergy: 100,
+    hype: 0,
+    showsThisWeek: 0,
+    postsThisWeek: 0,
+    skills,
+    songs: [],
+    owned: [],
+    log: [`<b>שבוע 1:</b> ${name} מ${city} מתחיל את הדרך. הרחוב מחכה.`],
+  };
+}
+
+// ---------- Utils ----------
+function rnd(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
+function fmt(n) {
+  n = Math.floor(n);
+  if (n >= 1e6) return (n / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
+  if (n >= 1e4) return (n / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
+  return n.toLocaleString('he-IL');
+}
+function $(id) { return document.getElementById(id); }
+function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) {} }
+function load() { try { const r = localStorage.getItem(SAVE_KEY); return r ? JSON.parse(r) : null; } catch (e) { return null; } }
+function addLog(msg) { S.log.unshift(`<b>שבוע ${S.week}:</b> ${msg}`); S.log = S.log.slice(0, 25); }
+function eff(key) { return S.owned.reduce((sum, id) => sum + (SHOP.find(x => x.id === id).eff[key] || 0), 0); }
+
+let toastTimer;
+function toast(msg) {
+  const t = $('toast');
+  t.innerHTML = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function modal(title, body, buttons) {
+  $('modalTitle').textContent = title;
+  $('modalBody').innerHTML = body;
+  const box = $('modalBtns');
+  box.innerHTML = '';
+  buttons.forEach(b => {
+    const el = document.createElement('button');
+    el.className = 'btn ' + (b.cls || '');
+    el.textContent = b.text;
+    el.onclick = () => { $('modalBg').classList.remove('show'); b.run && b.run(); };
+    box.appendChild(el);
+  });
+  $('modalBg').classList.add('show');
+}
+
+function useEnergy(n) {
+  if (S.energy < n) { toast('⚡ אין מספיק אנרגיה. סיים את השבוע כדי לנוח.'); return false; }
+  S.energy -= n;
+  return true;
+}
+
+function tier() {
+  const f = S.fans;
+  if (f >= 1000000) return 'אגדה 👑';
+  if (f >= 300000) return 'כוכב-על ⭐';
+  if (f >= 80000) return 'כוכב';
+  if (f >= 20000) return 'שם מוכר';
+  if (f >= 3000) return 'עולה';
+  if (f >= 300) return 'מקומי';
+  return 'מתחיל';
+}
+
+// ---------- Actions ----------
+function train(skill) {
+  if (S.skills[skill] >= 100) { toast('הכישור כבר במקסימום!'); return; }
+  if (!useEnergy(20)) return;
+  const gain = Math.max(1, Math.round(rnd(3, 6) * (1 - S.skills[skill] / 140)));
+  S.skills[skill] = Math.min(100, S.skills[skill] + gain);
+  toast(`💪 ${SKILLS[skill]} +${gain}`);
+  render();
+}
+
+function songQuality(beat, topicKey) {
+  const sk = S.skills;
+  const topic = TOPICS[topicKey];
+  let q = sk.flow * 0.3 + sk.lyrics * 0.3 + sk.production * 0.2 + sk.charisma * 0.2;
+  q += sk[topic.skill] * 0.15;
+  q += beat.q + eff('songQ');
+  q += rnd(-12, 12);
+  return Math.max(1, Math.min(100, Math.round(q)));
+}
+
+function recordSong() {
+  const name = $('songName').value.trim() || `טראק #${S.songs.length + 1}`;
+  const beat = BEATS.find(b => b.id === $('songBeat').value);
+  const feat = FEATS.find(f => f.id === $('songFeat').value);
+  const topicKey = $('songTopic').value;
+  const cost = beat.cost + feat.cost;
+  if (S.money < cost) { toast('💸 אין לך מספיק כסף'); return; }
+  if (!useEnergy(30)) return;
+  S.money -= cost;
+
+  const q = songQuality(beat, topicKey);
+  const topic = TOPICS[topicKey];
+  let hype = (q / 50) * topic.mult * (1 + feat.boost);
+
+  if (topicKey === 'diss' && Math.random() < 0.35) {
+    const lost = Math.floor(S.fans * 0.04);
+    S.fans -= lost;
+    addLog(`הדיס "${name}" יצר תגובת נגד. -${fmt(lost)} מעריצים`);
+  }
+
+  const song = { name, q, hype, week: S.week, streams: 0, lastStreams: 0, topic: topic.name, feat: feat.id !== 'none' ? feat.name : null };
+  S.songs.unshift(song);
+  const gainFans = Math.floor(q * (1 + feat.boost) * rnd(1, 3) + S.fans * 0.02 * (q / 50));
+  S.fans += gainFans;
+  S.rep += q >= 75 ? 2 : q >= 50 ? 1 : 0;
+  addLog(`שחררת את "${name}" (איכות ${q}). +${fmt(gainFans)} מעריצים`);
+  $('songName').value = '';
+  modal('🎶 השיר בחוץ!', `<b>"${name}"</b><br>ציון איכות: <b>${q}/100</b><br>${q >= 80 ? 'זה להיט פוטנציאלי! 🔥' : q >= 55 ? 'שיר סולידי.' : 'הקהל לא בטוח לגבי זה...'}<br><br>+${fmt(gainFans)} מעריצים`, [{ text: 'סבבה', cls: 'green' }]);
+  render();
+}
+
+function playShow(vid) {
+  const v = VENUES.find(x => x.id === vid);
+  if (S.fans < v.minFans) return;
+  if (S.showsThisWeek >= 2) { toast('כבר הופעת פעמיים השבוע'); return; }
+  if (!useEnergy(v.energy)) return;
+  S.showsThisWeek++;
+  const perf = (S.skills.charisma * 0.5 + S.skills.flow * 0.5) / 100;
+  const roll = Math.random() * 0.6 + perf * 0.7;
+  const success = Math.min(1.3, roll);
+  const pay = Math.floor(rnd(v.pay[0], v.pay[1]) * (0.5 + success) * (1 + eff('showPay')));
+  const fans = Math.floor(rnd(v.fans[0], v.fans[1]) * (0.4 + success));
+  S.money += pay;
+  S.fans += fans;
+  const repGain = success > 0.8 ? v.rep : success > 0.5 ? Math.ceil(v.rep / 2) : 0;
+  S.rep += repGain;
+  const verdict = success > 0.9 ? 'הקהל השתגע! 🔥🔥' : success > 0.6 ? 'הופעה טובה 👍' : 'הקהל היה קר... 😬';
+  addLog(`הופעה ב${v.name}: ${verdict} +₪${fmt(pay)}, +${fmt(fans)} מעריצים`);
+  modal(`🎤 ${v.name}`, `${verdict}<br><br>💰 +₪${fmt(pay)}<br>👥 +${fmt(fans)} מעריצים${repGain ? `<br>⭐ +${repGain} מוניטין` : ''}`, [{ text: 'מעולה', cls: 'green' }]);
+  render();
+}
+
+const SOCIAL_ACTIONS = [
+  { id: 'story',  name: 'סטורי מהאולפן',  desc: 'עלות: 5 ⚡. עוקבים קלים.', energy: 5,  cost: 0,    run: () => { const f = rnd(10, 40) + Math.floor(S.followers * 0.02); S.followers += f; S.hype += 3; return `+${fmt(f)} עוקבים`; } },
+  { id: 'tiktok', name: 'סרטון טיקטוק',   desc: 'עלות: 15 ⚡. סיכוי לוויראלי.', energy: 15, cost: 0, run: () => {
+      if (Math.random() < 0.12 + S.skills.charisma / 500) { const f = rnd(500, 3000) + Math.floor(S.followers * 0.25); S.followers += f; S.fans += Math.floor(f * 0.3); S.hype += 20; return `🚀 ויראלי! +${fmt(f)} עוקבים`; }
+      const f = rnd(20, 120) + Math.floor(S.followers * 0.03); S.followers += f; S.hype += 6; return `+${fmt(f)} עוקבים`; } },
+  { id: 'live',   name: 'לייב באינסטגרם', desc: 'עלות: 20 ⚡. מחבר מעריצים.', energy: 20, cost: 0,  run: () => { const f = Math.floor(S.followers * 0.05) + rnd(20, 80); S.fans += f; S.hype += 8; return `+${fmt(f)} מעריצים נאמנים`; } },
+  { id: 'ads',    name: 'קמפיין ממומן',   desc: 'עלות: ₪2,000. עוקבים בטוחים.', energy: 0, cost: 2000, run: () => { const f = rnd(800, 1600); S.followers += f; S.fans += Math.floor(f * 0.2); S.hype += 10; return `+${fmt(f)} עוקבים`; } },
+];
+
+function doSocial(id) {
+  const a = SOCIAL_ACTIONS.find(x => x.id === id);
+  if (S.postsThisWeek >= 4) { toast('הפוסטים השבוע נגמרו (4 מקסימום)'); return; }
+  if (S.money < a.cost) { toast('💸 אין מספיק כסף'); return; }
+  if (a.energy && !useEnergy(a.energy)) return;
+  S.money -= a.cost;
+  S.postsThisWeek++;
+  S.hype = Math.min(100, S.hype);
+  const r = a.run();
+  S.hype = Math.min(100, S.hype);
+  toast(`📱 ${r}`);
+  render();
+}
+
+function buy(id) {
+  const item = SHOP.find(x => x.id === id);
+  if (S.owned.includes(id) || S.money < item.cost) return;
+  S.money -= item.cost;
+  S.owned.push(id);
+  for (const k of ['flow', 'lyrics', 'charisma', 'production']) if (item.eff[k]) S.skills[k] = Math.min(100, S.skills[k] + item.eff[k]);
+  if (item.eff.rep) S.rep += item.eff.rep;
+  addLog(`קנית: ${item.name}`);
+  toast(`✅ ${item.name}`);
+  render();
+}
+
+// ---------- Week ----------
+function endWeek() {
+  const streamMult = 1 + eff('streamMult');
+  let totalStreams = 0;
+  S.songs.forEach(song => {
+    const age = S.week - song.week;
+    const decay = Math.pow(0.82, age);
+    const base = (S.fans * 0.6 + S.followers * 0.2 + 100) * song.hype * decay * (1 + S.hype / 100);
+    const st = Math.floor(base * rnd(80, 120) / 100 * streamMult);
+    song.lastStreams = st;
+    song.streams += st;
+    totalStreams += st;
+    song.hype = Math.max(0.05, song.hype * 0.97);
+  });
+  const income = Math.floor(totalStreams * 0.012);
+  S.money += income;
+  const fanGrowth = Math.floor(totalStreams * 0.004);
+  S.fans += fanGrowth;
+  S.followers += Math.floor(fanGrowth * 0.6);
+
+  const living = 300 + Math.floor(S.week * 5);
+  S.money -= living;
+
+  const summary = [];
+  if (S.songs.length) summary.push(`🎧 ${fmt(totalStreams)} השמעות → ₪${fmt(income)}`);
+  summary.push(`🏠 הוצאות מחיה: -₪${fmt(living)}`);
+
+  if (S.money < 0) {
+    S.fans = Math.floor(S.fans * 0.97);
+    summary.push('⚠️ אתה בחובות! מעריצים מתחילים לאבד אמון.');
+  }
+
+  S.week++;
+  S.energy = S.maxEnergy;
+  S.showsThisWeek = 0;
+  S.postsThisWeek = 0;
+  S.hype = Math.floor(S.hype * 0.5);
+  if (S.songs.length) addLog(`${fmt(totalStreams)} השמעות השבוע, +₪${fmt(income)}`);
+
+  checkMilestones(summary);
+  save();
+  render();
+
+  const showEvent = () => {
+    const pool = RANDOM_EVENTS.filter(e => !e.cond || e.cond(S));
+    if (Math.random() < 0.4 && pool.length) {
+      const ev = pool[rnd(0, pool.length - 1)];
+      modal(ev.title, ev.body, ev.options.map(o => ({
+        text: o.text,
+        run: () => { const res = o.run(S); addLog(res); save(); render(); toast(res); },
+      })));
+    }
+  };
+
+  modal(`📅 סיכום שבוע ${S.week - 1}`, summary.join('<br>') + `<br><br>מיקום במצעד: <b>${myChartPos() || '—'}</b>`, [{ text: 'לשבוע הבא', cls: 'green', run: () => setTimeout(showEvent, 150) }]);
+}
+
+const MILESTONES = [300, 3000, 20000, 80000, 300000, 1000000];
+function checkMilestones(summary) {
+  S.reached = S.reached || [];
+  MILESTONES.forEach(m => {
+    if (S.fans >= m && !S.reached.includes(m)) {
+      S.reached.push(m);
+      summary.push(`🎉 <b>הגעת ל-${fmt(m)} מעריצים! דרגה: ${tier()}</b>`);
+      addLog(`🎉 הגעת ל-${fmt(m)} מעריצים!`);
+    }
+  });
+}
+
+// ---------- Chart ----------
+function buildChart() {
+  const seed = S.week;
+  const rivals = RIVALS.map((r, i) => {
+    const wobble = Math.sin(seed * 1.7 + i * 2.3) * 12;
+    return { name: r.song, artist: r.name, score: Math.pow(10, (r.power + wobble) / 20), me: false };
+  });
+  const mine = S.songs.filter(s => s.lastStreams > 0).slice(0, 3).map(s => ({ name: s.name, artist: S.name, score: s.lastStreams / 120, me: true }));
+  return rivals.concat(mine).sort((a, b) => b.score - a.score).slice(0, 10);
+}
+function myChartPos() {
+  const c = buildChart();
+  const i = c.findIndex(x => x.me);
+  return i >= 0 ? `#${i + 1}` : null;
+}
+
+// ---------- Render ----------
+function render() {
+  $('tMoney').textContent = (S.money < 0 ? '-₪' : '₪') + fmt(Math.abs(S.money));
+  $('tMoney').style.color = S.money < 0 ? 'var(--accent-red)' : '';
+  $('tFans').textContent = fmt(S.fans);
+  $('tWeek').textContent = S.week;
+  $('tEnergy').style.width = (S.energy / S.maxEnergy * 100) + '%';
+  $('tEnergyTxt').textContent = `${S.energy}/${S.maxEnergy}`;
+
+  // Home
+  $('homeTitle').textContent = `${S.name} · ${S.city}`;
+  $('hRep').textContent = S.rep;
+  $('hTier').textContent = tier();
+  $('hSongs').textContent = S.songs.length;
+  $('hStreams').textContent = fmt(S.songs.reduce((a, s) => a + s.streams, 0));
+  $('skillsList').innerHTML = Object.keys(SKILLS).map(k => `
+    <div class="skill-row">
+      <div class="row"><span>${SKILLS[k]}</span><span>${S.skills[k]}/100</span></div>
+      <div class="bar"><div style="width:${S.skills[k]}%"></div></div>
+    </div>`).join('');
+  $('trainBtns').innerHTML = Object.keys(SKILLS).map(k => `<button class="btn ghost" onclick="train('${k}')">${SKILLS[k]}</button>`).join('');
+  $('logList').innerHTML = S.log.slice(0, 8).map(l => `<div class="log-item">${l}</div>`).join('');
+
+  // Studio
+  const beatSel = $('songBeat'), featSel = $('songFeat');
+  const pb = beatSel.value, pf = featSel.value;
+  beatSel.innerHTML = BEATS.map(b => `<option value="${b.id}" ${b.minFans && S.fans < b.minFans ? 'disabled' : ''}>${b.name} — ₪${fmt(b.cost)}${b.minFans && S.fans < b.minFans ? ` (🔒 ${fmt(b.minFans)})` : ''}</option>`).join('');
+  featSel.innerHTML = FEATS.map(f => `<option value="${f.id}" ${S.fans < f.minFans ? 'disabled' : ''}>${f.name} — ₪${fmt(f.cost)}${S.fans < f.minFans ? ` (🔒 ${fmt(f.minFans)})` : ''}</option>`).join('');
+  if (pb && !beatSel.querySelector(`option[value="${pb}"]`).disabled) beatSel.value = pb;
+  if (pf && !featSel.querySelector(`option[value="${pf}"]`).disabled) featSel.value = pf;
+  updateCost();
+
+  $('discList').innerHTML = S.songs.length ? S.songs.map(s => {
+    const cls = s.q >= 75 ? 'hit' : s.q >= 50 ? 'mid' : 'flop';
+    const lbl = s.q >= 75 ? 'להיט' : s.q >= 50 ? 'סביר' : 'פלופ';
+    return `<div class="card">
+      <div class="card-title">${s.name}<span class="tag ${cls}">${lbl} · ${s.q}</span></div>
+      <div class="card-sub">${s.topic}${s.feat ? ' · פיט׳ ' + s.feat : ''} · שבוע ${s.week}<br>
+      🎧 ${fmt(s.streams)} השמעות (${fmt(s.lastStreams)} בשבוע האחרון)</div>
+    </div>`;
+  }).join('') : '<div class="empty">עוד לא הקלטת כלום. הזמן להתחיל!</div>';
+
+  // Shows
+  $('venueList').innerHTML = VENUES.map(v => {
+    const locked = S.fans < v.minFans;
+    return `<div class="card" style="${locked ? 'opacity:0.5' : ''}">
+      <div class="card-title">${v.name}<span class="tag">-${v.energy} ⚡</span></div>
+      <div class="card-sub">💰 ₪${fmt(v.pay[0])}–${fmt(v.pay[1])} · 👥 ${fmt(v.fans[0])}–${fmt(v.fans[1])}</div>
+      ${locked ? `<div class="card-sub" style="margin-top:6px">🔒 נדרשים ${fmt(v.minFans)} מעריצים</div>` :
+      `<button class="btn orange full" onclick="playShow('${v.id}')" ${S.showsThisWeek >= 2 ? 'disabled' : ''}>הופע</button>`}
+    </div>`;
+  }).join('');
+
+  // Social
+  $('sFollowers').textContent = fmt(S.followers);
+  $('sHype').textContent = S.hype + '%';
+  $('socialActions').innerHTML = SOCIAL_ACTIONS.map(a => `
+    <div class="card"><div class="row">
+      <div><div class="card-title">${a.name}</div><div class="card-sub">${a.desc}</div></div>
+      <button class="btn" onclick="doSocial('${a.id}')" ${S.postsThisWeek >= 4 ? 'disabled' : ''}>פרסם</button>
+    </div></div>`).join('') + `<div class="card-sub" style="margin-bottom:10px">פוסטים השבוע: ${S.postsThisWeek}/4</div>`;
+  $('chartList').innerHTML = buildChart().map((c, i) => `
+    <div class="chart-item ${c.me ? 'me' : ''}">
+      <div class="chart-pos">${i + 1}</div>
+      <div class="chart-info"><div>${c.name}</div><div class="artist">${c.artist}</div></div>
+    </div>`).join('');
+
+  // Shop
+  $('shopList').innerHTML = SHOP.map(it => {
+    const own = S.owned.includes(it.id);
+    return `<div class="card"><div class="row">
+      <div><div class="card-title">${it.name}</div><div class="card-sub">${it.desc}</div></div>
+      ${own ? '<span class="tag hit">✓ בבעלותך</span>' : `<button class="btn green" onclick="buy('${it.id}')" ${S.money < it.cost ? 'disabled' : ''}>₪${fmt(it.cost)}</button>`}
+    </div></div>`;
+  }).join('');
+
+  save();
+}
+
+function updateCost() {
+  if (!S) return;
+  const b = BEATS.find(x => x.id === $('songBeat').value) || BEATS[0];
+  const f = FEATS.find(x => x.id === $('songFeat').value) || FEATS[0];
+  $('songCost').textContent = `עלות: ₪${fmt(b.cost + f.cost)}`;
+}
+$('songBeat').addEventListener('change', updateCost);
+$('songFeat').addEventListener('change', updateCost);
+
+// ---------- Nav ----------
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    btn.classList.add('active');
+    $('screen-' + btn.dataset.screen).classList.add('active');
+    $('content').scrollTop = 0;
+  });
+});
+
+// ---------- Start ----------
+function renderStyles() {
+  $('styleChoices').innerHTML = STYLES.map(s => `<div class="choice ${s.id === selectedStyle ? 'sel' : ''}" onclick="pickStyle('${s.id}')">${s.name}<small>${s.desc}</small></div>`).join('');
+}
+function pickStyle(id) { selectedStyle = id; renderStyles(); }
+
+function startGame() {
+  const name = $('inpName').value.trim() || 'MC אנונימי';
+  S = newState(name, $('inpCity').value, selectedStyle);
+  $('startScreen').style.display = 'none';
+  render();
+}
+function continueGame() {
+  S = load();
+  $('startScreen').style.display = 'none';
+  render();
+}
+function resetGame() {
+  modal('למחוק את המשחק?', 'כל ההתקדמות תימחק לצמיתות.', [
+    { text: 'כן, מחק', cls: 'red', run: () => { try { localStorage.removeItem(SAVE_KEY); } catch (e) {} location.reload(); } },
+    { text: 'ביטול', cls: 'ghost' },
+  ]);
+}
+
+(function init() {
+  renderStyles();
+  const saved = load();
+  if (saved && saved.name) {
+    $('continueCard').style.display = 'block';
+    $('continueInfo').textContent = `${saved.name} · שבוע ${saved.week} · ${fmt(saved.fans)} מעריצים`;
+  }
+})();
+</script>
+</body>
+</html>
