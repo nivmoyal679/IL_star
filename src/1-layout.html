@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ישראל ראפ סטאר - IL Rap Star Simulator</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- TAILWIND:START -->
+  <!-- TAILWIND:END -->
+  <style>
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #0b0f12; }
+    ::-webkit-scrollbar-thumb { background: #2d3748; border-radius: 4px; }
+    .no-select { user-select: none; -webkit-user-select: none; }
+    input, select { user-select: text; -webkit-user-select: text; }
+    .nav-active { color: #1DB954 !important; border-top: 2px solid #1DB954; }
+
+    @keyframes swipeRight {
+      0% { transform: translateX(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateX(250px) rotate(25deg); opacity: 0; }
+    }
+    @keyframes swipeLeft {
+      0% { transform: translateX(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateX(-250px) rotate(-25deg); opacity: 0; }
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.92); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .anim-swipe-right { animation: swipeRight 0.3s forwards ease-out; }
+    .anim-swipe-left { animation: swipeLeft 0.3s forwards ease-out; }
+    .anim-pop { animation: popIn 0.18s ease-out; }
+  </style>
+</head>
+<body class="bg-black text-gray-100 font-sans antialiased flex justify-center items-center min-h-screen p-0 m-0 no-select">
+
+  <!-- Mobile Viewport Container -->
+  <div class="w-full max-w-md h-screen max-h-[932px] bg-bgDark flex flex-col justify-between relative shadow-2xl overflow-hidden md:rounded-3xl border border-gray-800">
+
+    <!-- START SCREEN -->
+    <div id="start-screen" class="absolute inset-0 z-[60] bg-bgDark overflow-y-auto p-6 hidden">
+      <div class="text-center mt-8 mb-6">
+        <div class="w-20 h-20 mx-auto rounded-full bg-gray-800 border-2 border-spotifyGreen flex items-center justify-center text-4xl text-spotifyGreen shadow">
+          <i class="fa-solid fa-microphone-lines"></i>
+        </div>
+        <h1 class="text-2xl font-bold text-white mt-4">ישראל ראפ סטאר</h1>
+        <p class="text-xs text-gray-400 mt-1">מהשכונה לפסגת המצעד</p>
+      </div>
+
+      <div class="bg-cardDark p-4 rounded-2xl border border-gray-800 space-y-3 text-xs">
+        <div>
+          <label class="block text-gray-400 mb-1">שם במה:</label>
+          <input type="text" id="start-name" maxlength="20" placeholder="למשל: MC שכונה" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white focus:outline-none focus:border-spotifyGreen">
+        </div>
+        <div>
+          <label class="block text-gray-400 mb-1">שם משתמש באינסטגרם (אנגלית):</label>
+          <input type="text" id="start-handle" maxlength="20" dir="ltr" placeholder="artist_il" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white text-left focus:outline-none focus:border-spotifyGreen">
+        </div>
+        <div>
+          <label class="block text-gray-400 mb-1">עיר מוצא:</label>
+          <select id="start-city" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white focus:outline-none"></select>
+        </div>
+        <div>
+          <label class="block text-gray-400 mb-1">החוזקה שלך:</label>
+          <select id="start-perk" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white focus:outline-none">
+            <option value="flow">כותב חזק (+6 פלוואו)</option>
+            <option value="charisma">שואומן (+6 כריזמה)</option>
+            <option value="viral">ילד של טיקטוק (+5 ויראליות)</option>
+            <option value="money">יש קצת חסכונות (+₪2,500)</option>
+          </select>
+        </div>
+        <button onclick="startNewGame()" class="w-full bg-spotifyGreen text-black font-bold py-3 rounded-xl hover:bg-green-600 transition text-sm shadow mt-2">
+          יאללה, מתחילים 🎤
+        </button>
+      </div>
+      <p class="text-[10px] text-gray-600 text-center mt-4">כל האמנים, השירים והמותגים במשחק בדויים.</p>
+    </div>
+
+    <!-- TOP STATUS BAR -->
+    <header class="bg-cardDark px-4 py-3 border-b border-gray-800 flex justify-between items-center z-20 shrink-0">
+      <div class="flex items-center space-x-3 space-x-reverse">
+        <div>
+          <div class="text-[10px] text-gray-400">מאזן:</div>
+          <div class="text-sm font-bold text-spotifyGreen" id="top-money">₪1,500</div>
+        </div>
+        <div class="h-6 w-px bg-gray-700"></div>
+        <div>
+          <div class="text-[10px] text-gray-400">אנרגיה:</div>
+          <div class="text-sm font-bold text-accentOrange" id="top-energy"><i class="fa-solid fa-bolt text-xs ml-0.5"></i>20/20</div>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-3 space-x-reverse">
+        <div class="text-left">
+          <div class="text-xs font-semibold text-gray-300" id="top-date">שבוע 1, 2026</div>
+          <div class="text-[10px] text-gray-400" id="top-fame">Fame: F</div>
+        </div>
+        <button onclick="nextWeek()" class="bg-spotifyGreen hover:bg-green-600 text-black text-xs font-bold px-3 py-2 rounded-xl transition shadow flex items-center gap-1 active:scale-95">
+          <span>סיים שבוע</span>
+          <i class="fa-solid fa-chevron-left text-[10px]"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- MAIN CONTENT SCREENS CONTAINER -->
+    <main class="flex-1 overflow-y-auto p-4 pb-20 relative" id="main-content">
+
+      <!-- SCREEN 1: DASHBOARD -->
+      <section id="screen-dashboard" class="space-y-4">
+        <div class="bg-gradient-to-r from-cardDark via-gray-900 to-gray-950 rounded-2xl p-4 border border-gray-800 relative overflow-hidden shadow">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3 space-x-reverse">
+              <div class="w-14 h-14 rounded-full bg-gray-800 border-2 border-spotifyGreen flex items-center justify-center text-2xl text-spotifyGreen shadow">
+                <i class="fa-solid fa-microphone-lines"></i>
+              </div>
+              <div>
+                <h1 class="text-lg font-bold text-white flex items-center gap-1">
+                  <span id="dash-artist-name">MC IL</span> <i class="fa-solid fa-circle-check text-blue-500 text-xs hidden" id="dash-verified"></i>
+                </h1>
+                <p class="text-xs text-gray-400" id="dash-stage-title">ראפר מתחיל</p>
+                <div class="text-[11px] text-spotifyGreen mt-1 font-medium flex items-center gap-1">
+                  <i class="fa-brands fa-spotify"></i><span id="dash-listeners">0</span> מאזינים חודשיים
+                </div>
+              </div>
+            </div>
+            <button onclick="openSettings()" class="text-gray-500 hover:text-white text-lg p-2" title="הגדרות"><i class="fa-solid fa-gear"></i></button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-cardDark p-3 rounded-xl border border-gray-800">
+            <div class="text-xs text-gray-400 mb-1"><i class="fa-brands fa-instagram text-instaPink ml-1"></i>אינסטגרם</div>
+            <div class="text-base font-bold text-white" id="dash-insta-followers">120 עוקבים</div>
+          </div>
+          <div class="bg-cardDark p-3 rounded-xl border border-gray-800">
+            <div class="text-xs text-gray-400 mb-1"><i class="fa-brands fa-youtube text-youtubeRed ml-1"></i>צפיות ביוטיוב</div>
+            <div class="text-base font-bold text-white" id="dash-yt-views">0 צפיות</div>
+          </div>
+        </div>
+
+        <!-- Genre trend -->
+        <div class="bg-cardDark p-4 rounded-2xl border border-gray-800">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-solid fa-arrow-trend-up text-accentOrange"></i> טרנדים בסצנה</h3>
+            <span class="text-[10px] text-gray-400" id="trend-weeks"></span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div class="bg-gray-900/60 p-2.5 rounded-xl border border-orange-900/60">
+              <div class="text-[10px] text-gray-400">🔥 חם עכשיו (+40% השמעות)</div>
+              <div class="font-bold text-accentOrange mt-0.5" id="trend-hot"></div>
+            </div>
+            <div class="bg-gray-900/60 p-2.5 rounded-xl border border-blue-900/60">
+              <div class="text-[10px] text-gray-400">❄️ יוצא מהאופנה (-30%)</div>
+              <div class="font-bold text-blue-400 mt-0.5" id="trend-cold"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="bg-cardDark p-4 rounded-2xl border border-gray-800">
+          <div class="flex justify-between items-center mb-3">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i class="fa-brands fa-spotify text-spotifyGreen text-base"></i> Top 50 ספוטיפיי ישראל
+            </h3>
+            <button onclick="openChartModal()" class="text-[11px] text-spotifyGreen font-semibold hover:underline">למצעד המלא</button>
+          </div>
+          <div class="space-y-2" id="dash-chart-list"></div>
+          <div class="mt-3 text-xs bg-gray-900/60 p-2.5 rounded-xl border border-gray-800" id="dash-my-chart"></div>
+        </div>
+
+        <!-- Achievements -->
+        <div class="bg-cardDark p-4 rounded-2xl border border-gray-800">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-solid fa-trophy text-goldAccent"></i> הישגים <span class="text-gray-400 font-normal text-xs" id="ach-count"></span></h3>
+            <button onclick="openAchievementsModal()" class="text-[11px] text-spotifyGreen font-semibold hover:underline">כל ההישגים</button>
+          </div>
+          <div class="w-full bg-gray-900 h-2 rounded-full overflow-hidden border border-gray-800 mb-3">
+            <div class="bg-goldAccent h-full transition-all duration-300" id="ach-bar" style="width:0%"></div>
+          </div>
+          <div class="space-y-1.5 text-xs" id="ach-next"></div>
+        </div>
+
+        <!-- News Feed -->
+        <div class="bg-cardDark p-4 rounded-2xl border border-gray-800">
+          <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+            <i class="fa-solid fa-newspaper text-accentOrange"></i> חדשות, וואטסאפ ואירועים
+          </h3>
+          <ul class="space-y-2 text-xs text-gray-300" id="dash-logs"></ul>
+        </div>
+      </section>
+
+      <!-- SCREEN 2: TALENT & SKILLS -->
+      <section id="screen-talent" class="space-y-4 hidden">
+        <h2 class="text-lg font-bold text-white">כישורים ויכולות</h2>
+        <div class="bg-cardDark p-4 rounded-2xl border border-gray-800 space-y-3" id="skills-list"></div>
+        <div class="bg-cardDark p-3 rounded-xl border border-gray-800 text-[11px] text-gray-400 leading-relaxed">
+          <b class="text-gray-200">מה כל כישור עושה?</b><br>
+          פלוואו וכתיבה וכריזמה קובעים כמה השירים שלך מצליחים. כריזמה גם מעלה את התשלום בהופעות.
+          ויראליות משפרת את אתגרי הטיקטוק. בימוי וידאו מגדיל את הצפיות בקליפים.
+        </div>
+      </section>
+
+      <!-- SCREEN 3: STUDIO -->
+      <section id="screen-studio" class="space-y-4 hidden">
+        <div class="flex justify-between items-center">
+          <h2 class="text-lg font-bold text-white">אולפן הקלטות</h2>
+          <button onclick="openNewSongModal()" class="bg-spotifyGreen text-black text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1 hover:bg-green-600 transition shadow">
+            <i class="fa-solid fa-plus"></i> יצירת יצירה
+          </button>
+        </div>
+        <div class="space-y-2">
+          <h3 class="text-sm font-bold text-gray-300">דיסקוגרפיה ושירים</h3>
+          <div id="studio-songs-list" class="space-y-2"></div>
+        </div>
+      </section>
+
+      <!-- SCREEN 4: SOCIAL & TINDER -->
+      <section id="screen-social" class="space-y-4 hidden">
+        <div class="flex bg-cardDark p-1 rounded-xl border border-gray-800">
+          <button id="btn-subtab-insta" onclick="switchSocialTab('insta')" class="flex-1 py-1.5 text-xs font-bold rounded-lg bg-gray-800 text-white transition">
+            <i class="fa-brands fa-instagram text-instaPink ml-1"></i> Instagram & TikTok
+          </button>
+          <button id="btn-subtab-tinder" onclick="switchSocialTab('tinder')" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-gray-400 hover:text-white transition">
+            <i class="fa-solid fa-fire text-tinderFlame ml-1"></i> Tinder Israel
+          </button>
+        </div>
+
+        <div id="subtab-insta" class="space-y-4">
+          <div class="bg-cardDark p-4 rounded-2xl border border-gray-800 space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2 space-x-reverse">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600 p-0.5">
+                  <div class="w-full h-full bg-black rounded-full flex items-center justify-center text-white text-sm">
+                    <i class="fa-brands fa-instagram"></i>
+                  </div>
+                </div>
+                <div>
+                  <div class="text-xs font-bold text-white flex items-center gap-1" dir="ltr">
+                    <span id="insta-username">@artist_il</span>
+                  </div>
+                  <div class="text-[11px] text-gray-400"><span id="insta-followers-count">120</span> עוקבים</div>
+                </div>
+              </div>
+              <button onclick="postInstaStory()" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs font-bold px-3 py-1.5 rounded-xl hover:opacity-90 transition">
+                העלה סטורי (3 <i class="fa-solid fa-bolt text-[10px]"></i>)
+              </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 pt-2">
+              <button onclick="startBeef()" class="bg-red-950/60 border border-red-800/60 text-red-300 text-xs p-2.5 rounded-xl hover:bg-red-900/50 transition text-right">
+                <div class="font-bold flex items-center gap-1"><i class="fa-solid fa-fire text-red-500"></i> התחל דיס (5 <i class="fa-solid fa-bolt text-[9px]"></i>)</div>
+                <div class="text-[10px] text-red-400/80 mt-0.5">מעלה הייפ אך מסוכן</div>
+              </button>
+              <button onclick="tiktokChallenge()" class="bg-gray-800 border border-gray-700 text-gray-200 text-xs p-2.5 rounded-xl hover:bg-gray-700/60 transition text-right">
+                <div class="font-bold flex items-center gap-1"><i class="fa-brands fa-tiktok text-cyan-400"></i> אתגר טיקטוק (4 <i class="fa-solid fa-bolt text-[9px]"></i>)</div>
+                <div class="text-[10px] text-gray-400 mt-0.5">קידום ויראלי לשירים</div>
+              </button>
+            </div>
+            <div class="text-[10px] text-gray-500" id="beef-list"></div>
+          </div>
+
+          <div class="bg-cardDark p-4 rounded-2xl border border-gray-800 space-y-3">
+            <h3 class="text-xs font-bold text-gray-300 flex items-center gap-1.5">
+              <i class="fa-regular fa-comments text-instaPink"></i> תגובות מעריצים בפיד
+            </h3>
+            <div id="insta-comments-feed" class="space-y-2 text-xs"></div>
+          </div>
+        </div>
+
+        <div id="subtab-tinder" class="space-y-4 hidden">
+          <div class="bg-cardDark p-4 rounded-2xl border border-gray-800 text-center relative overflow-hidden" id="tinder-container">
+            <div class="flex justify-between items-center mb-3">
+              <div class="text-xs font-bold text-tinderFlame flex items-center gap-1">
+                <i class="fa-solid fa-fire"></i> Tinder Israel
+              </div>
+              <div class="text-xs text-gray-400">מאצ׳ים: <span id="tinder-matches-count" class="text-white font-bold">0</span> | סיכוי למאצ׳: <span id="tinder-chance" class="text-white font-bold">0%</span></div>
+            </div>
+
+            <div id="tinder-card" class="bg-gray-900 border border-gray-800 rounded-xl p-4 text-right space-y-2 relative shadow-lg">
+              <div class="w-full h-44 bg-gray-800 rounded-lg flex items-center justify-center text-5xl text-gray-500 relative overflow-hidden" id="tinder-avatar-bg">
+                <i class="fa-solid fa-user-ninja" id="tinder-avatar-icon"></i>
+                <div class="absolute bottom-2 right-2 bg-black/70 px-2.5 py-1 rounded-lg text-xs text-white backdrop-blur-sm" id="tinder-age-loc"></div>
+                <div class="absolute top-2 left-2 bg-black/70 px-2.5 py-1 rounded-lg text-[10px] text-tinderFlame font-bold" id="tinder-trait"></div>
+              </div>
+              <div>
+                <h4 class="text-base font-bold text-white" id="tinder-name"></h4>
+                <p class="text-xs text-gray-300" id="tinder-bio"></p>
+              </div>
+              <div class="flex justify-center space-x-6 space-x-reverse pt-2">
+                <button onclick="swipeTinder(false)" class="w-12 h-12 rounded-full bg-gray-800 border border-red-500 text-red-500 flex items-center justify-center text-lg hover:bg-red-500 hover:text-white transition shadow active:scale-90">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+                <button onclick="swipeTinder(true)" class="w-12 h-12 rounded-full bg-gray-800 border border-green-500 text-green-500 flex items-center justify-center text-lg hover:bg-green-500 hover:text-white transition shadow active:scale-90">
+                  <i class="fa-solid fa-heart"></i>
+                </button>
+              </div>
+            </div>
+
+            <div id="tinder-relationship-box" class="text-right space-y-3 hidden">
+              <div class="text-xs font-bold text-gray-300">בת הזוג הנוכחית שלך:</div>
+              <div class="bg-gray-900 p-3 rounded-xl border border-gray-800 space-y-2">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <div class="text-sm font-bold text-white" id="rel-partner-name"></div>
+                    <div class="text-[10px] text-tinderFlame font-bold mt-0.5" id="rel-partner-trait"></div>
+                    <div class="text-[10px] text-gray-400 mt-0.5">דרמה: <span id="rel-partner-drama"></span> | ביחד <span id="rel-weeks"></span> שבועות</div>
+                  </div>
+                  <button onclick="breakUp()" class="text-red-400 text-xs hover:underline font-bold">הפרד</button>
+                </div>
+                <div>
+                  <div class="flex justify-between text-[10px] text-gray-400 mb-1"><span>נאמנות</span><span id="rel-partner-loyalty"></span></div>
+                  <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden"><div class="bg-tinderFlame h-full transition-all duration-300" id="rel-loyalty-bar"></div></div>
+                </div>
+                <div class="text-[10px] text-gray-400" id="rel-perk"></div>
+                <div class="grid grid-cols-2 gap-2 pt-1" id="rel-dates"></div>
+                <div class="text-[10px] text-gray-500 text-center" id="rel-date-note"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCREEN 5: JOBS & GIGS -->
+      <section id="screen-jobs" class="space-y-4 hidden">
+        <h2 class="text-lg font-bold text-white">עבודה והופעות</h2>
+        <div class="space-y-2">
+          <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">עבודות מזדמנות (לכסף מהיר)</h3>
+          <div id="jobs-list" class="space-y-2"></div>
+        </div>
+        <div class="space-y-2 pt-2">
+          <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">הופעות חיות ומועדונים</h3>
+          <div class="text-[10px] text-gray-500">הופעה אחת בשבוע בכל מקום. הרווח עולה עם הכריזמה ועם המאזינים החודשיים.</div>
+          <div id="gigs-list" class="space-y-2"></div>
+        </div>
+      </section>
+
+      <!-- SCREEN 6: SHOP -->
+      <section id="screen-shop" class="space-y-4 hidden">
+        <h2 class="text-lg font-bold text-white">סגנון חיים וציוד</h2>
+        <div class="bg-cardDark p-3 rounded-xl border border-gray-800">
+          <div class="text-xs font-bold text-gray-400 mb-2">הרכוש שלך:</div>
+          <div id="shop-owned-items" class="text-xs text-gray-300 flex flex-wrap gap-1.5"></div>
+          <div class="text-[10px] text-gray-500 mt-2" id="shop-rent"></div>
+        </div>
+        <div id="shop-catalog" class="space-y-4"></div>
+      </section>
+    </main>
+
+    <!-- BOTTOM NAVIGATION BAR -->
+    <nav class="bg-cardDark border-t border-gray-800 px-2 py-1 flex justify-around items-center z-20 shrink-0">
+      <button onclick="navTo('dashboard')" id="nav-dashboard" class="nav-active flex-1 flex flex-col items-center py-2 text-gray-400 transition">
+        <i class="fa-solid fa-house text-base"></i>
+        <span class="text-[10px] mt-1">בית</span>
+      </button>
+      <button onclick="navTo('talent')" id="nav-talent" class="flex-1 flex flex-col items-center py-2 text-gray-400 transition">
+        <i class="fa-solid fa-dumbbell text-base"></i>
+        <span class="text-[10px] mt-1">כישורים</span>
+      </button>
+      <button onclick="navTo('studio')" id="nav-studio" class="flex-1 flex flex-col items-center py-2 text-gray-400 transition">
+        <i class="fa-solid fa-compact-disc text-base"></i>
+        <span class="text-[10px] mt-1">סטודיו</span>
+      </button>
+      <button onclick="navTo('social')" id="nav-social" class="flex-1 flex flex-col items-center py-2 text-gray-400 transition">
+        <i class="fa-solid fa-heart text-base"></i>
+        <span class="text-[10px] mt-1">סושיאל</span>
+      </button>
+      <button onclick="navTo('jobs')" id="nav-jobs" class="flex-1 flex flex-col items-center py-2 text-gray-400 transition">
+        <i class="fa-solid fa-briefcase text-base"></i>
+        <span class="text-[10px] mt-1">הופעות</span>
+      </button>
+      <button onclick="navTo('shop')" id="nav-shop" class="flex-1 flex flex-col items-center py-2 text-gray-400 transition">
+        <i class="fa-solid fa-store text-base"></i>
+        <span class="text-[10px] mt-1">חנות</span>
+      </button>
+    </nav>
+
+    <!-- MODAL: CREATE SONG OR ALBUM -->
+    <div id="modal-song" class="absolute inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+      <div class="bg-cardDark border border-gray-800 rounded-2xl p-5 w-full max-w-xs space-y-4 shadow-2xl max-h-full overflow-y-auto anim-pop">
+        <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+          <h3 class="text-base font-bold text-white">הקלטת יצירה חדשה</h3>
+          <button onclick="closeModal('modal-song')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="block text-gray-400 mb-1">סוג היצירה:</label>
+            <select id="input-song-type" onchange="updateSongCost()" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white focus:outline-none">
+              <option value="single">סינגל בודד (10 אנרגיה)</option>
+              <option value="album">אלבום מלא (20 אנרגיה, אחרי 3 סינגלים)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-gray-400 mb-1">שם היצירה:</label>
+            <div class="flex gap-2">
+              <input type="text" id="input-song-title" maxlength="32" placeholder="למשל: סטרייט מאוטה רמת גן" class="flex-1 min-w-0 bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white focus:outline-none focus:border-spotifyGreen">
+              <button onclick="suggestTitle()" class="bg-gray-800 border border-gray-700 rounded-xl px-3 text-gray-300 hover:text-white" title="הצע שם"><i class="fa-solid fa-dice"></i></button>
+            </div>
+          </div>
+          <div>
+            <label class="block text-gray-400 mb-1">ז׳אנר מוזיקלי:</label>
+            <select id="input-song-genre" onchange="updateSongCost()" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white focus:outline-none"></select>
+          </div>
+          <div>
+            <label class="block text-gray-400 mb-1">מפיק מוזיקלי:</label>
+            <select id="input-song-producer" onchange="updateSongCost()" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white focus:outline-none">
+              <option value="self">הפקה עצמית / חבר מהשכונה (חינם)</option>
+              <option value="indie">מפיק אינדי מוכר (₪1,500)</option>
+              <option value="top">מפיק צמרת ארצי (₪7,000)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-gray-400 mb-1">פיצ׳ר (אמן אורח):</label>
+            <select id="input-song-feat" onchange="updateSongCost()" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white focus:outline-none"></select>
+          </div>
+          <div>
+            <label class="block text-gray-400 mb-1">קליפ ליוטיוב:</label>
+            <select id="input-song-clip" onchange="updateSongCost()" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white focus:outline-none">
+              <option value="none">ללא קליפ</option>
+              <option value="lyric">קליפ מילים (₪400)</option>
+              <option value="pro">קליפ קולנועי מושקע (₪5,000)</option>
+            </select>
+          </div>
+          <div class="bg-gray-900/60 border border-gray-800 rounded-xl p-2.5 text-gray-300 leading-relaxed" id="song-cost-summary"></div>
+        </div>
+        <button onclick="confirmCreateSong()" class="w-full bg-spotifyGreen text-black font-bold py-2.5 rounded-xl hover:bg-green-600 transition text-xs shadow">
+          שחרר לרשת!
+        </button>
+      </div>
+    </div>
+
+    <!-- MODAL: GENERIC (events, summaries, lists) -->
+    <div id="modal-generic" class="absolute inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+      <div class="bg-cardDark border border-gray-800 rounded-2xl p-5 w-full max-w-sm shadow-2xl max-h-full flex flex-col anim-pop" id="modal-generic-box">
+        <h3 class="text-base font-bold text-white border-b border-gray-800 pb-2 mb-3" id="modal-generic-title"></h3>
+        <div class="text-xs text-gray-300 leading-relaxed overflow-y-auto flex-1" id="modal-generic-body"></div>
+        <div class="flex flex-col gap-2 mt-4" id="modal-generic-buttons"></div>
+      </div>
+    </div>
+
+    <!-- NOTIFICATION TOAST -->
+    <div id="toast" class="absolute top-16 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-4 py-2.5 rounded-xl border border-gray-700 shadow-xl transition-all duration-300 opacity-0 pointer-events-none z-[70] flex items-center gap-2 max-w-[90%]">
+      <i class="fa-solid fa-circle-info text-spotifyGreen" id="toast-icon"></i>
+      <span id="toast-msg">הודעה</span>
+    </div>
+
+  </div>
