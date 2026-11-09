@@ -37,7 +37,7 @@
         relationship: null, tinderProfile: null, dateThisWeek: false,
         gigsThisWeek: [], socialThisWeek: {},
         achievements: [], beefs: [], recentEvents: [], comments: [],
-        trend: null, chart: null,
+        trend: null, chart: null, home: 'parents', debtWeeks: 0,
         albums: [], job: null, jobOffers: null, investments: {}, invLast: {}, teams: {},
         inbox: [], history: [], income: {}, weekIncome: 0, lastWeekIncome: 0,
         tiktokFollowers: 40, ytSubs: 10, posts: [], tiktoks: [],
@@ -66,6 +66,8 @@
       if (!out.trend) out.trend = newTrend(-1);
       if (!out.chart) out.chart = initChart();
       out.baseEnergy = BASE_ENERGY;
+      // Saves from before housing paid rent every week, so they start in a shared flat
+      if (!s.home) out.home = out.inventory.includes('penthouse') ? 'own_penthouse' : out.inventory.includes('florentin') ? 'own_florentin' : 'room';
       if (!out.history.length) out.history = [{ w: out.totalWeeks, l: out.listeners, f: out.followers }];
       out.version = 3;
       return out;
@@ -87,15 +89,14 @@
     function effect(key) {
       return state.inventory.reduce((sum, id) => {
         const it = SHOP.find(i => i.id === id);
-        return sum + (it && it.eff && it.eff[key] && key !== 'rent' ? it.eff[key] : 0);
-      }, 0);
+        return sum + (it && it.eff && it.eff[key] ? it.eff[key] : 0);
+      }, 0) + (key === 'energy' || key === 'social' ? currentHome()[key] : 0);
     }
     function maxEnergy() { return state.baseEnergy + effect('energy'); }
-    function weeklyRent() {
-      if (state.inventory.includes('penthouse')) return 4000;
-      if (state.inventory.includes('florentin')) return 250;
-      return BASE_RENT;
-    }
+    function currentHome() { return HOMES.find(h => h.id === state.home) || HOMES[0]; }
+    function monthlyCost(h) { return h.rent + h.bills; }
+    // Rent and bills are monthly; the game charges the weekly share
+    function weeklyRent() { return Math.round(monthlyCost(currentHome()) * 12 / 52); }
     function moneyScale() { return 1 + Math.sqrt(state.followers) / 40; }
     function skillCost(skill) { return SKILL_BASE_COST[skill] + (state.skills[skill] || 5) * 25; }
     function partnerTrait() { return state.relationship ? TRAITS.find(t => t.id === state.relationship.trait) : null; }
@@ -692,7 +693,8 @@
     // ---------- Tinder ----------
     function genProfile() {
       const tr = pick(TRAITS);
-      return { name: pick(TINDER_NAMES), age: rnd(19, 31), city: pick(CITIES), bio: pick(tr.bios), icon: pick(TINDER_ICONS), bg: pick(TINDER_BG), trait: tr.id };
+      return { name: pick(TINDER_NAMES), age: rnd(19, 31), city: pick(CITIES), bio: pick(tr.bios), icon: pick(TINDER_ICONS), bg: pick(TINDER_BG), trait: tr.id,
+        avatar: genAvatar(), photo: TINDER_PHOTOS.length ? rnd(0, TINDER_PHOTOS.length - 1) : null };
     }
     function matchChance(p) {
       let c = 0.3 + Math.min(0.35, Math.sqrt(state.followers) / 600) + (state.verified ? 0.1 : 0);
@@ -754,7 +756,7 @@
       const tr = partnerTrait();
       r.weeks++;
       state.stats.relWeeksMax = Math.max(state.stats.relWeeksMax, r.weeks);
-      r.loyalty -= tr.decay + rnd(0, 4);
+      r.loyalty -= Math.max(1, tr.decay + currentHome().loyalty + rnd(0, 4));
       if (tr.id === 'influencer') {
         const gain = Math.floor(50 + Math.sqrt(state.followers) * 3);
         state.followers += gain;
@@ -972,7 +974,7 @@
         }
       }
       state.energy = Math.max(0, energy);
-      lines.push(`🏠 הוצאות מחיה: <b class="text-red-400">-₪${fmt(rent)}</b>`);
+      lines.push(`🏠 ${currentHome().name}: <b class="text-red-400">-₪${fmt(rent)}</b> (שכירות וחשבונות)`);
 
       tickInvestments(lines);
       recordChartStats();
@@ -988,9 +990,19 @@
 
       tickRelationship(lines);
       if (state.money < 0) {
-        lines.push(`<span class="text-red-400">⚠️ החשבון במינוס! תמצא עבודה.</span>`);
+        state.debtWeeks = (state.debtWeeks || 0) + 1;
+        if (currentHome().rent > 0 && state.debtWeeks >= 3) {
+          // Three weeks in debt in a rental: the landlord throws you out
+          lines.push(`<span class="text-red-400">🚪 לא שילמת שכירות 3 שבועות. פינו אותך, וחזרת לגור אצל ההורים.</span>`);
+          state.logs.push(`🚪 פינו אותך מ${currentHome().name}. חזרת להורים.`);
+          addInboxMessage('בעל הבית', 'לא שילמת שכירות כבר 3 שבועות. אני מצטער, אבל אתה צריך לפנות את הדירה.');
+          state.home = 'parents';
+          state.debtWeeks = 0;
+        } else {
+          lines.push(`<span class="text-red-400">⚠️ החשבון במינוס! ${currentHome().rent > 0 ? `עוד ${3 - state.debtWeeks} שבועות במינוס ובעל הבית יפנה אותך.` : 'תמצא עבודה.'}</span>`);
+        }
         state.logs.push(`⚠️ החשבון במינוס (${money(state.money)}).`);
-      }
+      } else state.debtWeeks = 0;
 
       addComments(state.followers < 2000 ? 'small' : state.followers > 100000 ? 'big' : 'general', 1);
       if (state.relationship && Math.random() < 0.4) addComments('rel', 1);
@@ -1262,6 +1274,10 @@
         $('money-yoy').innerHTML = `<span class="${ch >= 0 ? 'text-spotifyGreen' : 'text-red-400'}">${ch >= 0 ? '+' : ''}${ch.toFixed(1)}% בקצב שנתי</span>`;
       } else $('money-yoy').innerText = '';
 
+      const h = currentHome();
+      $('money-home').innerHTML = `<div class="font-bold text-white mb-1"><i class="fa-solid ${h.icon} ml-1"></i>${h.name}</div>
+        ${monthlyCost(h) ? `משלם <b class="text-red-400">₪${fmt(monthlyCost(h))}</b> לחודש (₪${fmt(weeklyRent())} בשבוע).` : 'לא משלם כלום.'} ${homeEffectsText(h)}`;
+
       if (state.job) {
         const j = JOBS.find(x => x.id === state.job.id);
         $('money-job').innerHTML = `<div class="font-bold text-white mb-1"><i class="fa-solid ${j.icon} ml-1"></i>${j.name}</div>
@@ -1306,7 +1322,7 @@
       $('shop-owned-items').innerHTML = state.inventory.length
         ? state.inventory.map(id => `<span class="bg-gray-800 px-2 py-1 rounded-lg border border-gray-700 text-spotifyGreen font-semibold">${SHOP.find(i => i.id === id).name}</span>`).join('')
         : '<span class="bg-gray-800 px-2 py-1 rounded-lg border border-gray-700 text-gray-500">אין רכוש עדיין</span>';
-      $('shop-rent').innerText = `🏠 הוצאות מחיה שבועיות: ₪${fmt(weeklyRent())} | ⚡ אנרגיה שבועית: ${maxEnergy()} | 🎚️ רמת האולפן הביתי: ${homeStudioLevel()}`;
+      $('shop-rent').innerText = `🏠 ${currentHome().name}: ₪${fmt(monthlyCost(currentHome()))} לחודש | ⚡ אנרגיה שבועית: ${maxEnergy()} | 🎚️ רמת האולפן הביתי: ${homeStudioLevel()}`;
       const cats = [...new Set(SHOP.map(i => i.cat))];
       $('shop-catalog').innerHTML = cats.map(cat => `<div class="space-y-2">
         <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">${cat}</h3>
@@ -1324,6 +1340,47 @@
           </div>`;
         }).join('')}
       </div>`).join('');
+    }
+
+    // ---------- Housing ----------
+    function homeEffectsText(h) {
+      const parts = [];
+      if (h.energy) parts.push(`${h.energy > 0 ? '+' : ''}${h.energy} אנרגיה בשבוע`);
+      if (h.social) parts.push(`${h.social > 0 ? '+' : ''}${Math.round(h.social * 100)}% מסושיאל`);
+      if (h.loyalty) parts.push(h.loyalty > 0 ? 'קשה לשמור על זוגיות' : 'עוזר לזוגיות');
+      return parts.length ? `<span class="text-gray-400">(${parts.join(' · ')})</span>` : '';
+    }
+    function openHousing() {
+      const options = HOMES.filter(h => !h.own || state.inventory.includes(h.own));
+      showModal({
+        title: '🏠 איפה לגור?',
+        html: `<div class="text-[11px] text-gray-400 mb-2">מעבר לדירה שכורה עולה חודש שכירות מראש (דמי תיווך). לחזור להורים או לדירה בבעלותך זה בחינם.</div>
+          <div class="space-y-2">${options.map(h => {
+            const here = h.id === state.home;
+            const moveCost = h.rent;
+            const ok = here || state.money >= moveCost;
+            return `<div class="p-2.5 rounded-xl border ${here ? 'border-spotifyGreen bg-green-900/20' : 'border-gray-800 bg-gray-900/60'}">
+              <div class="flex justify-between items-start gap-2">
+                <div class="min-w-0"><div class="font-bold text-white text-xs"><i class="fa-solid ${h.icon} ml-1 text-gray-400"></i>${h.name}</div>
+                  <div class="text-[10px] text-gray-400 mt-0.5">${h.desc}</div>
+                  <div class="text-[10px] mt-0.5">${monthlyCost(h) ? `<b class="text-white">₪${fmt(monthlyCost(h))}</b> לחודש` : '<b class="text-spotifyGreen">חינם</b>'} ${homeEffectsText(h)}</div></div>
+                ${here ? '<span class="text-[11px] text-spotifyGreen font-bold shrink-0">גר פה</span>'
+                  : `<button ${ok ? `onclick="moveHome('${h.id}')"` : 'disabled'} class="${ok ? 'bg-spotifyGreen text-black' : 'bg-gray-800 text-gray-500'} text-[11px] font-bold px-2.5 py-1.5 rounded-lg shrink-0">${moveCost ? `עבור (₪${shortNum(moveCost)})` : 'עבור'}</button>`}
+              </div></div>`;
+          }).join('')}</div>`,
+        buttons: [{ t: 'סגור', primary: false }],
+      });
+    }
+    function moveHome(id) {
+      const h = HOMES.find(x => x.id === id);
+      if (state.money < h.rent) { showToast('אין מספיק כסף למעבר!', false); return; }
+      state.money -= h.rent;
+      state.home = id;
+      state.logs.push(`🏠 עברת לגור ב${h.name}.`);
+      if (h.id !== 'parents') addPost('item', `בית חדש 🏠🔑`);
+      $('modal-generic').classList.add('hidden');
+      showToast(`עברת ל${h.name}!`);
+      updateUI();
     }
 
     // ---------- Navigation ----------

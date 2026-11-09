@@ -291,7 +291,7 @@
         const r = state.relationship, tr = partnerTrait();
         return `<div class="min-h-full text-white">${header}
           <div class="px-4 mt-4 space-y-3 pb-8">
-            <div class="rounded-2xl overflow-hidden ${r.bg} h-56 flex items-center justify-center text-7xl text-white/70 relative"><i class="fa-solid ${r.icon}"></i>
+            <div class="rounded-2xl overflow-hidden bg-gray-800 h-72 relative"><div class="absolute inset-0">${profilePicture(r)}</div>
               <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/90 to-transparent p-4 text-right">
                 <div class="text-2xl font-bold">${esc(r.name)} <span class="font-normal">${r.age}</span></div>
                 <div class="text-xs text-gray-300"><i class="fa-solid fa-location-dot ml-1"></i>${esc(r.city)} · ביחד ${r.weeks} שבועות</div>
@@ -315,8 +315,8 @@
       const p = state.tinderProfile, tr = TRAITS.find(t => t.id === p.trait);
       return `<div class="min-h-full text-white">${header}
         <div class="px-4 mt-4 pb-8">
-          <div id="tinder-card" class="rounded-2xl overflow-hidden ${p.bg} h-[420px] relative flex items-center justify-center text-8xl text-white/60 shadow-2xl">
-            <i class="fa-solid ${p.icon}"></i>
+          <div id="tinder-card" class="rounded-2xl overflow-hidden bg-gray-800 h-[420px] relative shadow-2xl">
+            <div class="absolute inset-0">${profilePicture(p)}</div>
             <div class="absolute top-3 left-3 bg-black/60 px-2.5 py-1 rounded-full text-[11px] text-[#FD267A] font-bold">${tr.name}</div>
             <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black via-black/70 to-transparent p-4 text-right">
               <div class="text-3xl font-bold">${esc(p.name)} <span class="font-normal text-2xl">${p.age}</span></div>

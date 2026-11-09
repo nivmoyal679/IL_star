@@ -2,7 +2,6 @@
   <script>
     // ---- Balance constants ----
     const ROYALTY_PER_STREAM = 0.03;   // ₪ per stream
-    const BASE_RENT = 600;             // weekly living costs
     const BASE_ENERGY = 20;
     const SKILL_CAP = { flow: 50, charisma: 50, viral: 25, video: 25 };
     const SKILL_BASE_COST = { flow: 150, charisma: 150, viral: 100, video: 120 };
@@ -65,13 +64,35 @@
       { id: 'scooter', cat: 'רכבים ונדל״ן', name: 'קורקינט חשמלי Xiaomi', cost: 2200, eff: { energy: 2 }, once: { f: 40 }, legacy: 'קורקינט חשמלי', desc: '+2 אנרגיה בשבוע, +40 עוקבים' },
       { id: 'civic', cat: 'רכבים ונדל״ן', name: 'הונדה סיוויק משופרת', cost: 35000, eff: { energy: 4 }, once: { f: 600 }, legacy: 'הונדה סיוויק', desc: '+4 אנרגיה בשבוע, +600 עוקבים' },
       { id: 'gwagon', cat: 'רכבים ונדל״ן', name: 'ג׳יפ יוקרה שחור', cost: 380000, eff: { energy: 4, gigPay: 0.1 }, once: { f: 9000 }, desc: '+4 אנרגיה, +10% בהופעות, +9,000 עוקבים' },
-      { id: 'florentin', cat: 'רכבים ונדל״ן', name: 'דירת שותפים בפלורנטין', cost: 120000, eff: { rent: 250 }, once: { f: 3000 }, legacy: 'דירה בפלורנטין', desc: 'שכירות יורדת ל-₪250, +3,000 עוקבים' },
-      { id: 'penthouse', cat: 'רכבים ונדל״ן', name: 'פנטהאוז במגדלי תל אביב', cost: 850000, eff: { rent: 4000, energy: 4 }, once: { f: 25000 }, legacy: 'פנטהאוז במגדלים', desc: 'תחזוקה ₪4,000 בשבוע, +4 אנרגיה, +25,000 עוקבים' },
+      { id: 'florentin', cat: 'רכבים ונדל״ן', name: 'דירת שותפים בפלורנטין', cost: 120000, once: { f: 3000 }, legacy: 'דירה בפלורנטין', desc: 'דירה בבעלותך: אפשר לגור בה בלי שכירות. +3,000 עוקבים' },
+      { id: 'penthouse', cat: 'רכבים ונדל״ן', name: 'פנטהאוז במגדלי תל אביב', cost: 850000, once: { f: 25000 }, legacy: 'פנטהאוז במגדלים', desc: 'דירה בבעלותך: בלי שכירות, רק תחזוקה. +25,000 עוקבים' },
 
       { id: 'trainer', cat: 'צוות', name: 'מאמן כושר אישי', cost: 8000, eff: { energy: 2 }, desc: '+2 אנרגיה בשבוע' },
       { id: 'pr', cat: 'צוות', name: 'יחצ״ן', cost: 15000, eff: { social: 0.3 }, desc: '+30% עוקבים מסטורי, טיקטוק ודיסים' },
       { id: 'lawyer', cat: 'צוות', name: 'עורך דין צמוד', cost: 20000, eff: { beefShield: 1 }, desc: 'דיס שנכשל עולה לך חצי' },
       { id: 'manager', cat: 'צוות', name: 'מנהל אישי', cost: 25000, eff: { gigPay: 0.25 }, desc: '+25% תשלום בהופעות' },
+    ];
+
+    // Housing. Costs are per month (charged weekly). energy: weekly energy change,
+    // social: % bonus to social reach, loyalty: extra weekly loyalty loss for a partner.
+    // own: needs that shop item to live there (no rent, only bills/maintenance).
+    const HOMES = [
+      { id: 'parents', name: 'אצל ההורים', icon: 'fa-house-chimney', rent: 0, bills: 0, energy: -3, social: -0.1, loyalty: 3,
+        desc: 'בחינם! אבל אמא מעירה אותך ב-7, אין פרטיות לדייטים וזה לא נראה טוב ברשת.' },
+      { id: 'room', name: 'חדר בדירת שותפים', icon: 'fa-door-open', rent: 2400, bills: 400, energy: 0, social: 0, loyalty: 0,
+        desc: 'חדר קטן עם שני שותפים. בסיסי, אבל שלך.' },
+      { id: 'studio', name: 'דירת סטודיו בפלורנטין', icon: 'fa-building', rent: 4200, bills: 600, energy: 1, social: 0.03, loyalty: -1,
+        desc: 'דירה קטנה לבד. שקט לכתוב ומקום להביא דייטים.' },
+      { id: 'three', name: 'דירת 3 חדרים בתל אביב', icon: 'fa-city', rent: 7500, bills: 900, energy: 2, social: 0.06, loyalty: -2,
+        desc: 'מרווחת, עם חדר שהופך לאולפן קטן.' },
+      { id: 'luxury', name: 'דירת יוקרה עם נוף לים', icon: 'fa-water', rent: 16000, bills: 1500, energy: 3, social: 0.12, loyalty: -3,
+        desc: 'מרפסת מול הים. כל סטורי משם אוסף לייקים.' },
+      { id: 'villa', name: 'וילה בהרצליה פיתוח', icon: 'fa-umbrella-beach', rent: 45000, bills: 3000, energy: 4, social: 0.2, loyalty: -4,
+        desc: 'בריכה, חדר כושר ואולפן. חיים של כוכב.' },
+      { id: 'own_florentin', own: 'florentin', name: 'הדירה שלך בפלורנטין', icon: 'fa-key', rent: 0, bills: 900, energy: 1, social: 0.03, loyalty: -1,
+        desc: 'בבעלותך. משלמים רק ארנונה וחשבונות.' },
+      { id: 'own_penthouse', own: 'penthouse', name: 'הפנטהאוז שלך', icon: 'fa-crown', rent: 0, bills: 7000, energy: 4, social: 0.15, loyalty: -4,
+        desc: 'בבעלותך. בלי שכירות, אבל התחזוקה והארנונה יקרות.' },
     ];
 
     const VENUES = [

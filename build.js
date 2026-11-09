@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const parts = ['1-layout.html', '2-data.js', '3-events.js', '5-apps.js', '4-logic.js'];
+const parts = ['1-layout.html', '2-data.js', '3-events.js', '6-avatars.js', '5-apps.js', '4-logic.js'];
 const game = parts.map(f => fs.readFileSync(path.join(__dirname, 'src', f), 'utf8')).join('\n');
 
 fs.mkdirSync(path.join(__dirname, 'build'), { recursive: true });

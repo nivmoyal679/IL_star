@@ -12,6 +12,7 @@
 | `src/2-data.js` | נתונים: אמנים בדויים, חנות, הופעות, הישגים, טינדר, תגובות מעריצים |
 | `src/3-events.js` | האירועים האקראיים (מגיעים כהודעות ב־WhatsApp) |
 | `src/5-apps.js` | האפליקציות שבתוך המשחק: Spotify, Apple Music, YouTube, Instagram, TikTok, Tinder, WhatsApp |
+| `src/6-avatars.js` | דיוקנאות לפרופילים בטינדר (ותמיכה בתמונות מ־`img/tinder/`) |
 | `src/4-logic.js` | מנוע המשחק |
 
 ## עריכה ובנייה
