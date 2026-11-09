@@ -77,7 +77,9 @@
     ];
 
     // Energy can't be recharged mid-week: it renews once a week, minus a "tax".
-    const FATIGUE_STEP = 8;          // energy tax per week in a row that you ran yourself to zero
+    // The agent shows up once you're successful (until then messages come from friends)
+    const AGENT_NAME = 'דני הסוכן';
+    const AGENT_FOLLOWERS = 5000;
 
     // Housing. Costs are per month (charged weekly). energy: weekly energy change,
     // social: % bonus to social reach, loyalty: extra weekly loyalty loss for a partner.
@@ -110,20 +112,20 @@
       { id: 'yarkon', name: 'פארק הירקון', req: 250000, pay: 100000, e: 20 },
     ];
 
-    // Job contracts: weekly pay and a weekly energy cost for a number of weeks.
+    // Job contracts: weekly pay and a weekly energy cost (already on the 100-point scale, max 20).
     // req: minimum skill / followers to be offered the job.
     const JOBS = [
-      { id: 'barista', name: 'בריסטה בבית קפה', icon: 'fa-mug-hot text-amber-400', e: 6, pay: 450 },
-      { id: 'sneakers', name: 'מוכר בחנות סניקרס', icon: 'fa-shoe-prints text-gray-300', e: 7, pay: 550 },
-      { id: 'wolt', name: 'שליח Wolt בתל אביב', icon: 'fa-motorcycle text-cyan-400', e: 8, pay: 700 },
-      { id: 'warehouse', name: 'מחסנאי במרכז לוגיסטי', icon: 'fa-boxes-stacked text-orange-400', e: 10, pay: 900 },
-      { id: 'security', name: 'מאבטח באירועים', icon: 'fa-shield-halved text-blue-400', e: 10, pay: 1000 },
-      { id: 'bar', name: 'ברמן במועדון אברקסס', icon: 'fa-wine-glass text-purple-400', e: 12, pay: 1300 },
-      { id: 'studioasst', name: 'עוזר הפקה באולפן', icon: 'fa-sliders text-spotifyGreen', e: 7, pay: 800, req: { flow: 15 }, perk: { flow: 0.3 } },
-      { id: 'soundtech', name: 'טכנאי סאונד במועדון', icon: 'fa-headphones text-pink-400', e: 9, pay: 1200, req: { followers: 500 } },
-      { id: 'editor', name: 'עורך וידאו פרילנס', icon: 'fa-film text-red-400', e: 8, pay: 1400, req: { video: 12 }, perk: { video: 0.3 } },
-      { id: 'teacher', name: 'מורה לראפ במתנ״ס', icon: 'fa-chalkboard-user text-yellow-300', e: 9, pay: 1500, req: { flow: 20 }, perk: { charisma: 0.3 } },
-      { id: 'jingles', name: 'כותב ג׳ינגלים לפרסומות', icon: 'fa-pen-nib text-teal-300', e: 10, pay: 2200, req: { flow: 30 } },
+      { id: 'barista', name: 'בריסטה בבית קפה', icon: 'fa-mug-hot text-amber-400', e: 8, pay: 450 },
+      { id: 'sneakers', name: 'מוכר בחנות סניקרס', icon: 'fa-shoe-prints text-gray-300', e: 10, pay: 550 },
+      { id: 'wolt', name: 'שליח Wolt בתל אביב', icon: 'fa-motorcycle text-cyan-400', e: 12, pay: 700 },
+      { id: 'warehouse', name: 'מחסנאי במרכז לוגיסטי', icon: 'fa-boxes-stacked text-orange-400', e: 14, pay: 900 },
+      { id: 'security', name: 'מאבטח באירועים', icon: 'fa-shield-halved text-blue-400', e: 14, pay: 1000 },
+      { id: 'bar', name: 'ברמן במועדון אברקסס', icon: 'fa-wine-glass text-purple-400', e: 18, pay: 1300 },
+      { id: 'studioasst', name: 'עוזר הפקה באולפן', icon: 'fa-sliders text-spotifyGreen', e: 10, pay: 800, req: { flow: 15 }, perk: { flow: 0.3 } },
+      { id: 'soundtech', name: 'טכנאי סאונד במועדון', icon: 'fa-headphones text-pink-400', e: 12, pay: 1200, req: { followers: 500 } },
+      { id: 'editor', name: 'עורך וידאו פרילנס', icon: 'fa-film text-red-400', e: 12, pay: 1400, req: { video: 12 }, perk: { video: 0.3 } },
+      { id: 'teacher', name: 'מורה לראפ במתנ״ס', icon: 'fa-chalkboard-user text-yellow-300', e: 14, pay: 1500, req: { flow: 20 }, perk: { charisma: 0.3 } },
+      { id: 'jingles', name: 'כותב ג׳ינגלים לפרסומות', icon: 'fa-pen-nib text-teal-300', e: 20, pay: 2200, req: { flow: 30 } },
     ];
 
     // Song components (level = how much it lifts the song)
@@ -227,7 +229,7 @@
         'אם אתה לא עונה תוך דקה, אני מניחה שבגדת', 'החברות שלי כבר שונאות אותך', 'אקס שלי ראפר. רק אומרת', 'אני לא דרמטית. אני פשוט מרגישה הכל חזק', 'מחפשת מישהו שיילחם בשבילי', 'אם תעלה סטורי בלי לתייג אותי, נגמר', 'יודעת הכל על כולם בסצנה', 'אוהבת בעוצמה. גם כועסת בעוצמה', 'קנאית? אני? בכלל לא. מי זאת בתמונה?'] },
       { id: 'rich', name: 'מבית עשיר', decay: 6, drama: 1, start: 60, perk: 'דייטים בחצי מחיר', bios: [
         'אבא שלי בעל רשת מסעדות. אני משלמת בדייט הראשון', 'גרה בהרצליה פיתוח, נוסעת הרבה לחו״ל', 'יש לי יאכטה. אין לי חבר', 'מנהלת את העסק המשפחתי, מחפשת מישהו עם חלומות', 'אם אתה צריך משקיעה לאלבום, אולי', 'סקי באירופה בחורף, יוון בקיץ', 'קונה אמנות ומחפשת אמן', 'הכסף לא מעניין אותי. כי יש לי', 'מחפשת מישהו אמיתי, לא מישהו שמחפש כסף'] },
-      { id: 'calm', name: 'רגועה', decay: 4, drama: 0, start: 70, perk: 'מורידה לחץ: חצי מס עייפות', bios: [
+      { id: 'calm', name: 'רגועה', decay: 4, drama: 0, start: 70, perk: 'דייטים רגועים: לוקחים חצי אנרגיה', bios: [
         'יוגה בבוקר, ים בערב, שקט בלב', 'מחפשת מישהו לטייל איתו בגליל', 'קפה טוב, ספר טוב, ואתה?', 'מורה לפילאטיס. אני אלמד אותך לנשום', 'אוהבת זריחות ושירים שקטים', 'בלי משחקים. רק כנות', 'מגדלת צמחים ומבשלת טבעוני', 'הכי טוב לי בבית עם סרט', 'אם אתה לחוץ מהקריירה, אני פה'] },
     ];
 

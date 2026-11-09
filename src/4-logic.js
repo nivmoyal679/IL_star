@@ -6,7 +6,7 @@
     (function scaleEnergy() {
       const k = ENERGY_SCALE;
       Object.keys(SKILL_ENERGY).forEach(x => SKILL_ENERGY[x] *= k);
-      [JOBS, DATES, VENUES].forEach(list => list.forEach(x => { x.e *= k; }));
+      [DATES, VENUES].forEach(list => list.forEach(x => { x.e *= k; }));
       SHOP.forEach(x => { if (x.eff && x.eff.energy) x.eff.energy *= k; });
       HOMES.forEach(x => { x.energy *= k; });
       const fx = f => { if (f && f.e) f.e *= k; };
@@ -780,9 +780,10 @@
       const cost = tr.id === 'rich' ? Math.floor(d.cost / 2) : d.cost;
       if (state.dateThisWeek) { showToast('כבר יצאתם לדייט השבוע!', false); return; }
       if (state.money < cost) { showToast('אין מספיק כסף לדייט!', false); return; }
-      if (!needEnergy(d.e)) return;
+      const dateE = tr.id === 'calm' ? Math.ceil(d.e / 2) : d.e;
+      if (!needEnergy(dateE)) return;
       state.money -= cost;
-      state.energy -= d.e;
+      state.energy -= dateE;
       state.dateThisWeek = true;
       state.relationship.loyalty = Math.min(100, state.relationship.loyalty + d.l + (tr.id === 'party' ? 10 : 0));
       showToast(`יצאתם ל${d.name}! 🍷`);
@@ -915,7 +916,7 @@
     // Events arrive as chats; you answer them whenever you want (within 3 weeks)
     const INBOX_EXPIRY = 3;
     function eventSender(ev, ctx) {
-      return ctx.partner || ctx.rapper || ctx.producer || ctx.media || ctx.brand || ctx.label || ctx.friend || 'הסוכן שלך';
+      return ctx.partner || ctx.rapper || ctx.producer || ctx.media || ctx.brand || ctx.label || ctx.friend || (state.hasAgent ? AGENT_NAME : pick(FRIENDS));
     }
     function rollEvent() {
       if (Math.random() > 0.65) return null;
@@ -1010,9 +1011,6 @@
       // plus a bonus for energy you saved by resting
       const leftover = state.energy;
       const eb = { base: state.baseEnergy, items: effect('energy') - currentHome().energy, home: currentHome().energy, job: 0, fatigue: 0, rest: 0 };
-      if (leftover <= 5) state.burnout = (state.burnout || 0) + 1; else state.burnout = 0;
-      eb.fatigue = Math.min(3, state.burnout) * FATIGUE_STEP;
-      if (eb.fatigue && partnerTrait() && partnerTrait().id === 'calm') eb.fatigue = Math.floor(eb.fatigue / 2);
       // Job contract: pay for the week that just ended, take this week's energy
       let energy = maxEnergy();
       if (state.job) {
@@ -1033,11 +1031,11 @@
           eb.job = j.e;
         }
       }
-      state.energy = clamp(energy - eb.fatigue, 0, energyCap());
+      state.energy = clamp(energy, 0, energyCap());
       eb.total = state.energy;
       state.energyWeek = eb;
       state.rechargeUsed = {};
-      lines.push(`⚡ אנרגיה השבוע: <b class="text-white">${state.energy}</b>${eb.fatigue ? ` <span class="text-coral">(−${eb.fatigue} עייפות: נגמרה לך האנרגיה ${state.burnout === 1 ? 'בשבוע שעבר' : `${state.burnout} שבועות ברצף`})</span>` : ''}`);
+      lines.push(`⚡ אנרגיה השבוע: <b class="text-white">${state.energy}</b>${eb.job ? ` <span class="text-gray-400">(−${eb.job} עבודה)</span>` : ''}`);
       lines.push(`🏠 ${currentHome().name}: <b class="text-red-400">-₪${fmt(rent)}</b> (שכירות וחשבונות)`);
 
       tickInvestments(lines);
@@ -1089,6 +1087,15 @@
       });
     }
 
+    // The agent reaches out once you've made it
+    function checkAgent() {
+      if (state.hasAgent || state.followers < AGENT_FOLLOWERS) return;
+      state.hasAgent = true;
+      addInboxMessage(AGENT_NAME, `היי! אני דני. עוקב אחריך כבר כמה חודשים, ומה שאתה עושה עכשיו זה אש. ${fmt(AGENT_FOLLOWERS)}+ עוקבים זה לא מקרה. מעכשיו אני הסוכן שלך: הצעות, ראיונות והופעות יעברו דרכי. בוא נעשה היסטוריה 🤝`);
+      state.logs.push(`🤝 ${AGENT_NAME} הפך לסוכן שלך!`);
+      showToast(`🤝 יש לך סוכן: ${AGENT_NAME}`);
+    }
+
     // ---------- Achievements ----------
     function checkAchievements() {
       ACHIEVEMENTS.forEach(a => {
@@ -1106,6 +1113,7 @@
     const FAME_STEPS = [[0, 'F'], [500, 'D'], [2500, 'C'], [10000, 'B'], [50000, 'A'], [100000, 'S+'], [1000000, 'S+']];
     function updateUI() {
       checkAchievements();
+      checkAgent();
       if (state.followers >= 10000 && !state.verified) {
         state.verified = true;
         showToast('מזל טוב! קיבלת וי כחול באינסטגרם!');
@@ -1117,7 +1125,7 @@
       moneyEl.classList.toggle('text-red-500', state.money < 0);
       moneyEl.classList.toggle('text-spotifyGreen', state.money >= 0);
       $('top-energy').innerHTML = `<i class="fa-solid fa-bolt text-xs ml-0.5"></i>${state.energy}/${maxEnergy()}`;
-      $('home-energy-btn').innerHTML = `⚡ אנרגיה ${state.energy}/${maxEnergy()}${state.burnout ? ' · 😵 עייף' : ''}`;
+      $('home-energy-btn').innerHTML = `⚡ אנרגיה ${state.energy}/${maxEnergy()}`;
       $('top-date').innerText = `שבוע ${state.week}, ${state.year}`;
       $('top-fame').innerText = `Fame: ${fameRank()}`;
 
@@ -1438,7 +1446,6 @@
         ${row('ציוד ורכבים', eb.items, 'text-mint')}
         ${row(currentHome().name, eb.home, eb.home > 0 ? 'text-mint' : 'text-coral')}
         ${row('עבודה', -eb.job, 'text-coral')}
-        ${row('עייפות מהשבוע שעבר', -eb.fatigue, 'text-coral')}
         <div class="flex justify-between border-t border-gray-700 pt-1 mt-1 text-sm"><span class="font-extrabold">התחלת את השבוע עם</span><b class="text-white">${eb.total !== undefined ? eb.total : state.energy}</b></div>
       </div>`;
     }
@@ -1446,10 +1453,7 @@
       showModal({
         title: `⚡ אנרגיה: ${state.energy}/${maxEnergy()}`,
         html: `${energyBreakdown()}
-          <div class="text-[11px] font-bold text-gray-400 mt-3 leading-relaxed">
-            האנרגיה מתחדשת פעם בשבוע, ואי אפשר להטעין אותה באמצע. עבודה ומגורים לוקחים "מס" קבוע.
-            אם תגמור את כל האנרגיה, בשבוע הבא תתחיל עייף: −${FATIGUE_STEP} לכל שבוע ברצף, עד −${FATIGUE_STEP * 3}.
-          </div>
+          <div class="text-[11px] font-bold text-gray-400 mt-3 leading-relaxed">האנרגיה מתחדשת פעם בשבוע, ואי אפשר להטעין אותה באמצע. עבודה ומגורים לוקחים "מס" קבוע.</div>
           <div class="text-[11px] font-bold text-gray-400 mt-2 leading-relaxed">להגדיל את האנרגיה לתמיד: רכבים ומאמן כושר בחנות, ודירה טובה יותר.</div>`,
         buttons: [{ t: 'סגור', primary: false }],
       });
