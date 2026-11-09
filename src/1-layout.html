@@ -85,31 +85,23 @@
         <p class="text-xs text-gray-400 mt-1">מהשכונה לפסגת המצעד</p>
       </div>
 
-      <div class="bg-cardDark p-4 rounded-2xl border border-gray-800 space-y-3 text-xs">
+      <div class="space-y-4">
         <div>
-          <label class="block text-gray-400 mb-1">שם במה:</label>
-          <input type="text" id="start-name" maxlength="20" placeholder="למשל: MC שכונה" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white focus:outline-none focus:border-spotifyGreen">
+          <label class="block text-sm font-extrabold text-gray-300 mb-1.5">השם שלי</label>
+          <input type="text" id="start-real" maxlength="20" placeholder="איך קוראים לך?" class="w-full bg-gray-800 rounded-full px-5 py-3.5 text-base text-white font-medium focus:outline-none placeholder:text-gray-500" style="box-shadow: inset 0 -4px 0 rgba(0,0,0,.18)">
         </div>
         <div>
-          <label class="block text-gray-400 mb-1">שם משתמש באינסטגרם (אנגלית):</label>
-          <input type="text" id="start-handle" maxlength="20" dir="ltr" placeholder="artist_il" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white text-left focus:outline-none focus:border-spotifyGreen">
+          <label class="block text-sm font-extrabold text-gray-300 mb-1.5">שם במה</label>
+          <div class="flex bg-gray-800 rounded-full overflow-hidden" style="box-shadow: inset 0 -4px 0 rgba(0,0,0,.18)">
+            <input type="text" id="start-name" maxlength="20" placeholder="למשל: MC שכונה" oninput="startHandle = null" class="flex-1 min-w-0 bg-transparent px-5 py-3.5 text-base text-white font-medium focus:outline-none placeholder:text-gray-500">
+            <button onclick="randomStageName()" class="bg-mint text-bgDark px-4 font-extrabold text-sm whitespace-nowrap" title="שם רנדומלי"><i class="fa-solid fa-dice ml-1"></i>רנדומלי</button>
+          </div>
         </div>
         <div>
-          <label class="block text-gray-400 mb-1">עיר מוצא:</label>
-          <select id="start-city" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white focus:outline-none"></select>
+          <label class="block text-sm font-extrabold text-gray-300 mb-1.5">מקום מגורים</label>
+          <select id="start-city" class="w-full bg-gray-800 rounded-full px-5 py-3.5 text-base text-white font-medium focus:outline-none appearance-none" style="box-shadow: inset 0 -4px 0 rgba(0,0,0,.18)"></select>
         </div>
-        <div>
-          <label class="block text-gray-400 mb-1">החוזקה שלך:</label>
-          <select id="start-perk" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white focus:outline-none">
-            <option value="flow">כותב חזק (+6 פלוואו)</option>
-            <option value="charisma">שואומן (+6 כריזמה)</option>
-            <option value="viral">ילד של טיקטוק (+5 ויראליות)</option>
-            <option value="money">יש קצת חסכונות (+₪2,500)</option>
-          </select>
-        </div>
-        <button onclick="startNewGame()" class="w-full bg-spotifyGreen text-black font-bold py-3 rounded-xl hover:bg-green-600 transition text-sm shadow mt-2">
-          יאללה, מתחילים 🎤
-        </button>
+        <button onclick="startNewGame()" class="w-full bg-mint text-bgDark font-extrabold py-4 rounded-full text-lg pill3d mt-2">יאללה, מתחילים 🎤</button>
       </div>
       <p class="text-[10px] text-gray-600 text-center mt-4">כל האמנים, השירים והמותגים במשחק בדויים.</p>
     </div>

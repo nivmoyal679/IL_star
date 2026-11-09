@@ -1511,16 +1511,37 @@
     }
 
     // ---------- Start / settings ----------
+    let startHandle = null;
+    function randomStageName() {
+      const w = pick(STAGE_WORD);
+      const r = Math.random();
+      let name, handle;
+      if (r < 0.5) { const p = pick(STAGE_PREFIX); name = `${p[0]} ${w[0]}`; handle = `${p[1]}_${w[1]}`; }
+      else if (r < 0.8) { const n = pick(STAGE_NUM); name = `${w[0]} ${n}`; handle = `${w[1]}${n}`; }
+      else { name = `ה${w[0]}`; handle = `the_${w[1]}`; }
+      $('start-name').value = name;
+      startHandle = handle;
+    }
+    // Instagram handle for a typed stage name: simple Hebrew-to-Latin spelling
+    const TRANSLIT = { 'א': 'a', 'ב': 'b', 'ג': 'g', 'ד': 'd', 'ה': 'h', 'ו': 'o', 'ז': 'z', 'ח': 'ch', 'ט': 't', 'י': 'i', 'כ': 'k', 'ך': 'ch', 'ל': 'l', 'מ': 'm', 'ם': 'm', 'נ': 'n', 'ן': 'n', 'ס': 's', 'ע': 'a', 'פ': 'p', 'ף': 'f', 'צ': 'tz', 'ץ': 'tz', 'ק': 'k', 'ר': 'r', 'ש': 'sh', 'ת': 't' };
+    function handleFrom(name) {
+      const h = [...name.toLowerCase()].map(ch => TRANSLIT[ch] !== undefined ? TRANSLIT[ch] : /[a-z0-9]/.test(ch) ? ch : ch === ' ' ? '_' : '').join('')
+        .replace(/_+/g, '_').replace(/^_|_$/g, '').slice(0, 20);
+      return h || 'artist_il';
+    }
     function showStartScreen() {
       $('start-city').innerHTML = CITIES.map(c => `<option>${c}</option>`).join('');
       $('start-screen').classList.remove('hidden');
     }
     function startNewGame() {
-      const name = $('start-name').value.trim().slice(0, 20) || 'MC IL';
-      const handle = ($('start-handle').value.trim().replace(/[^a-zA-Z0-9_.]/g, '').slice(0, 20)) || 'artist_il';
-      state = newState(name, handle, $('start-city').value, $('start-perk').value);
+      if (!$('start-name').value.trim()) randomStageName();
+      const name = $('start-name').value.trim().slice(0, 20);
+      const handle = startHandle || handleFrom(name);
+      const realName = $('start-real').value.trim().slice(0, 20);
+      state = newState(name, handle, $('start-city').value, null);
+      state.realName = realName;
       addComments('small', 2);
-      addInboxMessage('אמא', `בהצלחה חמוד שלי! אני גאה בך. רק תאכל משהו מדי פעם ❤️`);
+      addInboxMessage('אמא', `בהצלחה ${realName ? realName + ' ' : ''}חמוד שלי! אני גאה בך. רק תאכל משהו מדי פעם ❤️`);
       $('start-screen').classList.add('hidden');
       navTo('dashboard');
       updateUI();
@@ -1529,7 +1550,7 @@
       showModal({
         title: '⚙️ הגדרות',
         html: `<div class="space-y-1">
-          <div>🎤 ${esc(state.artistName)} · <span dir="ltr">@${esc(state.handle)}</span> · ${esc(state.city)}</div>
+          <div>🎤 ${esc(state.artistName)}${state.realName ? ` (${esc(state.realName)})` : ''} · <span dir="ltr">@${esc(state.handle)}</span> · ${esc(state.city)}</div>
           <div>📅 שבוע ${state.totalWeeks} בקריירה</div>
           <div>🏆 ${state.achievements.length}/${ACHIEVEMENTS.length} הישגים</div>
           <div class="text-gray-500 pt-2">המשחק נשמר אוטומטית בדפדפן.</div></div>`,
