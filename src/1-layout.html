@@ -118,7 +118,7 @@
     <header class="bg-bgDark px-4 pt-4 pb-2 flex justify-between items-center z-20 shrink-0">
       <div class="leading-tight">
         <div class="text-lg font-extrabold text-spotifyGreen" id="top-money">₪1,500</div>
-        <div class="text-base font-extrabold text-coral" id="top-energy"><i class="fa-solid fa-bolt text-xs ml-0.5"></i>20/20</div>
+        <div onclick="openEnergy()" class="text-base font-extrabold text-coral cursor-pointer" id="top-energy"><i class="fa-solid fa-bolt text-xs ml-0.5"></i>20/20</div>
       </div>
       <div class="text-center leading-tight">
         <div class="text-xs font-extrabold text-white" id="top-date">שבוע 1, 2026</div>
@@ -167,6 +167,7 @@
         <div class="space-y-2.5">
           <button onclick="navTo('studio'); openNewSongModal()" class="w-full bg-mustard text-bgDark text-lg py-3.5">🎙️ שיר חדש</button>
           <button onclick="openApp('whatsapp')" class="w-full bg-light text-bgDark text-lg py-3.5" id="home-wa-btn">WhatsApp</button>
+          <button onclick="openEnergy()" class="w-full bg-coral text-bgDark text-lg py-3.5" id="home-energy-btn">⚡ להטעין אנרגיה</button>
         </div>
 
         <!-- Genre trend -->

@@ -76,6 +76,20 @@
       { id: 'manager', cat: 'צוות', name: 'מנהל אישי', cost: 25000, eff: { gigPay: 0.25 }, desc: '+25% תשלום בהופעות' },
     ];
 
+    // Ways to recharge energy during the week (values are on the 100-point scale).
+    // once: once a week; cooldown: weeks before it can be used again.
+    const RECHARGE = [
+      { id: 'nap', name: 'שנ״צ ארוך', icon: 'fa-bed', cost: 0, e: 8, desc: 'חינם. מכבים טלפון וישנים.' },
+      { id: 'coffee', name: 'קפה ומאפה', icon: 'fa-mug-hot', cost: 35, e: 6, desc: 'דחיפה קטנה.' },
+      { id: 'meal', name: 'ארוחה טובה', icon: 'fa-utensils', cost: 180, e: 12, desc: 'אוכל אמיתי במקום שווארמה בשתיים בלילה.' },
+      { id: 'gymday', name: 'אימון וסאונה', icon: 'fa-dumbbell', cost: 120, e: 14, desc: 'כואב, אבל אחר כך אתה מרגיש מעולה.' },
+      { id: 'massage', name: 'עיסוי', icon: 'fa-spa', cost: 450, e: 22, desc: 'שעה של שקט.' },
+      { id: 'spa', name: 'יום ספא', icon: 'fa-hot-tub-person', cost: 1500, e: 38, desc: 'בריכה, ג׳קוזי ושינה.' },
+      { id: 'getaway', name: 'סופ״ש בצפון', icon: 'fa-mountain-sun', cost: 4500, e: 65, cooldown: 4, desc: 'צימר בגליל. פעם בחודש.' },
+    ];
+    const ENERGY_OVERCHARGE = 25;   // rest can push energy this far above the weekly max
+    const FATIGUE_STEP = 8;          // energy tax per week in a row that you ran yourself to zero
+
     // Housing. Costs are per month (charged weekly). energy: weekly energy change,
     // social: % bonus to social reach, loyalty: extra weekly loyalty loss for a partner.
     // own: needs that shop item to live there (no rent, only bills/maintenance).
