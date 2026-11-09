@@ -230,8 +230,8 @@
           ${state.songs.length ? `<div class="text-[#e0f1ff]">🎧 "${esc(state.songs[state.songs.length - 1].title)}" בחוץ עכשיו</div>` : ''}
         </div>
         <div class="px-4 mt-3 grid grid-cols-3 gap-1.5 text-xs font-semibold">
-          <button onclick="postInstaStory()" class="bg-[#363636] rounded-lg py-2">סטורי (3 ⚡)</button>
-          <button onclick="startBeef()" class="bg-[#363636] rounded-lg py-2 text-red-300">דיס 🔥 (5 ⚡)</button>
+          <button onclick="postInstaStory()" class="bg-[#363636] rounded-lg py-2">סטורי (${STORY_E} ⚡)</button>
+          <button onclick="startBeef()" class="bg-[#363636] rounded-lg py-2 text-red-300">דיס 🔥 (${BEEF_E} ⚡)</button>
           <button onclick="appSub(currentSub === 'comments' ? null : 'comments')" class="bg-[#363636] rounded-lg py-2">תגובות</button>
         </div>
         ${state.beefs.length ? `<div class="px-4 mt-2 text-[10px] text-gray-500">🥊 בביף עם: ${state.beefs.map(esc).join(', ')} (לא יעשו איתך פיצ׳ר)</div>` : ''}
@@ -268,7 +268,7 @@
             <div><div class="font-bold">${shortNum(state.tiktokFollowers)}</div><div class="text-xs text-gray-400">עוקבים</div></div>
             <div><div class="font-bold">${shortNum(likes)}</div><div class="text-xs text-gray-400">לייקים</div></div>
           </div>
-          <button onclick="tiktokChallenge()" class="mt-4 bg-[#FE2C55] text-white font-semibold text-sm px-10 py-2.5 rounded">אתגר חדש (4 ⚡)</button>
+          <button onclick="tiktokChallenge()" class="mt-4 bg-[#FE2C55] text-white font-semibold text-sm px-10 py-2.5 rounded">אתגר חדש (${TIKTOK_E} ⚡)</button>
           <div class="text-xs text-gray-400 mt-2 px-6 text-center">🎤 ראפר | ${esc(state.city)} | השיר החדש בלינק 👇</div>
         </div>
         <div class="flex justify-around mt-4 border-b border-gray-800 text-lg"><span class="py-2 flex-1 text-center border-b-2 border-white"><i class="fa-solid fa-table-cells"></i></span><span class="py-2 flex-1 text-center text-gray-500"><i class="fa-solid fa-lock"></i></span><span class="py-2 flex-1 text-center text-gray-500"><i class="fa-regular fa-heart"></i></span></div>

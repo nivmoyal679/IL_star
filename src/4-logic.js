@@ -1,6 +1,22 @@
   <!-- ================= GAME ENGINE ================= -->
   <script>
     const SAVE_KEY = 'il_rap_star_save';
+
+    // Scale every energy cost/effect in the data to the 100-point energy bar
+    (function scaleEnergy() {
+      const k = ENERGY_SCALE;
+      Object.keys(SKILL_ENERGY).forEach(x => SKILL_ENERGY[x] *= k);
+      [JOBS, DATES, VENUES].forEach(list => list.forEach(x => { x.e *= k; }));
+      SHOP.forEach(x => { if (x.eff && x.eff.energy) x.eff.energy *= k; });
+      HOMES.forEach(x => { x.energy *= k; });
+      const fx = f => { if (f && f.e) f.e *= k; };
+      EVENTS.forEach(ev => ev.ch.forEach(ch => {
+        if (ch.cost && ch.cost.e) ch.cost.e *= k;
+        fx(ch.fx);
+        if (ch.win) fx(ch.win.fx);
+        if (ch.lose) fx(ch.lose.fx);
+      }));
+    })();
     let state = null;
 
     // ---------- Helpers ----------
@@ -26,7 +42,7 @@
     // ---------- State ----------
     function newState(name, handle, city, perk) {
       const s = {
-        version: 3,
+        version: 4,
         artistName: name, handle, city,
         money: 1500, baseEnergy: BASE_ENERGY, energy: BASE_ENERGY,
         week: 1, year: 2026, totalWeeks: 1,
@@ -69,7 +85,9 @@
       // Saves from before housing paid rent every week, so they start in a shared flat
       if (!s.home) out.home = out.inventory.includes('penthouse') ? 'own_penthouse' : out.inventory.includes('florentin') ? 'own_florentin' : 'room';
       if (!out.history.length) out.history = [{ w: out.totalWeeks, l: out.listeners, f: out.followers }];
-      out.version = 3;
+      // Before version 4 energy was out of 20
+      if ((s.version || 1) < 4) out.energy = Math.min(BASE_ENERGY, Math.round((s.energy || 0) * 5));
+      out.version = 4;
       return out;
     }
 
@@ -464,7 +482,7 @@
     let songExplicit = true;
     function setExplicit(v) { songExplicit = v; updateSongCost(); }
     function openNewSongModal() {
-      if (state.energy < 10) { showToast('נדרשת לפחות 10 אנרגיה להקלטה!', false); return; }
+      if (state.energy < SONG_E) { showToast(`נדרשת לפחות ${SONG_E} אנרגיה להקלטה!`, false); return; }
       $('input-song-genre').innerHTML = GENRES.map((g, i) =>
         `<option value="${esc(g)}">${esc(g)}${i === state.trend.hot ? ' 🔥 בטרנד' : i === state.trend.cold ? ' ❄️ יורד' : ''}</option>`).join('');
       $('input-song-genre').value = GENRES[state.trend.hot];
@@ -512,7 +530,7 @@
       $('btn-clean').innerText = 'גרסה נקייה';
       $('btn-explicit').innerHTML = 'בוטה 🅴';
       $('explicit-note').innerText = c.explicit ? 'בוטה: +10% השמעות ועוקבים, אבל לא ייכנס לרדיו' : 'נקייה: +40% מאזינים חודשיים מהרדיו';
-      const lines = [`עלות: <b class="text-white">₪${fmt(c.cost)}</b> | אנרגיה: <b class="text-white">10</b>`];
+      const lines = [`עלות: <b class="text-white">₪${fmt(c.cost)}</b> | אנרגיה: <b class="text-white">${SONG_E}</b>`];
       const tm = trendMult(c.genre);
       if (tm > 1) lines.push('🔥 הז׳אנר בטרנד: +40% השמעות');
       if (tm < 1) lines.push('❄️ הז׳אנר יוצא מהאופנה: -30% השמעות');
@@ -565,11 +583,11 @@
         if (!name) { showToast('תן שם לאלבום החדש!', false); return; }
         albumId = null; // created below, once the song is paid for
       }
-      if (state.energy < 10) { showToast('נדרשת 10 אנרגיה!', false); return; }
+      if (state.energy < SONG_E) { showToast(`נדרשת ${SONG_E} אנרגיה!`, false); return; }
       if (state.money < c.cost) { showToast('אין מספיק כסף להפקה!', false); return; }
 
       state.money -= c.cost;
-      state.energy -= 10;
+      state.energy -= SONG_E;
       if (c.album === 'new') {
         const a = { id: 'a' + state.totalWeeks + '_' + state.albums.length, name: $('input-album-name').value.trim().slice(0, 28), released: false };
         state.albums.push(a);
@@ -646,8 +664,8 @@
       const a = state.albums.find(x => x.id === id);
       const tracks = albumTracks(id);
       if (tracks.length < ALBUM_MIN_TRACKS) { showToast(`צריך לפחות ${ALBUM_MIN_TRACKS} שירים באלבום!`, false); return; }
-      if (!needEnergy(10)) return;
-      state.energy -= 10;
+      if (!needEnergy(ALBUM_E)) return;
+      state.energy -= ALBUM_E;
       // Album release revives every track and sells copies
       tracks.forEach(s => { s.base *= 1.5; s.releaseTotalWeek = Math.max(s.releaseTotalWeek, state.totalWeeks - 1); });
       const sales = Math.floor(tracks.reduce((x, s) => x + s.base, 0) * 0.03);
@@ -671,8 +689,8 @@
       state.posts = state.posts.slice(0, 30);
     }
     function postInstaStory() {
-      if (!needEnergy(3)) return;
-      state.energy -= 3;
+      if (!needEnergy(STORY_E)) return;
+      state.energy -= STORY_E;
       const gain = Math.floor((Math.random() * 40 + 20 + state.skills.charisma + Math.sqrt(state.followers) * 1.2) * socialFatigue('story') * (1 + effect('social')));
       state.followers += gain;
       state.stats.stories = (state.stats.stories || 0) + 1;
@@ -682,8 +700,8 @@
     }
 
     function startBeef() {
-      if (!needEnergy(5)) return;
-      state.energy -= 5;
+      if (!needEnergy(BEEF_E)) return;
+      state.energy -= BEEF_E;
       const target = pick(RAPPERS.filter(r => !state.beefs.includes(r.n))) || pick(RAPPERS);
       const fatigue = socialFatigue('beef');
       if (Math.random() < 0.6 + state.skills.flow / 500) {
@@ -708,8 +726,8 @@
     }
 
     function tiktokChallenge() {
-      if (!needEnergy(4)) return;
-      state.energy -= 4;
+      if (!needEnergy(TIKTOK_E)) return;
+      state.energy -= TIKTOK_E;
       const boost = Math.floor((state.skills.viral * 8 + Math.sqrt(state.followers) * 3) * (Math.random() + 0.5) * socialFatigue('tiktok') * (1 + effect('social')));
       state.followers += boost;
       state.tiktokFollowers += Math.floor(boost * 2.5);
@@ -763,7 +781,7 @@
       if (state.money < cost) { showToast('אין מספיק כסף לדייט!', false); return; }
       state.money -= cost;
       state.dateThisWeek = true;
-      const extra = tr.id === 'party' ? 3 : tr.id === 'calm' ? 2 : 0;
+      const extra = (tr.id === 'party' ? 3 : tr.id === 'calm' ? 2 : 0) * ENERGY_SCALE;
       state.energy = Math.min(maxEnergy(), state.energy + d.e + extra);
       state.relationship.loyalty = Math.min(100, state.relationship.loyalty + d.l);
       showToast(`יצאתם ל${d.name}! האנרגיה התחדשה 🍷`);
@@ -1211,7 +1229,7 @@
               <div class="text-[10px] text-gray-400 mt-0.5">${tracks.length} שירים · ${fmt(streams)} השמעות${a.released ? ` · יצא בשבוע ${a.week}` : ''}</div>
             </div>
             ${a.released ? '<span class="text-[11px] text-goldAccent font-bold shrink-0">✓ יצא</span>'
-              : `<button onclick="releaseAlbum('${a.id}')" class="${ready ? 'bg-goldAccent text-black' : 'bg-gray-800 text-gray-500'} text-xs font-bold px-3 py-1.5 rounded-xl shrink-0">${ready ? 'שחרר אלבום (10 ⚡)' : `${tracks.length}/${ALBUM_MIN_TRACKS} שירים`}</button>`}
+              : `<button onclick="releaseAlbum('${a.id}')" class="${ready ? 'bg-goldAccent text-black' : 'bg-gray-800 text-gray-500'} text-xs font-bold px-3 py-1.5 rounded-xl shrink-0">${ready ? `שחרר אלבום (${ALBUM_E} ⚡)` : `${tracks.length}/${ALBUM_MIN_TRACKS} שירים`}</button>`}
           </div>
         </div>`;
       }).join('') : '<div class="bg-cardDark p-3 rounded-xl border border-gray-800 text-[11px] text-gray-500">אין עדיין אלבומים. בשיר חדש, בחר "+ אלבום חדש" כדי להתחיל לבנות אחד. אחרי 4 שירים אפשר לשחרר אותו.</div>';
