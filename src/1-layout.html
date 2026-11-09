@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>ישראל ראפ סטאר - IL Rap Star Simulator</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;800;900&display=swap" rel="stylesheet">
   <!-- TAILWIND:START -->
   <!-- TAILWIND:END -->
   <style>
@@ -13,7 +15,7 @@
     ::-webkit-scrollbar-thumb { background: #2d3748; border-radius: 4px; }
     .no-select { user-select: none; -webkit-user-select: none; }
     input, select { user-select: text; -webkit-user-select: text; }
-    .nav-active { color: #1DB954 !important; border-top: 2px solid #1DB954; }
+    .nav-active { color: #7cc4a4 !important; }
 
     @keyframes swipeRight {
       0% { transform: translateX(0) rotate(0deg); opacity: 1; }
@@ -39,6 +41,32 @@
     .app-badge { position: absolute; top: -5px; left: -5px; min-width: 20px; height: 20px; border-radius: 10px; background: #ff3b30; color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; padding: 0 5px; }
     .ig-ring { background: conic-gradient(from 180deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5, #feda75); }
     .tt-shadow { text-shadow: 2px 0 #25F4EE, -2px 0 #FE2C55; }
+    /* ===== Bold style layer: chunky pills, flat cards, heavy type ===== */
+    body { font-family: Rubik, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    .hero { font-weight: 900; font-size: 44px; line-height: 1.05; letter-spacing: -1px; white-space: nowrap; }
+    .hero .n { color: #4c5a66; }
+    .pill3d { border-radius: 999px !important; box-shadow: inset 0 -4px 0 rgba(0,0,0,.18); font-weight: 800; }
+    .pill3d:active { transform: translateY(1px); box-shadow: inset 0 -2px 0 rgba(0,0,0,.18); }
+    /* Every coloured button in the main screens and dialogs becomes a chunky pill */
+    #main-content button[class*="bg-"], header button, #modal-generic-buttons button, #modal-song button[class*="bg-"] {
+      border-radius: 999px !important; box-shadow: inset 0 -4px 0 rgba(0,0,0,.18); font-weight: 800;
+    }
+    #main-content .rounded-2xl, #modal-generic-box { border-radius: 26px !important; }
+    #main-content button.tile3d { border-radius: 24px !important; box-shadow: inset 0 -5px 0 rgba(0,0,0,.15); }
+    #main-content .rounded-xl { border-radius: 18px; }
+    /* Flat cards: drop the thin grey outlines */
+    #main-content .border-gray-800, #main-content .border-gray-700, #modal-generic .border-gray-800, header, nav { border-color: transparent !important; }
+    #main-content .bg-cardDark, #modal-generic-box { box-shadow: inset 0 -5px 0 rgba(0,0,0,.14); }
+    .app-icon { box-shadow: inset 0 -4px 0 rgba(0,0,0,.2); border-radius: 18px; width: 58px; height: 58px; }
+    nav button { border-top: none !important; }
+    nav .nav-active { color: #7cc4a4 !important; }
+    nav .nav-active i { background: #303c47; }
+    nav i { width: 54px; height: 42px; border-radius: 22px; display: inline-flex !important; align-items: center; justify-content: center; }
+    .chip { flex: 1; min-width: 0; text-align: center; background: #26303a; border-radius: 16px; padding: 8px 4px 10px; font-weight: 800; font-size: 12px; box-shadow: inset 0 -4px 0 rgba(0,0,0,.18); color: #f5f3ee; }
+    .chip small { display: block; font-weight: 500; font-size: 10px; color: #8d9aa5; margin-top: 1px; }
+    .chip.on { background: #7cc4a4; color: #1c232a; } .chip.on small { color: #1c232a; opacity: .7; }
+    .chip.lock { opacity: .4; }
+    .tile3d { border-radius: 24px; box-shadow: inset 0 -5px 0 rgba(0,0,0,.15); color: #1c232a; }
     .wa-bg { background-color: #0b141a; background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 14px 14px; }
   </style>
 </head>
@@ -87,29 +115,16 @@
     </div>
 
     <!-- TOP STATUS BAR -->
-    <header class="bg-cardDark px-4 py-3 border-b border-gray-800 flex justify-between items-center z-20 shrink-0">
-      <div class="flex items-center space-x-3 space-x-reverse">
-        <div>
-          <div class="text-[10px] text-gray-400">מאזן:</div>
-          <div class="text-sm font-bold text-spotifyGreen" id="top-money">₪1,500</div>
-        </div>
-        <div class="h-6 w-px bg-gray-700"></div>
-        <div>
-          <div class="text-[10px] text-gray-400">אנרגיה:</div>
-          <div class="text-sm font-bold text-accentOrange" id="top-energy"><i class="fa-solid fa-bolt text-xs ml-0.5"></i>20/20</div>
-        </div>
+    <header class="bg-bgDark px-4 pt-4 pb-2 flex justify-between items-center z-20 shrink-0">
+      <div class="leading-tight">
+        <div class="text-lg font-extrabold text-spotifyGreen" id="top-money">₪1,500</div>
+        <div class="text-base font-extrabold text-coral" id="top-energy"><i class="fa-solid fa-bolt text-xs ml-0.5"></i>20/20</div>
       </div>
-
-      <div class="flex items-center space-x-3 space-x-reverse">
-        <div class="text-left">
-          <div class="text-xs font-semibold text-gray-300" id="top-date">שבוע 1, 2026</div>
-          <div class="text-[10px] text-gray-400" id="top-fame">Fame: F</div>
-        </div>
-        <button onclick="nextWeek()" class="bg-spotifyGreen hover:bg-green-600 text-black text-xs font-bold px-3 py-2 rounded-xl transition shadow flex items-center gap-1 active:scale-95">
-          <span>סיים שבוע</span>
-          <i class="fa-solid fa-chevron-left text-[10px]"></i>
-        </button>
+      <div class="text-center leading-tight">
+        <div class="text-xs font-extrabold text-white" id="top-date">שבוע 1, 2026</div>
+        <div class="text-[10px] font-bold text-gray-400" id="top-fame">Fame: F</div>
       </div>
+      <button onclick="nextWeek()" class="bg-mint text-bgDark text-base font-extrabold px-5 py-2.5 transition active:scale-95">סיים שבוע</button>
     </header>
 
     <!-- MAIN CONTENT SCREENS CONTAINER -->
@@ -117,46 +132,41 @@
 
       <!-- SCREEN 1: HOME -->
       <section id="screen-dashboard" class="space-y-4">
-        <div class="bg-gradient-to-r from-cardDark via-gray-900 to-gray-950 rounded-2xl p-4 border border-gray-800 relative overflow-hidden shadow">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-3 space-x-reverse">
-              <div class="w-14 h-14 rounded-full bg-gray-800 border-2 border-spotifyGreen flex items-center justify-center text-2xl text-spotifyGreen shadow">
-                <i class="fa-solid fa-microphone-lines"></i>
-              </div>
-              <div>
-                <h1 class="text-lg font-bold text-white flex items-center gap-1">
-                  <span id="dash-artist-name">MC IL</span> <i class="fa-solid fa-circle-check text-blue-500 text-xs hidden" id="dash-verified"></i>
-                </h1>
-                <p class="text-xs text-gray-400" id="dash-stage-title">ראפר מתחיל</p>
-              </div>
-            </div>
-            <button onclick="openSettings()" class="text-gray-500 hover:text-white text-lg p-2" title="הגדרות"><i class="fa-solid fa-gear"></i></button>
-          </div>
-          <!-- Fame bar -->
-          <div class="mt-3">
-            <div class="flex justify-between text-[10px] text-gray-400 mb-1"><span>פרסום: <b class="text-white text-xs" id="fame-rank">F</b></span><span id="fame-next"></span></div>
-            <div class="w-full bg-gray-900 h-2.5 rounded-full overflow-hidden border border-gray-800">
-              <div class="bg-gradient-to-l from-spotifyGreen to-accentOrange h-full transition-all duration-300" id="fame-bar" style="width:0%"></div>
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2 min-w-0">
+            <div class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-lg text-spotifyGreen shrink-0"><i class="fa-solid fa-microphone-lines"></i></div>
+            <div class="min-w-0">
+              <div class="text-sm font-extrabold text-white flex items-center gap-1 truncate"><span id="dash-artist-name">MC IL</span> <i class="fa-solid fa-circle-check text-peri text-xs hidden" id="dash-verified"></i></div>
+              <div class="text-[11px] font-bold text-gray-400 truncate" id="dash-stage-title">ראפר מתחיל</div>
             </div>
           </div>
+          <button onclick="openSettings()" class="text-gray-500 hover:text-white text-lg p-2" title="הגדרות"><i class="fa-solid fa-gear"></i></button>
         </div>
+
+        <div>
+          <div class="hero"><span class="n" id="graph-listeners">0</span> מאזינים</div>
+          <div class="text-sm font-extrabold mt-1" id="graph-delta"></div>
+        </div>
+
+        <!-- Fame pill -->
+        <div class="bg-coral rounded-full px-4 pt-2.5 pb-3 flex items-center gap-3 text-bgDark font-black" style="box-shadow: inset 0 -5px 0 rgba(0,0,0,.15)">
+          <span class="whitespace-nowrap">פרסום <span id="fame-rank">F</span></span>
+          <div class="flex-1 h-4 rounded-full bg-white/35 overflow-hidden"><div class="h-full bg-gray-100 rounded-full transition-all duration-300" id="fame-bar" style="width:0%"></div></div>
+        </div>
+        <div class="text-[11px] font-bold text-gray-400 -mt-2 text-left" id="fame-next"></div>
 
         <!-- Phone home screen: apps -->
-        <div class="bg-cardDark p-4 rounded-2xl border border-gray-800">
-          <div class="grid grid-cols-4 gap-y-4 gap-x-2" id="app-grid"></div>
-        </div>
+        <div class="grid grid-cols-4 gap-y-4 gap-x-2" id="app-grid"></div>
 
         <!-- Listeners graph -->
-        <div class="bg-cardDark p-4 rounded-2xl border border-gray-800">
-          <div class="flex justify-between items-end mb-2">
-            <div>
-              <div class="text-[10px] text-gray-400">מאזינים חודשיים</div>
-              <div class="text-2xl font-black text-white" id="graph-listeners">0</div>
-            </div>
-            <div class="text-xs font-bold" id="graph-delta"></div>
-          </div>
+        <div>
+          <div class="text-xs font-extrabold text-gray-400 mb-1">מאזינים בשבועות האחרונים</div>
           <div id="graph-svg" class="h-28"></div>
-          <div class="text-[10px] text-gray-500 text-center mt-1">השבועות האחרונים</div>
+        </div>
+
+        <div class="space-y-2.5">
+          <button onclick="navTo('studio'); openNewSongModal()" class="w-full bg-mustard text-bgDark text-lg py-3.5">🎙️ שיר חדש</button>
+          <button onclick="openApp('whatsapp')" class="w-full bg-light text-bgDark text-lg py-3.5" id="home-wa-btn">WhatsApp</button>
         </div>
 
         <!-- Genre trend -->
@@ -203,8 +213,8 @@
 
       <!-- SCREEN 2: TALENT & SKILLS -->
       <section id="screen-talent" class="space-y-4 hidden">
-        <h2 class="text-lg font-bold text-white">כישורים ויכולות</h2>
-        <div class="bg-cardDark p-4 rounded-2xl border border-gray-800 space-y-3" id="skills-list"></div>
+        <div class="hero"><span class="n" id="talent-total">0</span> כישרון</div>
+        <div class="grid grid-cols-2 gap-3" id="skills-list"></div>
         <div class="bg-cardDark p-3 rounded-xl border border-gray-800 text-[11px] text-gray-400 leading-relaxed">
           <b class="text-gray-200">מה כל כישור עושה?</b><br>
           פלוואו וכתיבה הוא רמת הכתיבה כשאתה כותב בעצמך. פלוואו וכריזמה קובעים כמה טוב אתה מבצע את השיר.
@@ -214,12 +224,8 @@
 
       <!-- SCREEN 3: STUDIO -->
       <section id="screen-studio" class="space-y-4 hidden">
-        <div class="flex justify-between items-center">
-          <h2 class="text-lg font-bold text-white">אולפן הקלטות</h2>
-          <button onclick="openNewSongModal()" class="bg-spotifyGreen text-black text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1 hover:bg-green-600 transition shadow">
-            <i class="fa-solid fa-plus"></i> שיר חדש (10 <i class="fa-solid fa-bolt text-[10px]"></i>)
-          </button>
-        </div>
+        <div class="hero"><span class="n" id="studio-total">0</span> השמעות</div>
+        <button onclick="openNewSongModal()" class="w-full bg-mustard text-bgDark text-lg py-3.5">🎙️ שיר חדש · 10 <i class="fa-solid fa-bolt text-sm"></i></button>
         <div class="space-y-2">
           <h3 class="text-sm font-bold text-gray-300">אלבומים</h3>
           <div id="studio-albums" class="space-y-2"></div>
@@ -232,45 +238,39 @@
 
       <!-- SCREEN 4: GIGS -->
       <section id="screen-jobs" class="space-y-4 hidden">
-        <h2 class="text-lg font-bold text-white">הופעות חיות</h2>
+        <div class="hero"><span class="n" id="gigs-total">0</span> הופעות</div>
         <div class="text-[11px] text-gray-500">הופעה אחת בשבוע בכל מקום. הרווח עולה עם הכריזמה ועם המאזינים החודשיים.</div>
         <div id="gigs-list" class="space-y-2"></div>
       </section>
 
       <!-- SCREEN 5: MONEY -->
       <section id="screen-money" class="space-y-4 hidden">
-        <div class="bg-cardDark p-4 rounded-2xl border border-gray-800">
-          <div class="text-[10px] text-gray-400">שווי נקי</div>
-          <div class="text-3xl font-black text-white" id="money-networth">₪0</div>
-          <div class="text-[11px] text-gray-400 mt-1" id="money-breakdown"></div>
+        <div>
+          <div class="hero"><span class="n" id="money-networth">₪0</span> שווי</div>
+          <div class="text-sm font-bold text-gray-300 leading-relaxed mt-2"><span id="money-income"></span> <span id="money-yoy"></span></div>
+          <div class="text-[11px] font-bold text-gray-500 mt-1" id="money-breakdown"></div>
         </div>
-        <div class="bg-cardDark p-4 rounded-2xl border border-gray-800 space-y-1">
-          <div class="flex justify-between items-center">
-            <div class="text-sm font-bold text-white">הכנסות השנה</div>
-            <div class="text-xs font-bold" id="money-yoy"></div>
-          </div>
-          <div class="text-xs text-gray-300 leading-relaxed" id="money-income"></div>
-        </div>
-        <div class="bg-cardDark p-4 rounded-2xl border border-gray-800 space-y-2">
+        <div class="grid grid-cols-2 gap-3" id="money-tiles"></div>
+        <div class="bg-cardDark p-4 rounded-2xl border border-gray-800 space-y-2" id="sec-home">
           <div class="flex justify-between items-center">
             <div class="text-sm font-bold text-white"><i class="fa-solid fa-house text-blue-400 ml-1"></i> מגורים</div>
             <button onclick="openHousing()" class="bg-gray-800 border border-gray-700 text-gray-100 text-xs font-bold px-3 py-1.5 rounded-xl hover:bg-gray-700">עבור דירה</button>
           </div>
           <div class="text-xs text-gray-300 leading-relaxed" id="money-home"></div>
         </div>
-        <div class="bg-cardDark p-4 rounded-2xl border border-gray-800 space-y-2">
+        <div class="bg-cardDark p-4 rounded-2xl border border-gray-800 space-y-2" id="sec-job">
           <div class="flex justify-between items-center">
             <div class="text-sm font-bold text-white"><i class="fa-solid fa-briefcase text-accentOrange ml-1"></i> עבודה</div>
             <button onclick="openJobOffers()" class="bg-gray-800 border border-gray-700 text-gray-100 text-xs font-bold px-3 py-1.5 rounded-xl hover:bg-gray-700">מצא עבודה</button>
           </div>
           <div class="text-xs text-gray-300 leading-relaxed" id="money-job"></div>
         </div>
-        <div class="bg-cardDark p-4 rounded-2xl border border-gray-800 space-y-2">
+        <div class="bg-cardDark p-4 rounded-2xl border border-gray-800 space-y-2" id="sec-inv">
           <div class="text-sm font-bold text-white"><i class="fa-solid fa-chart-line text-spotifyGreen ml-1"></i> השקעות</div>
           <div class="text-[10px] text-gray-500">הערך משתנה כל שבוע. סיכון גבוה = סיכוי לרווח גדול או להפסד גדול.</div>
           <div id="money-investments" class="space-y-2"></div>
         </div>
-        <div class="bg-cardDark p-4 rounded-2xl border border-gray-800 space-y-2">
+        <div class="bg-cardDark p-4 rounded-2xl border border-gray-800 space-y-2" id="sec-teams">
           <div class="text-sm font-bold text-white"><i class="fa-solid fa-trophy text-goldAccent ml-1"></i> קבוצות ספורט</div>
           <div class="text-[10px] text-gray-500">בעלות על קבוצה מביאה הכנסה שבועית ומעריצים, אבל גם הפסדים בעונה רעה.</div>
           <div id="money-teams" class="space-y-2"></div>
@@ -279,7 +279,7 @@
 
       <!-- SCREEN 6: SHOP -->
       <section id="screen-shop" class="space-y-4 hidden">
-        <h2 class="text-lg font-bold text-white">סגנון חיים וציוד</h2>
+        <div class="hero"><span class="n" id="shop-total">0</span> פריטים</div>
         <div class="bg-cardDark p-3 rounded-xl border border-gray-800">
           <div class="text-xs font-bold text-gray-400 mb-2">הרכוש שלך:</div>
           <div id="shop-owned-items" class="text-xs text-gray-300 flex flex-wrap gap-1.5"></div>
@@ -290,30 +290,24 @@
     </main>
 
     <!-- BOTTOM NAVIGATION BAR -->
-    <nav class="bg-cardDark border-t border-gray-800 px-2 py-1 flex justify-around items-center z-20 shrink-0">
+    <nav class="bg-bgDark px-2 pt-1 pb-3 flex justify-around items-center z-20 shrink-0">
       <button onclick="navTo('dashboard')" id="nav-dashboard" class="nav-active flex-1 flex flex-col items-center py-2 text-gray-400 transition">
-        <i class="fa-solid fa-house text-base"></i>
-        <span class="text-[10px] mt-1">בית</span>
+        <i class="fa-solid fa-house text-xl"></i>
       </button>
       <button onclick="navTo('talent')" id="nav-talent" class="flex-1 flex flex-col items-center py-2 text-gray-400 transition">
-        <i class="fa-solid fa-dumbbell text-base"></i>
-        <span class="text-[10px] mt-1">כישורים</span>
+        <i class="fa-solid fa-dumbbell text-xl"></i>
       </button>
       <button onclick="navTo('studio')" id="nav-studio" class="flex-1 flex flex-col items-center py-2 text-gray-400 transition">
-        <i class="fa-solid fa-compact-disc text-base"></i>
-        <span class="text-[10px] mt-1">סטודיו</span>
+        <i class="fa-solid fa-compact-disc text-xl"></i>
       </button>
       <button onclick="navTo('jobs')" id="nav-jobs" class="flex-1 flex flex-col items-center py-2 text-gray-400 transition">
-        <i class="fa-solid fa-microphone text-base"></i>
-        <span class="text-[10px] mt-1">הופעות</span>
+        <i class="fa-solid fa-microphone text-xl"></i>
       </button>
       <button onclick="navTo('money')" id="nav-money" class="flex-1 flex flex-col items-center py-2 text-gray-400 transition">
-        <i class="fa-solid fa-sack-dollar text-base"></i>
-        <span class="text-[10px] mt-1">כסף</span>
+        <i class="fa-solid fa-sack-dollar text-xl"></i>
       </button>
       <button onclick="navTo('shop')" id="nav-shop" class="flex-1 flex flex-col items-center py-2 text-gray-400 transition">
-        <i class="fa-solid fa-store text-base"></i>
-        <span class="text-[10px] mt-1">חנות</span>
+        <i class="fa-solid fa-store text-xl"></i>
       </button>
     </nav>
 
@@ -322,68 +316,52 @@
       <div id="app-body" class="flex-1 overflow-y-auto"></div>
     </div>
 
-    <!-- MODAL: CREATE SONG -->
-    <div id="modal-song" class="absolute inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-      <div class="bg-cardDark border border-gray-800 rounded-2xl p-5 w-full max-w-xs space-y-4 shadow-2xl max-h-full overflow-y-auto anim-pop">
-        <div class="flex justify-between items-center border-b border-gray-800 pb-2">
-          <h3 class="text-base font-bold text-white">הקלטת שיר חדש</h3>
-          <button onclick="closeModal('modal-song')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+    <!-- SCREEN: CREATE SONG (full screen; the hidden selects hold the choices) -->
+    <div id="modal-song" class="absolute inset-0 bg-bgDark z-50 flex flex-col hidden">
+      <div class="flex items-center justify-between px-4 pt-4 pb-2">
+        <button onclick="closeModal('modal-song')" class="text-white text-xl w-9 h-9"><i class="fa-solid fa-chevron-right"></i></button>
+        <div class="text-3xl font-black text-white">שיר חדש</div>
+        <div class="text-coral font-extrabold" id="song-energy"></div>
+      </div>
+      <div class="flex-1 overflow-y-auto px-4 pb-4 space-y-4 text-xs">
+        <div class="flex bg-gray-800 rounded-full overflow-hidden" style="box-shadow: inset 0 -4px 0 rgba(0,0,0,.18)">
+          <input type="text" id="input-song-title" maxlength="32" placeholder="שם השיר..." class="flex-1 min-w-0 bg-transparent px-5 py-3.5 text-base text-white font-medium focus:outline-none placeholder:text-gray-500">
+          <button onclick="suggestTitle()" class="bg-mint text-bgDark w-14 text-lg" title="הצע שם"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
         </div>
-        <div class="space-y-3 text-xs">
-          <div>
-            <label class="block text-gray-400 mb-1">שם השיר:</label>
-            <div class="flex gap-2">
-              <input type="text" id="input-song-title" maxlength="32" placeholder="למשל: סטרייט מאוטה רמת גן" class="flex-1 min-w-0 bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white focus:outline-none focus:border-spotifyGreen">
-              <button onclick="suggestTitle()" class="bg-gray-800 border border-gray-700 rounded-xl px-3 text-gray-300 hover:text-white" title="הצע שם"><i class="fa-solid fa-dice"></i></button>
-            </div>
-          </div>
-          <div>
-            <label class="block text-gray-400 mb-1">שיוך לאלבום:</label>
-            <select id="input-song-album" onchange="updateSongCost()" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white focus:outline-none"></select>
-            <input type="text" id="input-album-name" maxlength="28" placeholder="שם האלבום החדש" class="hidden w-full mt-2 bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white focus:outline-none focus:border-spotifyGreen">
-          </div>
-          <div>
-            <label class="block text-gray-400 mb-1">ז׳אנר מוזיקלי:</label>
-            <select id="input-song-genre" onchange="updateSongCost()" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white focus:outline-none"></select>
-          </div>
-          <div class="grid grid-cols-1 gap-2 bg-gray-900/50 border border-gray-800 rounded-xl p-2.5">
-            <div class="text-[10px] text-gray-400">מרכיבי השיר (המספר = רמה)</div>
-            <div>
-              <label class="block text-gray-400 mb-1"><i class="fa-solid fa-pen-nib ml-1"></i> כתיבה:</label>
-              <select id="input-song-writer" onchange="updateSongCost()" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white focus:outline-none"></select>
-            </div>
-            <div>
-              <label class="block text-gray-400 mb-1"><i class="fa-solid fa-sliders ml-1"></i> הפקה:</label>
-              <select id="input-song-producer" onchange="updateSongCost()" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white focus:outline-none"></select>
-            </div>
-            <div>
-              <label class="block text-gray-400 mb-1"><i class="fa-solid fa-house-signal ml-1"></i> אולפן:</label>
-              <select id="input-song-studio" onchange="updateSongCost()" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white focus:outline-none"></select>
-            </div>
-            <div class="text-[10px] text-gray-500" id="song-perform-line"></div>
-          </div>
-          <div>
-            <label class="block text-gray-400 mb-1">פיצ׳ר (אמן אורח):</label>
-            <select id="input-song-feat" onchange="updateSongCost()" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white focus:outline-none"></select>
-          </div>
-          <div>
-            <label class="block text-gray-400 mb-1">קליפ ליוטיוב:</label>
-            <select id="input-song-clip" onchange="updateSongCost()" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-white focus:outline-none">
-              <option value="none">ללא קליפ</option>
-              <option value="lyric">קליפ מילים (₪400)</option>
-              <option value="pro">קליפ קולנועי מושקע (₪5,000)</option>
-            </select>
-          </div>
-          <div class="grid grid-cols-2 gap-2">
-            <button id="btn-clean" onclick="setExplicit(false)" class="py-2 rounded-xl font-bold border"></button>
-            <button id="btn-explicit" onclick="setExplicit(true)" class="py-2 rounded-xl font-bold border"></button>
-          </div>
-          <div class="text-[10px] text-gray-500 -mt-1" id="explicit-note"></div>
-          <div class="bg-gray-900/60 border border-gray-800 rounded-xl p-2.5 text-gray-300 leading-relaxed" id="song-cost-summary"></div>
+
+        <div><div class="flex justify-between font-extrabold text-sm text-white mb-2"><span>כתיבה</span><span class="text-mustard" id="lvl-writer"></span></div><div class="flex gap-2" id="chips-writer"></div></div>
+        <div><div class="flex justify-between font-extrabold text-sm text-white mb-2"><span>הפקה</span><span class="text-mustard" id="lvl-producer"></span></div><div class="flex gap-2" id="chips-producer"></div></div>
+        <div><div class="flex justify-between font-extrabold text-sm text-white mb-2"><span>אולפן</span><span class="text-mustard" id="lvl-studio"></span></div><div class="flex gap-2" id="chips-studio"></div></div>
+        <div class="text-[11px] font-bold text-gray-400 -mt-2" id="song-perform-line"></div>
+
+        <div><div class="flex justify-between font-extrabold text-sm text-white mb-2"><span>ז׳אנר</span><span class="text-gray-400 font-bold" id="genre-note"></span></div><div class="grid grid-cols-3 gap-2" id="chips-genre"></div></div>
+        <div>
+          <div class="flex justify-between font-extrabold text-sm text-white mb-2"><span>אלבום</span></div>
+          <div class="flex gap-2 flex-wrap" id="chips-album"></div>
+          <input type="text" id="input-album-name" maxlength="28" placeholder="שם האלבום החדש" class="hidden w-full mt-2 bg-gray-800 rounded-full px-5 py-3 text-sm text-white focus:outline-none placeholder:text-gray-500">
         </div>
-        <button onclick="confirmCreateSong()" class="w-full bg-spotifyGreen text-black font-bold py-2.5 rounded-xl hover:bg-green-600 transition text-xs shadow">
-          שחרר לרשת! (10 אנרגיה)
-        </button>
+        <div><div class="flex justify-between font-extrabold text-sm text-white mb-2"><span>קליפ ליוטיוב</span></div><div class="flex gap-2" id="chips-clip"></div></div>
+        <div>
+          <div class="flex justify-between font-extrabold text-sm text-white mb-2"><span>פיצ׳ר (אמן אורח)</span></div>
+          <select id="input-song-feat" onchange="updateSongCost()" class="w-full bg-gray-800 rounded-full px-4 py-3 text-sm text-white font-bold focus:outline-none appearance-none" style="box-shadow: inset 0 -4px 0 rgba(0,0,0,.18)"></select>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <button id="btn-clean" onclick="setExplicit(false)" class="py-3 text-sm"></button>
+          <button id="btn-explicit" onclick="setExplicit(true)" class="py-3 text-sm"></button>
+        </div>
+        <div class="text-[11px] font-bold text-gray-400 -mt-2" id="explicit-note"></div>
+        <div class="text-[11px] font-bold text-gray-300 leading-relaxed" id="song-cost-summary"></div>
+
+        <!-- Hidden selects keep the actual values -->
+        <div class="hidden">
+          <select id="input-song-album"></select><select id="input-song-genre"></select>
+          <select id="input-song-writer"></select><select id="input-song-producer"></select><select id="input-song-studio"></select>
+          <select id="input-song-clip"><option value="none">ללא</option><option value="lyric">מילים</option><option value="pro">קולנועי</option></select>
+        </div>
+      </div>
+      <div class="px-4 pt-2 pb-5 bg-bgDark">
+        <div class="flex justify-between items-end"><span class="font-extrabold text-gray-400">עלות</span><span class="text-4xl font-black text-coral" id="song-total">₪0</span></div>
+        <button onclick="confirmCreateSong()" class="w-full bg-mint text-bgDark font-extrabold text-lg py-3.5 mt-2 pill3d">הקלט · 10 <i class="fa-solid fa-bolt text-sm"></i></button>
       </div>
     </div>
 
@@ -397,7 +375,7 @@
     </div>
 
     <!-- NOTIFICATION TOAST -->
-    <div id="toast" class="absolute top-16 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-4 py-2.5 rounded-xl border border-gray-700 shadow-xl transition-all duration-300 opacity-0 pointer-events-none z-[70] flex items-center gap-2 max-w-[90%]">
+    <div id="toast" class="absolute bottom-24 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-4 py-2.5 rounded-xl border border-gray-700 shadow-xl transition-all duration-300 opacity-0 pointer-events-none z-[70] flex items-center gap-2 max-w-[90%]">
       <i class="fa-solid fa-circle-info text-spotifyGreen" id="toast-icon"></i>
       <span id="toast-msg">הודעה</span>
     </div>

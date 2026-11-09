@@ -505,10 +505,10 @@
     function updateSongCost() {
       const c = songChoices();
       $('input-album-name').classList.toggle('hidden', c.album !== 'new');
-      $('song-perform-line').innerHTML = `🎤 ביצוע: אתה (פלוואו ${state.skills.flow}, כריזמה ${state.skills.charisma})`;
-      const on = 'bg-spotifyGreen text-black border-spotifyGreen', off = 'bg-gray-900 text-gray-400 border-gray-700';
-      $('btn-clean').className = `py-2 rounded-xl font-bold border ${!c.explicit ? on : off}`;
-      $('btn-explicit').className = `py-2 rounded-xl font-bold border ${c.explicit ? 'bg-red-500 text-white border-red-500' : off}`;
+      $('song-perform-line').innerHTML = `🎤 הביצוע שלך: פלוואו ${state.skills.flow}, כריזמה ${state.skills.charisma}`;
+      const off = 'bg-gray-800 text-gray-400';
+      $('btn-clean').className = `py-3 text-sm pill3d ${!c.explicit ? 'bg-mint text-bgDark' : off}`;
+      $('btn-explicit').className = `py-3 text-sm pill3d ${c.explicit ? 'bg-coral text-bgDark' : off}`;
       $('btn-clean').innerText = 'גרסה נקייה';
       $('btn-explicit').innerHTML = 'בוטה 🅴';
       $('explicit-note').innerText = c.explicit ? 'בוטה: +10% השמעות ועוקבים, אבל לא ייכנס לרדיו' : 'נקייה: +40% מאזינים חודשיים מהרדיו';
@@ -519,7 +519,40 @@
       if (c.feat) lines.push(`🤝 פיצ׳ר: +${Math.round(c.tier.boost * (c.feat.g === GENRES.indexOf(c.genre) ? 1.25 : 1) * 100)}% השמעות${c.feat.g === GENRES.indexOf(c.genre) ? ' (אותו ז׳אנר!)' : ''}`);
       if (state.socialThisWeek.release) lines.push(`<span class="text-accentOrange">כבר שחררת השבוע: השיר הזה יקבל ${Math.round(100 / (state.socialThisWeek.release + 1))}% מתשומת הלב</span>`);
       if (state.money < c.cost) lines.push('<span class="text-red-400">אין מספיק כסף</span>');
-      $('song-cost-summary').innerHTML = lines.join('<br>');
+      $('song-cost-summary').innerHTML = lines.slice(1).join('<br>');
+      $('song-total').innerText = '₪' + fmt(c.cost);
+      $('song-total').classList.toggle('text-red-400', state.money < c.cost);
+      $('song-energy').innerHTML = `<i class="fa-solid fa-bolt text-xs"></i>${state.energy}`;
+      renderSongChips(c);
+    }
+    // Chip rows mirror the hidden selects: tapping a chip sets the select and refreshes
+    function chipRow(selectId, items) {
+      return items.map(it => `<button type="button" ${it.lock ? 'disabled' : `onclick="pickChip('${selectId}', '${it.v}')"`} class="chip ${it.on ? 'on' : ''} ${it.lock ? 'lock' : ''}">${it.t}${it.s ? `<small>${it.s}</small>` : ''}</button>`).join('');
+    }
+    function pickChip(selectId, v) { $(selectId).value = v; updateSongCost(); }
+    function shortPrice(n) { return n ? '₪' + (n >= 1000 ? shortNum(n) : fmt(n)) : 'חינם'; }
+    function renderSongChips(c) {
+      const comp = (list, sel, lvl, short) => chipRow(sel, list.map(x => ({
+        v: x.id, on: $(sel).value === x.id, lock: state.followers < x.req,
+        t: (state.followers < x.req ? '🔒 ' : '') + short[x.id], s: state.followers < x.req ? shortNum(x.req) + ' עוקבים' : shortPrice(x.cost),
+      })));
+      $('chips-writer').innerHTML = comp(WRITERS, 'input-song-writer', writerLevel, { self: 'אני', w1: 'צעיר', w2: 'מקצועי', w3: 'להיטים', w4: 'כותב-על' });
+      $('chips-producer').innerHTML = comp(PRODUCER_TIERS, 'input-song-producer', x => x.lvl, { self: 'עצמית', indie: 'אינדי', top: 'צמרת', legend: 'בינ״ל' });
+      $('chips-studio').innerHTML = comp(STUDIOS, 'input-song-studio', studioLevel, { home: 'ביתי', rent: 'שכור', pro: 'מקצועי', elite: 'צמרת' });
+      $('lvl-writer').innerText = `רמה ${writerLevel(c.writer)}`;
+      $('lvl-producer').innerText = `רמה ${c.producer.lvl}`;
+      $('lvl-studio').innerText = `רמה ${studioLevel(c.studio)}`;
+      $('chips-genre').innerHTML = chipRow('input-song-genre', GENRES.map((g, i) => ({
+        v: g, on: c.genre === g, t: g.replace('ישראלי ', '').replace(' עברי', '').replace(' קלאסי', '') + (i === state.trend.hot ? ' 🔥' : i === state.trend.cold ? ' ❄️' : ''),
+      })));
+      const tm = trendMult(c.genre);
+      $('genre-note').innerText = tm > 1 ? '🔥 בטרנד: +40%' : tm < 1 ? '❄️ יוצא מהאופנה: -30%' : '';
+      $('chips-album').innerHTML = chipRow('input-song-album', [...$('input-song-album').options].map(o => ({
+        v: o.value, on: c.album === o.value, t: o.value === '' ? 'סינגל' : o.value === 'new' ? '+ אלבום חדש' : esc(state.albums.find(a => a.id === o.value).name),
+        s: o.value && o.value !== 'new' ? `${albumTracks(o.value).length}/${ALBUM_MIN_TRACKS} שירים` : '',
+      })));
+      $('chips-clip').innerHTML = chipRow('input-song-clip', [{ v: 'none', t: 'בלי', s: 'חינם' }, { v: 'lyric', t: 'מילים', s: '₪400' }, { v: 'pro', t: 'קולנועי', s: '₪5,000' }]
+        .map(x => Object.assign(x, { on: c.clip === x.v })));
     }
 
     function confirmCreateSong() {
@@ -1069,6 +1102,11 @@
 
       renderSkills();
       renderStudio();
+      $('studio-total').innerText = shortNum(state.songs.reduce((a, x) => a + x.streams, 0));
+      $('gigs-total').innerText = fmt(Object.values(state.stats.gigs).reduce((a, b) => a + b, 0));
+      $('shop-total').innerText = state.inventory.length;
+      const unread = unreadCount(), pending = pendingCount();
+      $('home-wa-btn').innerHTML = `<i class="fa-brands fa-whatsapp"></i> WhatsApp${pending ? ` · ${pending} מחכות לתשובה` : unread ? ` · ${unread} חדשות` : ''}`;
       renderMyChartLine();
       renderAchievements();
       renderGigs();
@@ -1094,11 +1132,11 @@
 
     function renderGraph() {
       const h = state.history.length ? state.history : [{ l: state.listeners }];
-      $('graph-listeners').innerText = fmt(state.listeners);
+      $('graph-listeners').innerText = shortNum(state.listeners);
       const prev = h.length > 1 ? h[h.length - 2].l : 0;
       const d = state.listeners - prev;
-      $('graph-delta').innerHTML = h.length > 1 ? `<span class="${d >= 0 ? 'text-spotifyGreen' : 'text-red-400'}">${d >= 0 ? '▲' : '▼'} ${fmt(Math.abs(d))}</span>` : '';
-      $('graph-svg').innerHTML = lineChart(h.map(x => x.l), '#ecc94b');
+      $('graph-delta').innerHTML = h.length > 1 ? `<span class="${d >= 0 ? 'text-mint' : 'text-coral'}">${d >= 0 ? '▲' : '▼'} ${fmt(Math.abs(d))} מאזינים מהשבוע שעבר</span>` : '';
+      $('graph-svg').innerHTML = lineChart(h.map(x => x.l), '#f0bf55');
     }
     // Small SVG line chart. Drawn left-to-right in time, so it is flipped for RTL readers.
     function lineChart(values, color) {
@@ -1110,24 +1148,30 @@
       const path = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
       const area = path + ` L${pts[pts.length - 1][0].toFixed(1)} ${H} L${pts[0][0].toFixed(1)} ${H} Z`;
       return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" class="w-full h-full" style="direction:ltr">
-        <path d="${area}" fill="${color}" opacity="0.12"/>
-        <path d="${path}" fill="none" stroke="${color}" stroke-width="2.5" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>
-        ${pts.map(p => `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.2" fill="${color}"/>`).join('')}
+        <path d="${area}" fill="${color}" opacity="0.08"/>
+        <path d="${path}" fill="none" stroke="${color}" stroke-width="3.5" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/>
       </svg>`;
     }
 
+    const SKILL_RING = { flow: '#7cc4a4', charisma: '#ee8b7e', viral: '#b4a0d8', video: '#8fa7e0' };
+    function ringSVG(pct, color, label) {
+      const r = 45, c = 2 * Math.PI * r;
+      return `<svg viewBox="0 0 110 110" class="w-24 h-24 mx-auto"><circle cx="55" cy="55" r="${r}" stroke="#303c47" stroke-width="13" fill="none"/>
+        <circle cx="55" cy="55" r="${r}" stroke="${color}" stroke-width="13" fill="none" stroke-linecap="round" stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${(c * (1 - pct)).toFixed(1)}" transform="rotate(-90 55 55)"/>
+        <text x="55" y="65" text-anchor="middle" font-family="Rubik, sans-serif" font-size="32" font-weight="900" fill="#f5f3ee">${label}</text></svg>`;
+    }
     function renderSkills() {
-      $('skills-list').innerHTML = Object.keys(SKILL_CAP).map(k => {
+      const keys = Object.keys(SKILL_CAP);
+      // Overall talent: average level as a share of each cap, on a 0-50 scale
+      $('talent-total').innerText = Math.round(keys.reduce((a, k) => a + state.skills[k] / SKILL_CAP[k], 0) / keys.length * 50);
+      $('skills-list').innerHTML = keys.map(k => {
         const lvl = state.skills[k];
         const maxed = lvl >= SKILL_CAP[k];
-        return `<div>
-          <div class="flex justify-between text-xs mb-1">
-            <span class="text-gray-200">${SKILL_NAMES[k]} (${lvl}/${SKILL_CAP[k]})</span>
-            <button onclick="upgradeSkill('${k}')" class="${maxed ? 'text-gray-500' : 'text-spotifyGreen hover:underline'} font-semibold text-[11px]">${maxed ? 'מקסימום ✓' : `אימון (${SKILL_ENERGY[k]} <i class="fa-solid fa-bolt"></i> / ₪${fmt(skillCost(k))})`}</button>
-          </div>
-          <div class="w-full bg-gray-900 h-2.5 rounded-full overflow-hidden border border-gray-800">
-            <div class="${SKILL_BAR[k]} h-full transition-all duration-300" style="width:${lvl / SKILL_CAP[k] * 100}%"></div>
-          </div>
+        return `<div class="bg-cardDark rounded-2xl p-3 text-center">
+          ${ringSVG(lvl / SKILL_CAP[k], SKILL_RING[k], lvl)}
+          <div class="font-extrabold text-sm text-white mt-1">${SKILL_SHORT[k]}</div>
+          <div class="text-[11px] font-bold text-gray-400 mb-2">${maxed ? `מקסימום ${SKILL_CAP[k]}` : `<i class="fa-solid fa-bolt"></i>${SKILL_ENERGY[k]} · ₪${fmt(skillCost(k))}`}</div>
+          <button onclick="upgradeSkill('${k}')" ${maxed ? 'disabled' : ''} class="w-full ${maxed ? 'bg-gray-800 text-gray-500' : 'bg-mint text-bgDark'} text-sm py-2">${maxed ? '✓' : 'אימון'}</button>
         </div>`;
       }).join('');
     }
@@ -1262,19 +1306,30 @@
 
     function renderMoney() {
       const nw = netWorth();
-      $('money-networth').innerText = money(nw.total);
+      $('money-networth').innerText = (nw.total < 0 ? '-₪' : '₪') + shortNum(Math.abs(nw.total));
       $('money-breakdown').innerText = `מזומן ${money(state.money)} · השקעות ₪${shortNum(nw.inv)} · קבוצות ₪${shortNum(nw.teams)} · רכוש ₪${shortNum(nw.items)}`;
       const thisYear = state.income[state.year] || 0;
       const lastYear = state.income[state.year - 1] || 0;
-      $('money-income').innerHTML = `הרווחת <b class="text-spotifyGreen">₪${fmt(thisYear)}</b> השנה (₪${fmt(state.lastWeekIncome)} בשבוע שעבר). כולל תמלוגים, הופעות, משכורת ומכירות.${lastYear ? ` בשנה שעברה: <b class="text-goldAccent">₪${fmt(lastYear)}</b>.` : ''}`;
+      $('money-income').innerHTML = `הרווחת <b class="text-mint">₪${fmt(thisYear)}</b> השנה (₪${fmt(state.lastWeekIncome)} בשבוע שעבר).${lastYear ? ` בשנה שעברה: <b class="text-mustard">₪${fmt(lastYear)}</b>.` : ''}`;
       if (lastYear) {
         // Compare with the same point last year
         const pace = thisYear / Math.max(1, state.week) * 52;
         const ch = (pace - lastYear) / lastYear * 100;
-        $('money-yoy').innerHTML = `<span class="${ch >= 0 ? 'text-spotifyGreen' : 'text-red-400'}">${ch >= 0 ? '+' : ''}${ch.toFixed(1)}% בקצב שנתי</span>`;
+        $('money-yoy').innerHTML = `<b class="${ch >= 0 ? 'text-mint' : 'text-coral'}">${ch >= 0 ? '+' : ''}${ch.toFixed(1)}%</b> מהקצב של שנה שעברה.`;
       } else $('money-yoy').innerText = '';
 
       const h = currentHome();
+      const job = state.job ? JOBS.find(x => x.id === state.job.id) : null;
+      const invTotal = nw.inv;
+      const teamsOwned = Object.keys(state.teams).length;
+      const tile = (cls, icon, value, sub, target) => `<button onclick="document.getElementById('${target}').scrollIntoView({behavior:'smooth'})" class="tile3d ${cls} p-4 text-right flex flex-col justify-between min-h-[118px]">
+        <i class="fa-solid ${icon} text-xl opacity-75"></i>
+        <div><div class="text-2xl font-black tracking-tight">${value}</div><div class="text-[11px] font-bold opacity-75">${sub}</div></div></button>`;
+      $('money-tiles').innerHTML =
+        tile('bg-mint', job ? job.icon.split(' ')[0] : 'fa-briefcase', job ? '₪' + fmt(state.job.pay) : '—', job ? `${job.name} · עוד ${state.job.weeksLeft} שב׳` : 'אין עבודה · מצא עבודה', 'sec-job') +
+        tile('bg-coral', h.icon, monthlyCost(h) ? '₪' + fmt(monthlyCost(h)) : 'חינם', `${h.name} · לחודש`, 'sec-home') +
+        tile('bg-mustard', 'fa-chart-line', invTotal ? '₪' + shortNum(invTotal) : '—', 'השקעות', 'sec-inv') +
+        tile('bg-peri', 'fa-futbol', teamsOwned ? teamsOwned : '—', 'קבוצות ספורט', 'sec-teams');
       $('money-home').innerHTML = `<div class="font-bold text-white mb-1"><i class="fa-solid ${h.icon} ml-1"></i>${h.name}</div>
         ${monthlyCost(h) ? `משלם <b class="text-red-400">₪${fmt(monthlyCost(h))}</b> לחודש (₪${fmt(weeklyRent())} בשבוע).` : 'לא משלם כלום.'} ${homeEffectsText(h)}`;
 
