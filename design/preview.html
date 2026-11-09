@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>הדמיית עיצוב</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  :root { --bg:#0b0f12; --card:#161c22; --card2:#1f2730; --line:#262f38; --green:#1DB954; --orange:#f6ad55; --gold:#ecc94b; --pink:#FE3C72; --text:#f4f6f8; --sub:#7d8a96; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #000; font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif; color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 16px; }
+  .phone { display: none !important; }
+  .phone.show { display: flex !important; }
+  .nav i, .opt, .pill, .ring .pill, [data-go] { cursor: pointer; user-select: none; }
+  .pill:active, .opt:active, .nav i:active { transform: scale(.96); }
+  @media (max-width: 430px) { body { padding: 0; } .phone { width: 100vw; height: 100dvh; border-radius: 0; border: none; } }
+  .toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: #1f2730; border: 1px solid #333; padding: 10px 16px; border-radius: 14px; font-weight: 800; font-size: 14px; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 9; }
+  .toast.on { opacity: 1; }
+  .phone { width: 390px; height: 844px; background: var(--bg); border-radius: 36px; overflow: hidden; position: relative; display: flex; flex-direction: column; border: 1px solid #222; }
+  .top { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px 10px; }
+  .wallet { font-weight: 800; font-size: 17px; color: var(--green); line-height: 1.15; }
+  .wallet .en { color: var(--orange); font-size: 15px; }
+  .date { text-align: center; font-weight: 800; font-size: 12px; letter-spacing: .5px; }
+  .pill { border: none; border-radius: 999px; font-weight: 900; font-size: 16px; padding: 12px 22px; color: #0b0f12; box-shadow: inset 0 -4px 0 rgba(0,0,0,.25); }
+  .g { background: var(--green); } .o { background: var(--orange); } .gold { background: var(--gold); } .pk { background: var(--pink); color: #fff; } .dk { background: var(--card2); color: var(--text); } .wh { background: #e9edf0; }
+  .content { flex: 1; overflow: hidden; padding: 6px 20px 0; }
+  .hero { font-size: 52px; font-weight: 900; line-height: 1; letter-spacing: -1px; margin: 18px 0 6px; }
+  .hero .n { color: #3a4652; }
+  .label { font-size: 12px; font-weight: 800; letter-spacing: 3px; color: var(--sub); margin: 18px 0 8px; }
+  .row { display: flex; justify-content: space-between; align-items: center; }
+  .fame { background: linear-gradient(90deg, #f6ad55, #FE3C72); border-radius: 999px; padding: 10px 16px; display: flex; align-items: center; gap: 14px; font-weight: 900; color: #0b0f12; margin-top: 14px; box-shadow: inset 0 -4px 0 rgba(0,0,0,.2); }
+  .fame .bar { flex: 1; height: 14px; border-radius: 999px; background: rgba(255,255,255,.35); overflow: hidden; }
+  .fame .bar div { height: 100%; width: 34%; background: #fff; border-radius: 999px; }
+  .apps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 18px; }
+  .app { width: 64px; height: 64px; border-radius: 20px; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 30px; position: relative; }
+  .badge { position: absolute; top: -6px; left: -6px; background: #ff3b30; color: #fff; font-size: 12px; font-weight: 800; border-radius: 999px; min-width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; }
+  .list .pill { width: 100%; margin-bottom: 10px; font-size: 17px; padding: 15px; }
+  .nav { display: flex; justify-content: space-around; padding: 12px 10px 22px; background: var(--bg); }
+  .nav i { font-size: 22px; color: #c9d1d8; padding: 12px 18px; border-radius: 22px; }
+  .nav .on { background: var(--card2); color: var(--green); }
+  .songs div { font-size: 22px; font-weight: 800; margin: 6px 0; }
+  .songs span { color: #3a4652; font-weight: 800; margin-right: 6px; }
+  .songs b { color: var(--sub); font-size: 14px; margin-left: 6px; }
+  .skill { display: flex; align-items: stretch; background: var(--card2); border-radius: 26px; margin-bottom: 12px; overflow: hidden; height: 88px; }
+  .skill .lv { width: 92px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 40px; font-weight: 900; }
+  .skill .lv small { font-size: 12px; color: var(--orange); font-weight: 800; }
+  .skill .mid { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 10px; padding-left: 12px; }
+  .skill .mid .t { font-size: 12px; letter-spacing: 3px; font-weight: 800; color: var(--sub); }
+  .skill .mid .b { height: 16px; border-radius: 999px; background: #33404c; overflow: hidden; }
+  .skill .mid .b div { height: 100%; border-radius: 999px; }
+  .skill .up { width: 70px; display: flex; align-items: center; justify-content: center; font-size: 26px; color: #0b0f12; }
+  .comp { text-align: center; margin-top: 10px; }
+  .comp .t { font-size: 12px; letter-spacing: 3px; font-weight: 800; color: var(--sub); }
+  .comp .v { font-size: 24px; font-weight: 900; margin-top: 2px; }
+  .comp .m { font-size: 17px; font-weight: 800; }
+  .comp .m .lvl { color: var(--orange); } .comp .m .sep { color: #3a4652; margin: 0 6px; }
+  .chips { display: flex; gap: 8px; justify-content: center; margin-top: 8px; }
+  .chip { width: 10px; height: 10px; border-radius: 50%; background: #33404c; } .chip.on { background: var(--green); width: 26px; border-radius: 6px; }
+  .input { display: flex; background: var(--card2); border-radius: 999px; overflow: hidden; margin-top: 8px; }
+  .input span { flex: 1; padding: 16px 20px; color: var(--sub); font-size: 18px; font-weight: 600; }
+  .input b { background: var(--green); width: 64px; display: flex; align-items: center; justify-content: center; color: #0b0f12; font-size: 20px; }
+  .text { font-size: 15px; font-weight: 700; line-height: 1.5; color: #cfd6dc; margin-top: 10px; }
+  .graph { height: 120px; margin-top: 8px; }
+  .herocard { background: linear-gradient(135deg, #1f2730, #12181d); border-radius: 28px; padding: 18px 20px; margin-top: 14px; border: 1px solid var(--line); }
+  .herocard .k { font-size: 13px; font-weight: 800; color: var(--sub); }
+  .herocard .big { font-size: 54px; font-weight: 900; letter-spacing: -1.5px; line-height: 1.05; }
+  .delta { display: inline-block; background: rgba(29,185,84,.15); color: var(--green); font-weight: 800; font-size: 13px; border-radius: 999px; padding: 4px 10px; }
+  .step { background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 12px 14px; margin-top: 10px; }
+  .step .h { display: flex; justify-content: space-between; align-items: center; font-weight: 900; font-size: 15px; }
+  .step .h .num { width: 26px; height: 26px; border-radius: 50%; background: var(--green); color: #0b0f12; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; margin-left: 8px; }
+  .chiprow { display: flex; gap: 8px; margin-top: 10px; overflow: hidden; }
+  .opt { flex-shrink: 0; border-radius: 16px; padding: 8px 12px; background: var(--card2); border: 2px solid transparent; font-weight: 800; font-size: 13px; text-align: center; }
+  .opt small { display: block; font-size: 11px; color: var(--sub); font-weight: 700; margin-top: 2px; }
+  .opt.on { border-color: var(--green); background: rgba(29,185,84,.12); }
+  .opt.lock { opacity: .45; }
+  .footer { position: absolute; bottom: 0; left: 0; right: 0; background: #12181d; border-top: 1px solid var(--line); padding: 14px 20px 22px; display: flex; align-items: center; gap: 14px; border-radius: 28px 28px 0 0; }
+  .rings { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+  .ring { background: var(--card); border: 1px solid var(--line); border-radius: 28px; padding: 16px 10px 14px; text-align: center; }
+  .ring svg { width: 110px; height: 110px; }
+  .ring .name { font-weight: 900; font-size: 15px; margin-top: 6px; }
+  .ring .cost { font-size: 12px; color: var(--sub); font-weight: 700; margin: 2px 0 10px; }
+  .ring .pill { padding: 9px 0; width: 100%; font-size: 15px; }
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+  .tile { background: var(--card); border: 1px solid var(--line); border-radius: 24px; padding: 14px; min-height: 128px; display: flex; flex-direction: column; justify-content: space-between; }
+  .tile .ic { width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #0b0f12; }
+  .tile .v { font-size: 26px; font-weight: 900; letter-spacing: -.5px; margin-top: 8px; }
+  .tile .s { font-size: 12px; color: var(--sub); font-weight: 700; }
+  .stack { display: flex; height: 12px; border-radius: 999px; overflow: hidden; margin-top: 12px; gap: 3px; }
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div class="phone show" id="p1">
+  <div class="top">
+    <div class="wallet">₪3,955<br><span class="en">⚡16 | 20</span></div>
+    <div class="date">שבוע 29<br>2026</div>
+    <button class="pill g">סיים שבוע</button>
+  </div>
+  <div class="content">
+    <div class="herocard"><div class="row"><span class="k">מאזינים חודשיים</span><span class="delta">▲ 10.2K</span></div><div class="big">81,686</div></div>
+    <div class="fame">פרסום | B <div class="bar"><div></div></div></div>
+    <div class="apps">
+      <div><div class="app" style="background:#191414"><i class="fa-brands fa-spotify" style="color:#1DB954"></i></div></div>
+      <div><div class="app" style="background:linear-gradient(#fb5c74,#fa233b)"><i class="fa-solid fa-music"></i></div></div>
+      <div><div class="app" style="background:#fff"><i class="fa-brands fa-youtube" style="color:#f00"></i></div></div>
+      <div><div class="app" style="background:linear-gradient(45deg,#feda75,#d62976,#4f5bd5)"><i class="fa-brands fa-instagram"></i></div></div>
+      <div><div class="app" style="background:#000;border:1px solid #333"><i class="fa-brands fa-tiktok"></i></div></div>
+      <div><div class="app" style="background:linear-gradient(45deg,#FD267A,#FF6036)"><i class="fa-solid fa-fire"></i></div></div>
+      <div><div class="app" style="background:#25D366"><i class="fa-brands fa-whatsapp"></i><span class="badge">3</span></div></div>
+      <div><div class="app" style="background:var(--gold);color:#0b0f12"><i class="fa-solid fa-ranking-star"></i></div></div>
+    </div>
+    <svg class="graph" viewBox="0 0 300 100" preserveAspectRatio="none" style="width:100%;direction:ltr;margin-top:16px">
+      <path d="M5 92 L30 88 L55 84 L80 80 L105 70 L130 66 L155 56 L180 50 L205 42 L230 34 L255 22 L280 14 L295 12 L295 100 L5 100 Z" fill="#ecc94b" opacity=".12"/>
+      <path d="M5 92 L30 88 L55 84 L80 80 L105 70 L130 66 L155 56 L180 50 L205 42 L230 34 L255 22 L280 14 L295 12" stroke="#ecc94b" stroke-width="3" fill="none" vector-effect="non-scaling-stroke"/>
+    </svg>
+    <div class="list" style="margin-top:14px">
+      <button class="pill g" data-go="p2">🎙️ שיר חדש</button>
+      <button class="pill wh">טרנדים</button>
+      <button class="pill wh">הישגים · 12/33</button>
+    </div>
+  </div>
+  <div class="nav"><i class="fa-solid fa-house on"></i><i class="fa-solid fa-user"></i><i class="fa-solid fa-compact-disc"></i><i class="fa-solid fa-microphone"></i><i class="fa-solid fa-sack-dollar"></i></div>
+</div>
+
+<!-- STUDIO / NEW SONG -->
+<div class="phone" id="p2">
+  <div class="top"><i class="fa-solid fa-chevron-right" data-go="p1" style="font-size:22px;cursor:pointer"></i><div style="font-weight:900;font-size:24px">שיר חדש 🎙️</div><span class="wallet en" style="color:var(--orange)">⚡16</span></div>
+  <div class="content">
+    <div class="input" style="margin-top:4px"><span>תן שם לשיר...</span><b><i class="fa-solid fa-dice"></i></b></div>
+    <div class="step"><div class="h"><span><span class="num">1</span>כתיבה</span><span style="color:var(--orange)">רמה 24</span></div>
+      <div class="chiprow"><div class="opt on">אני<small>חינם</small></div><div class="opt">כותב צעיר<small>₪800</small></div><div class="opt">כותב מקצועי<small>₪3K</small></div><div class="opt lock">🔒 להיטים<small>20K עוקבים</small></div></div></div>
+    <div class="step"><div class="h"><span><span class="num">2</span>הפקה</span><span style="color:var(--orange)">רמה 30</span></div>
+      <div class="chiprow"><div class="opt">עצמית<small>חינם</small></div><div class="opt on">אינדי<small>₪1,500</small></div><div class="opt">צמרת<small>₪7K</small></div><div class="opt lock">🔒 בינלאומי<small>50K</small></div></div></div>
+    <div class="step"><div class="h"><span><span class="num">3</span>אולפן</span><span style="color:var(--orange)">רמה 30</span></div>
+      <div class="chiprow"><div class="opt">ביתי<small>חינם</small></div><div class="opt on">שכור<small>₪600</small></div><div class="opt">מקצועי<small>₪2,500</small></div><div class="opt lock">🔒 צמרת<small>30K</small></div></div></div>
+    <div class="step"><div class="h"><span><span class="num">4</span>סגנון</span><span style="color:var(--sub);font-size:12px">🔥 טראפ בטרנד</span></div>
+      <div class="chiprow"><div class="opt on">טראפ 🔥</div><div class="opt">דריל</div><div class="opt">מזרחי</div><div class="opt on" style="border-color:var(--pink);background:rgba(254,60,114,.12)">בוטה 🅴</div></div></div>
+  </div>
+  <div class="footer"><div><div style="font-size:12px;color:var(--sub);font-weight:800">עלות</div><div style="font-size:30px;font-weight:900">₪2,100</div></div><button class="pill g" style="flex:1;font-size:18px;padding:15px">הקלט · 10 ⚡</button></div>
+</div>
+
+<!-- TALENT -->
+<div class="phone" id="p3">
+  <div class="top">
+    <div class="wallet">₪3,955<br><span class="en">⚡16 | 20</span></div>
+    <div class="date">שבוע 29<br>2026</div>
+    <button class="pill g">סיים שבוע</button>
+  </div>
+  <div class="content">
+    <div class="herocard"><div class="row"><span class="k">רמת כישרון כללית</span><span class="delta" style="background:rgba(246,173,85,.15);color:var(--orange)">דרגה C</span></div><div class="big">18<span style="font-size:22px;color:var(--sub)"> / 50</span></div></div>
+    <div class="rings">
+      <div class="ring"><svg viewBox="0 0 110 110"><circle cx="55" cy="55" r="46" stroke="#262f38" stroke-width="12" fill="none"/><circle cx="55" cy="55" r="46" stroke="#1DB954" stroke-width="12" fill="none" stroke-linecap="round" stroke-dasharray="289.0" stroke-dashoffset="150.3" transform="rotate(-90 55 55)"/><text x="55" y="64" text-anchor="middle" font-size="30" font-weight="900" fill="#f4f6f8">24</text></svg><div class="name">פלוואו</div><div class="cost">⚡4 · ₪750</div><button class="pill g">אימון</button></div>
+      <div class="ring"><svg viewBox="0 0 110 110"><circle cx="55" cy="55" r="46" stroke="#262f38" stroke-width="12" fill="none"/><circle cx="55" cy="55" r="46" stroke="#f6ad55" stroke-width="12" fill="none" stroke-linecap="round" stroke-dasharray="289.0" stroke-dashoffset="173.4" transform="rotate(-90 55 55)"/><text x="55" y="64" text-anchor="middle" font-size="30" font-weight="900" fill="#f4f6f8">20</text></svg><div class="name">כריזמה</div><div class="cost">⚡4 · ₪650</div><button class="pill g">אימון</button></div>
+      <div class="ring"><svg viewBox="0 0 110 110"><circle cx="55" cy="55" r="46" stroke="#262f38" stroke-width="12" fill="none"/><circle cx="55" cy="55" r="46" stroke="#a78bfa" stroke-width="12" fill="none" stroke-linecap="round" stroke-dasharray="289.0" stroke-dashoffset="150.3" transform="rotate(-90 55 55)"/><text x="55" y="64" text-anchor="middle" font-size="30" font-weight="900" fill="#f4f6f8">12</text></svg><div class="name">ויראליות</div><div class="cost">⚡3 · ₪400</div><button class="pill g">אימון</button></div>
+      <div class="ring"><svg viewBox="0 0 110 110"><circle cx="55" cy="55" r="46" stroke="#262f38" stroke-width="12" fill="none"/><circle cx="55" cy="55" r="46" stroke="#60a5fa" stroke-width="12" fill="none" stroke-linecap="round" stroke-dasharray="289.0" stroke-dashoffset="185.0" transform="rotate(-90 55 55)"/><text x="55" y="64" text-anchor="middle" font-size="30" font-weight="900" fill="#f4f6f8">9</text></svg><div class="name">וידאו</div><div class="cost">⚡3 · ₪345</div><button class="pill g">אימון</button></div>
+    </div>
+  </div>
+  <div class="nav"><i class="fa-solid fa-house"></i><i class="fa-solid fa-user on"></i><i class="fa-solid fa-compact-disc"></i><i class="fa-solid fa-microphone"></i><i class="fa-solid fa-sack-dollar"></i></div>
+</div>
+
+<!-- MONEY -->
+<div class="phone" id="p4">
+  <div class="top">
+    <div class="wallet">₪3,955<br><span class="en">⚡16 | 20</span></div>
+    <div class="date">שבוע 29<br>2026</div>
+    <button class="pill g">סיים שבוע</button>
+  </div>
+  <div class="content">
+    <div class="herocard"><div class="row"><span class="k">שווי נקי</span><span class="delta" style="background:rgba(254,60,114,.15);color:var(--pink)">▼ 12.4% השנה</span></div><div class="big">₪61,240</div>
+      <div class="stack"><div style="flex:4;background:var(--green)"></div><div style="flex:3;background:var(--gold)"></div><div style="flex:2;background:#60a5fa"></div></div>
+      <div class="row" style="font-size:11px;font-weight:700;color:var(--sub);margin-top:6px"><span>🟢 מזומן</span><span>🟡 השקעות</span><span>🔵 רכוש</span></div></div>
+    <div class="tiles">
+      <div class="tile"><div class="ic g"><i class="fa-solid fa-mug-hot"></i></div><div><div class="v">₪450</div><div class="s">בריסטה · עוד 3 שבועות</div></div></div>
+      <div class="tile"><div class="ic" style="background:var(--pink);color:#fff"><i class="fa-solid fa-door-open"></i></div><div><div class="v">₪2,800</div><div class="s">חדר בשותפים · לחודש</div></div></div>
+      <div class="tile"><div class="ic gold"><i class="fa-solid fa-chart-line"></i></div><div><div class="v">₪18K</div><div class="s">השקעות · ▲ 1.8%</div></div></div>
+      <div class="tile"><div class="ic" style="background:#60a5fa"><i class="fa-solid fa-futbol"></i></div><div><div class="v">—</div><div class="s">קבוצות ספורט</div></div></div>
+    </div>
+    <button class="pill wh" style="width:100%;margin-top:12px;padding:14px;font-size:16px">הכנסות השנה: ₪20,012</button>
+  </div>
+  <div class="nav"><i class="fa-solid fa-house"></i><i class="fa-solid fa-user"></i><i class="fa-solid fa-compact-disc"></i><i class="fa-solid fa-microphone"></i><i class="fa-solid fa-sack-dollar on"></i></div>
+</div>
+
+
+<div class="toast" id="toast"></div>
+<script>
+  const screens = { 0: 'p1', 1: 'p3', 2: 'p2', 3: 'p2', 4: 'p4' }; // nav order: home, skills, studio, gigs, money
+  function show(id) { document.querySelectorAll('.phone').forEach(p => p.classList.toggle('show', p.id === id)); }
+  function toast(t) { const el = document.getElementById('toast'); el.textContent = t; el.classList.add('on'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('on'), 1400); }
+  document.querySelectorAll('.nav').forEach(nav => nav.querySelectorAll('i').forEach((ic, i) => ic.onclick = () => {
+    const target = screens[i];
+    show(target);
+    document.querySelectorAll('#' + target + ' .nav i').forEach((x, j) => x.classList.toggle('on', j === i));
+  }));
+  document.querySelectorAll('[data-go]').forEach(el => el.onclick = () => show(el.dataset.go));
+  // Option chips: pick one per row and update the cost
+  const price = t => { const m = t.replace(/,/g, '').match(/₪(\d+(?:\.\d+)?)(K)?/); return m ? parseFloat(m[1]) * (m[2] ? 1000 : 1) : 0; };
+  function updateCost() {
+    let total = 0;
+    document.querySelectorAll('#p2 .step').forEach((st, i) => { if (i < 3) { const on = st.querySelector('.opt.on'); if (on) total += price(on.textContent); } });
+    document.querySelector('#p2 .footer div div:last-child').textContent = '₪' + total.toLocaleString('en-US');
+  }
+  document.querySelectorAll('#p2 .chiprow').forEach((row, ri) => row.querySelectorAll('.opt').forEach(o => o.onclick = () => {
+    if (o.classList.contains('lock')) { toast('🔒 עוד לא נפתח'); return; }
+    if (ri === 3 && o.textContent.includes('בוטה')) { o.classList.toggle('on'); return; }
+    row.querySelectorAll('.opt').forEach(x => { if (!(ri === 3 && x.textContent.includes('בוטה'))) x.classList.remove('on'); });
+    o.classList.add('on');
+    updateCost();
+  }));
+  document.querySelector('#p2 .footer .pill').onclick = () => { toast('🎶 השיר שוחרר!'); setTimeout(() => show('p1'), 900); };
+  // Training rings: each click raises the level
+  document.querySelectorAll('#p3 .ring').forEach(r => r.querySelector('.pill').onclick = () => {
+    const txt = r.querySelector('text'), arc = r.querySelectorAll('circle')[1];
+    const lvl = Math.min(50, +txt.textContent + 2); txt.textContent = lvl;
+    const c = 2 * Math.PI * 46; arc.setAttribute('stroke-dashoffset', (c * (1 - lvl / 50)).toFixed(1));
+    toast('💪 +2');
+  });
+  document.querySelectorAll('.pill.g').forEach(b => { if (b.textContent.includes('סיים שבוע')) b.onclick = () => toast('📅 שבוע חדש התחיל'); });
+</script>
+</body>
+</html>
