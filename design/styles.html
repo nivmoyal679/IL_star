@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>סגנונות עיצוב</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Karantina:wght@700&family=Heebo:wght@500;700;900&family=Rubik:wght@500;700;900&family=Frank+Ruhl+Libre:wght@500;900&display=block" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #000; display: flex; flex-wrap: wrap; gap: 30px; padding: 30px; justify-content: center; }
+  .phone { width: 390px; height: 844px; overflow: hidden; position: relative; display: flex; flex-direction: column; }
+  .row { display: flex; justify-content: space-between; align-items: center; }
+  svg { display: block; }
+
+  /* ================= A: STREET (brutalist) ================= */
+  .A { background: #0a0a0a; color: #fff; font-family: Heebo, sans-serif; border: 3px solid #fff; }
+  .A .top { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 3px solid #fff; }
+  .A .money { font-family: Karantina; font-size: 34px; line-height: .9; color: #C6FF00; }
+  .A .money small { display: block; font-size: 22px; color: #fff; }
+  .A .wk { font-family: Karantina; font-size: 26px; line-height: .9; text-align: center; }
+  .A .btn { background: #C6FF00; color: #000; font-family: Karantina; font-size: 28px; padding: 6px 16px 2px; border: 3px solid #000; box-shadow: 5px 5px 0 #fff; }
+  .A .btn.red { background: #FF2E2E; color: #fff; box-shadow: 5px 5px 0 #C6FF00; }
+  .A .btn.wht { background: #fff; color: #000; box-shadow: 5px 5px 0 #FF2E2E; }
+  .A .content { padding: 16px; flex: 1; overflow: hidden; }
+  .A .tag { display: inline-block; background: #FF2E2E; color: #fff; font-family: Karantina; font-size: 22px; padding: 2px 10px 0; transform: rotate(-2deg); }
+  .A .huge { font-family: Karantina; font-size: 118px; line-height: .82; letter-spacing: -1px; margin-top: 8px; }
+  .A .huge span { color: #C6FF00; }
+  .A .fame { display: flex; align-items: center; gap: 10px; margin-top: 12px; border: 3px solid #fff; padding: 6px 10px; }
+  .A .fame b { font-family: Karantina; font-size: 30px; line-height: 1; }
+  .A .fame .bar { flex: 1; height: 14px; border: 2px solid #fff; } .A .fame .bar div { height: 100%; width: 34%; background: #C6FF00; }
+  .A .apps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 16px; }
+  .A .app { aspect-ratio: 1; border: 3px solid #fff; display: flex; align-items: center; justify-content: center; font-size: 30px; position: relative; background: #111; }
+  .A .app .n { position: absolute; top: -10px; left: -10px; background: #FF2E2E; font-family: Karantina; font-size: 20px; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; border: 2px solid #000; }
+  .A .label { font-family: Karantina; font-size: 26px; margin-top: 16px; }
+  .A .nav { display: flex; border-top: 3px solid #fff; }
+  .A .nav i { flex: 1; text-align: center; padding: 16px 0 20px; font-size: 22px; border-left: 3px solid #fff; }
+  .A .nav i:last-child { border-left: none; }
+  .A .nav .on { background: #C6FF00; color: #000; }
+  .A .input { border: 3px solid #fff; display: flex; margin-top: 10px; }
+  .A .input span { flex: 1; padding: 12px; color: #777; font-weight: 700; font-size: 17px; }
+  .A .input b { width: 58px; background: #C6FF00; color: #000; display: flex; align-items: center; justify-content: center; font-size: 20px; border-right: 3px solid #fff; }
+  .A .comp { border: 3px solid #fff; margin-top: 12px; }
+  .A .comp .h { display: flex; justify-content: space-between; padding: 6px 10px 2px; font-family: Karantina; font-size: 26px; border-bottom: 3px solid #fff; }
+  .A .comp .h .lv { color: #C6FF00; }
+  .A .opts { display: grid; grid-template-columns: repeat(4, 1fr); }
+  .A .opt { padding: 8px 4px; text-align: center; font-weight: 900; font-size: 13px; border-left: 2px solid #333; }
+  .A .opt:last-child { border-left: none; }
+  .A .opt small { display: block; font-weight: 500; color: #888; font-size: 11px; }
+  .A .opt.on { background: #C6FF00; color: #000; } .A .opt.on small { color: #000; }
+  .A .opt.lock { color: #444; }
+  .A .footer { border-top: 3px solid #fff; padding: 14px 16px 22px; display: flex; gap: 14px; align-items: center; }
+
+  /* ================= B: CLUB (neon) ================= */
+  .B { background: #07050f; color: #f2ecff; font-family: Rubik, sans-serif; border: 1px solid #2a1f45;
+       background-image: linear-gradient(rgba(255,43,214,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,.05) 1px, transparent 1px); background-size: 26px 26px; }
+  .B .top { display: flex; justify-content: space-between; align-items: center; padding: 16px 18px; }
+  .B .money { font-weight: 900; font-size: 20px; color: #00e5ff; text-shadow: 0 0 10px #00e5ff; line-height: 1.1; }
+  .B .money small { display: block; color: #ff2bd6; text-shadow: 0 0 10px #ff2bd6; font-size: 16px; }
+  .B .wk { font-weight: 700; font-size: 12px; letter-spacing: 2px; text-align: center; color: #9a8cc0; }
+  .B .btn { background: transparent; color: #ff2bd6; border: 2px solid #ff2bd6; font-family: Rubik; font-weight: 900; font-size: 16px; padding: 10px 18px; border-radius: 3px; box-shadow: 0 0 14px rgba(255,43,214,.6), inset 0 0 10px rgba(255,43,214,.3); text-shadow: 0 0 8px #ff2bd6; }
+  .B .btn.cy { color: #00e5ff; border-color: #00e5ff; box-shadow: 0 0 14px rgba(0,229,255,.6), inset 0 0 10px rgba(0,229,255,.3); text-shadow: 0 0 8px #00e5ff; }
+  .B .btn.fill { background: #ff2bd6; color: #07050f; text-shadow: none; }
+  .B .content { padding: 6px 18px; flex: 1; overflow: hidden; }
+  .B .k { font-size: 12px; letter-spacing: 3px; color: #9a8cc0; font-weight: 700; }
+  .B .huge { font-size: 76px; font-weight: 900; line-height: 1; color: #fff; text-shadow: 0 0 18px #ff2bd6, 0 0 40px rgba(255,43,214,.5); margin-top: 4px; }
+  .B .delta { color: #00e5ff; text-shadow: 0 0 8px #00e5ff; font-weight: 900; }
+  .B .fame { margin-top: 14px; border: 1px solid #00e5ff; padding: 10px 12px; display: flex; gap: 12px; align-items: center; box-shadow: 0 0 12px rgba(0,229,255,.35); border-radius: 3px; }
+  .B .fame b { color: #00e5ff; text-shadow: 0 0 8px #00e5ff; font-size: 18px; }
+  .B .fame .bar { flex: 1; height: 6px; background: #1d1636; } .B .fame .bar div { width: 34%; height: 100%; background: linear-gradient(90deg, #00e5ff, #ff2bd6); box-shadow: 0 0 10px #ff2bd6; }
+  .B .apps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 18px; }
+  .B .app { aspect-ratio: 1; border: 1.5px solid var(--c); color: var(--c); display: flex; align-items: center; justify-content: center; font-size: 28px; border-radius: 4px; box-shadow: 0 0 12px var(--c), inset 0 0 12px rgba(255,255,255,.04); position: relative; text-shadow: 0 0 10px var(--c); }
+  .B .app .n { position: absolute; top: -8px; left: -8px; background: #ff2bd6; color: #07050f; font-size: 12px; font-weight: 900; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: 2px; box-shadow: 0 0 10px #ff2bd6; text-shadow: none; }
+  .B .nav { display: flex; justify-content: space-around; padding: 14px 10px 22px; border-top: 1px solid #2a1f45; }
+  .B .nav i { font-size: 20px; color: #5d5280; } .B .nav .on { color: #ff2bd6; text-shadow: 0 0 10px #ff2bd6; }
+  .B .input { border: 1px solid #00e5ff; display: flex; margin-top: 10px; border-radius: 3px; box-shadow: 0 0 10px rgba(0,229,255,.3); }
+  .B .input span { flex: 1; padding: 13px; color: #6e6496; font-weight: 500; }
+  .B .input b { width: 54px; color: #00e5ff; display: flex; align-items: center; justify-content: center; font-size: 20px; border-right: 1px solid #00e5ff; }
+  .B .comp { margin-top: 14px; }
+  .B .comp .h { display: flex; justify-content: space-between; font-size: 13px; letter-spacing: 2px; color: #9a8cc0; font-weight: 700; margin-bottom: 6px; }
+  .B .comp .h .lv { color: #00e5ff; text-shadow: 0 0 8px #00e5ff; }
+  .B .opts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .B .opt { border: 1px solid #2f2550; padding: 8px 2px; text-align: center; font-size: 12px; font-weight: 700; border-radius: 3px; }
+  .B .opt small { display: block; color: #6e6496; font-size: 11px; font-weight: 500; }
+  .B .opt.on { border-color: #ff2bd6; color: #fff; box-shadow: 0 0 12px rgba(255,43,214,.6); } .B .opt.on small { color: #ff8fe9; }
+  .B .opt.lock { opacity: .35; }
+  .B .footer { border-top: 1px solid #2a1f45; padding: 14px 18px 22px; display: flex; gap: 14px; align-items: center; }
+
+  /* ================= C: MAGAZINE (editorial) ================= */
+  .C { background: #0e0e0e; color: #f3f0ea; font-family: Heebo, sans-serif; border: 1px solid #333; }
+  .C .top { display: flex; justify-content: space-between; align-items: flex-end; padding: 16px 18px 10px; border-bottom: 1px solid #f3f0ea; }
+  .C .mast { font-family: 'Frank Ruhl Libre'; font-weight: 900; font-size: 30px; line-height: 1; }
+  .C .issue { font-size: 11px; letter-spacing: 2px; text-align: left; line-height: 1.5; color: #aaa; font-weight: 700; }
+  .C .strip { display: flex; justify-content: space-between; padding: 8px 18px; font-size: 12px; font-weight: 700; letter-spacing: 1px; border-bottom: 3px double #f3f0ea; }
+  .C .strip .r { color: #E10600; }
+  .C .content { padding: 12px 18px; flex: 1; overflow: hidden; }
+  .C .kicker { color: #E10600; font-size: 12px; letter-spacing: 3px; font-weight: 900; }
+  .C .huge { font-family: 'Frank Ruhl Libre'; font-weight: 900; font-size: 84px; line-height: .95; letter-spacing: -2px; margin-top: 2px; }
+  .C .dek { font-family: 'Frank Ruhl Libre'; font-size: 17px; color: #cfcac0; margin-top: 6px; line-height: 1.35; }
+  .C .rule { border-top: 1px solid #555; margin: 14px 0 10px; }
+  .C .fame { display: flex; align-items: center; gap: 12px; font-weight: 900; font-size: 13px; letter-spacing: 1px; }
+  .C .fame .bar { flex: 1; height: 4px; background: #333; } .C .fame .bar div { width: 34%; height: 100%; background: #E10600; }
+  .C .apps { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid #555; border-right: 1px solid #555; margin-top: 12px; }
+  .C .app { aspect-ratio: 1.15; border-left: 1px solid #555; border-bottom: 1px solid #555; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font-size: 24px; position: relative; }
+  .C .app span { font-size: 10px; letter-spacing: 1px; font-weight: 700; color: #aaa; }
+  .C .app .n { position: absolute; top: 6px; left: 8px; color: #E10600; font-weight: 900; font-size: 13px; }
+  .C .btn { background: #f3f0ea; color: #0e0e0e; font-family: Heebo; font-weight: 900; font-size: 15px; letter-spacing: 1px; padding: 11px 18px; border: none; }
+  .C .btn.red { background: #E10600; color: #fff; }
+  .C .btn.out { background: transparent; color: #f3f0ea; border: 1px solid #f3f0ea; }
+  .C .nav { display: flex; justify-content: space-around; padding: 12px 6px 20px; border-top: 3px double #f3f0ea; font-size: 11px; font-weight: 900; letter-spacing: 1px; }
+  .C .nav span { color: #777; } .C .nav .on { color: #f3f0ea; border-bottom: 2px solid #E10600; padding-bottom: 2px; }
+  .C .input { border-bottom: 1px solid #f3f0ea; display: flex; margin-top: 6px; }
+  .C .input span { flex: 1; padding: 10px 0; color: #777; font-family: 'Frank Ruhl Libre'; font-size: 20px; }
+  .C .input b { color: #E10600; font-size: 13px; letter-spacing: 1px; display: flex; align-items: center; }
+  .C .comp { border-top: 1px solid #555; padding-top: 10px; margin-top: 12px; }
+  .C .comp .h { display: flex; justify-content: space-between; font-size: 12px; letter-spacing: 3px; font-weight: 900; }
+  .C .comp .h .lv { color: #E10600; }
+  .C .comp .val { font-family: 'Frank Ruhl Libre'; font-weight: 900; font-size: 26px; margin-top: 2px; }
+  .C .comp .alt { font-size: 12px; color: #888; margin-top: 2px; }
+  .C .comp .alt b { color: #f3f0ea; }
+  .C .footer { border-top: 3px double #f3f0ea; padding: 12px 18px 22px; display: flex; gap: 14px; align-items: center; }
+</style>
+</head>
+<body>
+
+<!-- ======== A: STREET ======== -->
+<div class="phone A" id="A1">
+  <div class="top">
+    <div class="money">₪3,955<small>⚡16/20</small></div>
+    <div class="wk">שבוע 29<br>2026</div>
+    <button class="btn">סיים שבוע ←</button>
+  </div>
+  <div class="content">
+    <span class="tag">מאזינים חודשיים ▲10.2K</span>
+    <div class="huge"><span>81,686</span></div>
+    <div class="fame"><b>פרסום B</b><div class="bar"><div></div></div><b style="color:#C6FF00">A</b></div>
+    <div class="apps">
+      <div class="app"><i class="fa-brands fa-spotify" style="color:#1DB954"></i></div>
+      <div class="app"><i class="fa-solid fa-music" style="color:#fa2d48"></i></div>
+      <div class="app"><i class="fa-brands fa-youtube" style="color:#f00"></i></div>
+      <div class="app"><i class="fa-brands fa-instagram" style="color:#e1306c"></i></div>
+      <div class="app"><i class="fa-brands fa-tiktok"></i></div>
+      <div class="app"><i class="fa-solid fa-fire" style="color:#FE3C72"></i></div>
+      <div class="app"><i class="fa-brands fa-whatsapp" style="color:#25D366"></i><span class="n">3</span></div>
+      <div class="app" style="background:#C6FF00;color:#000"><i class="fa-solid fa-ranking-star"></i></div>
+    </div>
+    <div class="label">השבועות האחרונים</div>
+    <svg viewBox="0 0 300 80" preserveAspectRatio="none" style="width:100%;height:80px;direction:ltr"><polyline points="0,74 25,72 50,68 75,66 100,58 125,55 150,46 175,42 200,34 225,28 250,18 275,12 300,10" fill="none" stroke="#C6FF00" stroke-width="4" vector-effect="non-scaling-stroke" stroke-linejoin="miter"/></svg>
+    <div class="row" style="margin-top:16px;gap:12px"><button class="btn red" style="flex:1">🎙️ שיר חדש</button><button class="btn wht" style="flex:1">הישגים 12/33</button></div>
+  </div>
+  <div class="nav"><i class="fa-solid fa-house on"></i><i class="fa-solid fa-user"></i><i class="fa-solid fa-compact-disc"></i><i class="fa-solid fa-microphone"></i><i class="fa-solid fa-sack-dollar"></i></div>
+</div>
+
+<div class="phone A" id="A2">
+  <div class="top"><i class="fa-solid fa-arrow-right" style="font-size:24px"></i><div style="font-family:Karantina;font-size:48px;line-height:.9">שיר חדש</div><div class="money" style="font-size:28px">⚡16</div></div>
+  <div class="content">
+    <div class="input"><span>שם השיר...</span><b><i class="fa-solid fa-dice"></i></b></div>
+    <div class="comp"><div class="h"><span>כתיבה</span><span class="lv">רמה 24</span></div><div class="opts"><div class="opt on">אני<small>חינם</small></div><div class="opt">צעיר<small>₪800</small></div><div class="opt">מקצועי<small>₪3K</small></div><div class="opt lock">🔒 להיטים<small>20K</small></div></div></div>
+    <div class="comp"><div class="h"><span>הפקה</span><span class="lv">רמה 30</span></div><div class="opts"><div class="opt">עצמית<small>חינם</small></div><div class="opt on">אינדי<small>₪1,500</small></div><div class="opt">צמרת<small>₪7K</small></div><div class="opt lock">🔒 בינ״ל<small>50K</small></div></div></div>
+    <div class="comp"><div class="h"><span>אולפן</span><span class="lv">רמה 30</span></div><div class="opts"><div class="opt">ביתי<small>חינם</small></div><div class="opt on">שכור<small>₪600</small></div><div class="opt">מקצועי<small>₪2.5K</small></div><div class="opt lock">🔒 צמרת<small>30K</small></div></div></div>
+    <div class="comp"><div class="h"><span>סגנון</span><span class="lv">🔥 טראפ בטרנד</span></div><div class="opts"><div class="opt on">טראפ</div><div class="opt">דריל</div><div class="opt">מזרחי</div><div class="opt" style="background:#FF2E2E;color:#fff">בוטה E</div></div></div>
+  </div>
+  <div class="footer"><div><div style="font-family:Karantina;font-size:20px;color:#888">עלות</div><div style="font-family:Karantina;font-size:52px;line-height:.85;color:#C6FF00">₪2,100</div></div><button class="btn" style="flex:1;font-size:34px">הקלט ⚡10</button></div>
+</div>
+
+<!-- ======== B: CLUB ======== -->
+<div class="phone B" id="B1">
+  <div class="top">
+    <div class="money">₪3,955<small>⚡ 16/20</small></div>
+    <div class="wk">WEEK 29<br>2026</div>
+    <button class="btn">סיים שבוע</button>
+  </div>
+  <div class="content">
+    <div class="row"><span class="k">מאזינים חודשיים</span><span class="delta">▲ 10.2K</span></div>
+    <div class="huge">81,686</div>
+    <div class="fame"><b>B</b><div class="bar"><div></div></div><span class="k" style="letter-spacing:1px">17K לדרגה A</span></div>
+    <div class="apps">
+      <div class="app" style="--c:#1DB954"><i class="fa-brands fa-spotify"></i></div>
+      <div class="app" style="--c:#fa2d48"><i class="fa-solid fa-music"></i></div>
+      <div class="app" style="--c:#ff3030"><i class="fa-brands fa-youtube"></i></div>
+      <div class="app" style="--c:#ff2bd6"><i class="fa-brands fa-instagram"></i></div>
+      <div class="app" style="--c:#00e5ff"><i class="fa-brands fa-tiktok"></i></div>
+      <div class="app" style="--c:#ff4f81"><i class="fa-solid fa-fire"></i></div>
+      <div class="app" style="--c:#25D366"><i class="fa-brands fa-whatsapp"></i><span class="n">3</span></div>
+      <div class="app" style="--c:#ffd400"><i class="fa-solid fa-ranking-star"></i></div>
+    </div>
+    <svg viewBox="0 0 300 90" preserveAspectRatio="none" style="width:100%;height:90px;margin-top:18px;direction:ltr;filter:drop-shadow(0 0 6px #ff2bd6)">
+      <defs><linearGradient id="gB" x1="0" x2="1"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#ff2bd6"/></linearGradient></defs>
+      <polyline points="0,82 25,80 50,76 75,73 100,64 125,60 150,50 175,46 200,37 225,30 250,19 275,12 300,10" fill="none" stroke="url(#gB)" stroke-width="3" vector-effect="non-scaling-stroke"/></svg>
+    <div class="row" style="margin-top:18px;gap:12px"><button class="btn fill" style="flex:1">🎙️ שיר חדש</button><button class="btn cy" style="flex:1">הישגים 12/33</button></div>
+  </div>
+  <div class="nav"><i class="fa-solid fa-house on"></i><i class="fa-solid fa-user"></i><i class="fa-solid fa-compact-disc"></i><i class="fa-solid fa-microphone"></i><i class="fa-solid fa-sack-dollar"></i></div>
+</div>
+
+<div class="phone B" id="B2">
+  <div class="top"><i class="fa-solid fa-chevron-right" style="font-size:20px;color:#00e5ff"></i><div style="font-weight:900;font-size:30px;text-shadow:0 0 14px #ff2bd6">שיר חדש</div><div class="money" style="font-size:16px">⚡16</div></div>
+  <div class="content">
+    <div class="input"><span>שם השיר...</span><b><i class="fa-solid fa-dice"></i></b></div>
+    <div class="comp"><div class="h"><span>כתיבה</span><span class="lv">LV 24</span></div><div class="opts"><div class="opt on">אני<small>חינם</small></div><div class="opt">צעיר<small>₪800</small></div><div class="opt">מקצועי<small>₪3K</small></div><div class="opt lock">🔒 להיטים<small>20K</small></div></div></div>
+    <div class="comp"><div class="h"><span>הפקה</span><span class="lv">LV 30</span></div><div class="opts"><div class="opt">עצמית<small>חינם</small></div><div class="opt on">אינדי<small>₪1,500</small></div><div class="opt">צמרת<small>₪7K</small></div><div class="opt lock">🔒 בינ״ל<small>50K</small></div></div></div>
+    <div class="comp"><div class="h"><span>אולפן</span><span class="lv">LV 30</span></div><div class="opts"><div class="opt">ביתי<small>חינם</small></div><div class="opt on">שכור<small>₪600</small></div><div class="opt">מקצועי<small>₪2.5K</small></div><div class="opt lock">🔒 צמרת<small>30K</small></div></div></div>
+    <div class="comp"><div class="h"><span>סגנון</span><span class="lv">🔥 טראפ בטרנד</span></div><div class="opts"><div class="opt on">טראפ</div><div class="opt">דריל</div><div class="opt">מזרחי</div><div class="opt on" style="border-color:#00e5ff;box-shadow:0 0 12px rgba(0,229,255,.6)">בוטה E</div></div></div>
+  </div>
+  <div class="footer"><div><div class="k">עלות</div><div style="font-size:34px;font-weight:900;color:#00e5ff;text-shadow:0 0 12px #00e5ff">₪2,100</div></div><button class="btn fill" style="flex:1;font-size:18px;padding:14px">הקלט · ⚡10</button></div>
+</div>
+
+<!-- ======== C: MAGAZINE ======== -->
+<div class="phone C" id="C1">
+  <div class="top"><div class="mast">ראפ סטאר</div><div class="issue">גיליון 29 · 2026<br>₪3,955 · ⚡16/20</div></div>
+  <div class="strip"><span>MC שכונה · תל אביב</span><span class="r">סיים שבוע ←</span></div>
+  <div class="content">
+    <div class="kicker">מאזינים חודשיים</div>
+    <div class="huge">81,686</div>
+    <div class="dek">עלייה של 10,200 מאזינים השבוע. "לילות בדרום" ממשיך לטפס במצעד.</div>
+    <div class="rule"></div>
+    <div class="fame"><span>פרסום <span style="color:#E10600">B</span></span><div class="bar"><div></div></div><span style="color:#888">A</span></div>
+    <div class="apps">
+      <div class="app"><i class="fa-brands fa-spotify"></i><span>SPOTIFY</span></div>
+      <div class="app"><i class="fa-solid fa-music"></i><span>MUSIC</span></div>
+      <div class="app"><i class="fa-brands fa-youtube"></i><span>YOUTUBE</span></div>
+      <div class="app"><i class="fa-brands fa-instagram"></i><span>INSTAGRAM</span></div>
+      <div class="app"><i class="fa-brands fa-tiktok"></i><span>TIKTOK</span></div>
+      <div class="app"><i class="fa-solid fa-fire"></i><span>TINDER</span></div>
+      <div class="app"><i class="fa-brands fa-whatsapp"></i><span>WHATSAPP</span><b class="n">3</b></div>
+      <div class="app" style="color:#E10600"><i class="fa-solid fa-ranking-star"></i><span>מצעד</span></div>
+    </div>
+    <div class="row" style="margin-top:14px;gap:10px"><button class="btn red" style="flex:1">שיר חדש</button><button class="btn out" style="flex:1">הישגים 12/33</button></div>
+  </div>
+  <div class="nav"><span class="on">בית</span><span>כישורים</span><span>אולפן</span><span>הופעות</span><span>כסף</span></div>
+</div>
+
+<div class="phone C" id="C2">
+  <div class="top"><div class="mast">שיר חדש</div><div class="issue">⚡16 · ₪3,955<br><span style="color:#E10600">← חזרה</span></div></div>
+  <div class="content">
+    <div class="kicker">שם השיר</div>
+    <div class="input"><span>כתוב כאן...</span><b>הצע שם</b></div>
+    <div class="comp"><div class="h"><span>כתיבה</span><span class="lv">רמה 24</span></div><div class="val">אני כותב</div><div class="alt">גם: <b>כותב צעיר</b> ₪800 · <b>מקצועי</b> ₪3K · 🔒 להיטים</div></div>
+    <div class="comp"><div class="h"><span>הפקה</span><span class="lv">רמה 30</span></div><div class="val">מפיק אינדי · ₪1,500</div><div class="alt">גם: <b>עצמית</b> חינם · <b>צמרת</b> ₪7K · 🔒 בינלאומי</div></div>
+    <div class="comp"><div class="h"><span>אולפן</span><span class="lv">רמה 30</span></div><div class="val">אולפן שכור · ₪600</div><div class="alt">גם: <b>ביתי</b> חינם · <b>מקצועי</b> ₪2.5K · 🔒 צמרת</div></div>
+    <div class="comp"><div class="h"><span>סגנון</span><span class="lv">🔥 בטרנד</span></div><div class="val">טראפ עברי · <span style="color:#E10600">גרסה בוטה</span></div></div>
+  </div>
+  <div class="footer"><div><div class="kicker" style="color:#888">עלות</div><div style="font-family:'Frank Ruhl Libre';font-weight:900;font-size:40px;line-height:1">₪2,100</div></div><button class="btn red" style="flex:1;padding:16px;font-size:17px">הקלט · ⚡10</button></div>
+</div>
+
+</body>
+</html>
