@@ -10,7 +10,8 @@
 |---|---|
 | `src/1-layout.html` | המסכים והעיצוב |
 | `src/2-data.js` | נתונים: אמנים בדויים, חנות, הופעות, הישגים, טינדר, תגובות מעריצים |
-| `src/3-events.js` | האירועים האקראיים |
+| `src/3-events.js` | האירועים האקראיים (מגיעים כהודעות ב־WhatsApp) |
+| `src/5-apps.js` | האפליקציות שבתוך המשחק: Spotify, Apple Music, YouTube, Instagram, TikTok, Tinder, WhatsApp |
 | `src/4-logic.js` | מנוע המשחק |
 
 ## עריכה ובנייה

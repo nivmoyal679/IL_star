@@ -49,14 +49,14 @@
     const PRODUCERS = ['ביטס בן-עמי', 'DJ קובי', 'פרודוסר ליבנה', 'אסף ביטס', 'מקס 808', 'רועי סאונד', 'נוי דרים', 'בייסמן', 'ליאם ויקטורי', 'עוזי טראקס', 'דור מיקס', 'ספיר ביטס', 'גבי לופ', 'ג׳קי סאונד'];
     const LABELS = ['"שכונה רקורדס"', '"דרום מיוזיק"', '"זהב הפקות"', '"ביט סיטי"', '"מגדל רקורדס"', '"נייט אאוט"', '"קומה 9"', '"IL סאונד"'];
 
-    // Shop. eff keys: quality (song streams %), clip (YT views %), gigPay (%), social (%),
+    // Shop. eff keys: studio (home studio level), clip (YT views %), gigPay (%), social (%),
     // energy (max energy), beefShield (halves beef losses), rent (weekly rent override).
     // once: applied at purchase (followers f, skill points).
     const SHOP = [
-      { id: 'mic', cat: 'ציוד אולפן', name: 'מיקרופון אולפן', cost: 1200, eff: { quality: 0.1 }, desc: '+10% השמעות לכל שיר חדש' },
-      { id: 'laptop', cat: 'ציוד אולפן', name: 'מחשב + תוכנת הפקה', cost: 6000, eff: { quality: 0.2 }, desc: '+20% השמעות לכל שיר חדש' },
+      { id: 'mic', cat: 'ציוד אולפן', name: 'מיקרופון אולפן', cost: 1200, eff: { studio: 6 }, desc: '+6 לרמת האולפן הביתי' },
+      { id: 'laptop', cat: 'ציוד אולפן', name: 'מחשב + תוכנת הפקה', cost: 6000, eff: { studio: 12 }, desc: '+12 לרמת האולפן הביתי' },
       { id: 'camera', cat: 'ציוד אולפן', name: 'מצלמת 4K לקליפים', cost: 9000, eff: { clip: 0.5 }, once: { video: 3 }, desc: '+50% צפיות בקליפים, +3 וידאו' },
-      { id: 'homestudio', cat: 'ציוד אולפן', name: 'אולפן ביתי מבודד', cost: 60000, eff: { quality: 0.35 }, desc: '+35% השמעות לכל שיר חדש' },
+      { id: 'homestudio', cat: 'ציוד אולפן', name: 'אולפן ביתי מבודד', cost: 60000, eff: { studio: 30 }, desc: '+30 לרמת האולפן הביתי' },
 
       { id: 'chain', cat: 'תכשיטים ובלינג', name: 'שרשרת גורמט כסף', cost: 3500, once: { f: 80, charisma: 2 }, legacy: 'שרשרת גורמט כסף', desc: '+80 עוקבים, +2 כריזמה' },
       { id: 'grillz', cat: 'תכשיטים ובלינג', name: 'גריל יהלומים לשיניים', cost: 12000, eff: { social: 0.1 }, once: { f: 400 }, desc: '+400 עוקבים, +10% מסושיאל' },
@@ -80,13 +80,60 @@
       { id: 'kuli', name: 'מועדון כולי עלמא', req: 1500, pay: 3000, e: 10 },
       { id: 'barby', name: 'מועדון הבארבי', req: 10000, pay: 12000, e: 15 },
       { id: 'menora', name: 'האנגר 11 / מנורה מבטחים', req: 60000, pay: 45000, e: 20 },
-      { id: 'yarkon', name: 'פארק הירקון', req: 250000, pay: 150000, e: 20 },
+      { id: 'yarkon', name: 'פארק הירקון', req: 250000, pay: 100000, e: 20 },
     ];
 
+    // Job contracts: weekly pay and a weekly energy cost for a number of weeks.
+    // req: minimum skill / followers to be offered the job.
     const JOBS = [
+      { id: 'barista', name: 'בריסטה בבית קפה', icon: 'fa-mug-hot text-amber-400', e: 6, pay: 450 },
+      { id: 'sneakers', name: 'מוכר בחנות סניקרס', icon: 'fa-shoe-prints text-gray-300', e: 7, pay: 550 },
       { id: 'wolt', name: 'שליח Wolt בתל אביב', icon: 'fa-motorcycle text-cyan-400', e: 8, pay: 700 },
+      { id: 'warehouse', name: 'מחסנאי במרכז לוגיסטי', icon: 'fa-boxes-stacked text-orange-400', e: 10, pay: 900 },
+      { id: 'security', name: 'מאבטח באירועים', icon: 'fa-shield-halved text-blue-400', e: 10, pay: 1000 },
       { id: 'bar', name: 'ברמן במועדון אברקסס', icon: 'fa-wine-glass text-purple-400', e: 12, pay: 1300 },
+      { id: 'studioasst', name: 'עוזר הפקה באולפן', icon: 'fa-sliders text-spotifyGreen', e: 7, pay: 800, req: { flow: 15 }, perk: { flow: 0.3 } },
+      { id: 'soundtech', name: 'טכנאי סאונד במועדון', icon: 'fa-headphones text-pink-400', e: 9, pay: 1200, req: { followers: 500 } },
+      { id: 'editor', name: 'עורך וידאו פרילנס', icon: 'fa-film text-red-400', e: 8, pay: 1400, req: { video: 12 }, perk: { video: 0.3 } },
+      { id: 'teacher', name: 'מורה לראפ במתנ״ס', icon: 'fa-chalkboard-user text-yellow-300', e: 9, pay: 1500, req: { flow: 20 }, perk: { charisma: 0.3 } },
+      { id: 'jingles', name: 'כותב ג׳ינגלים לפרסומות', icon: 'fa-pen-nib text-teal-300', e: 10, pay: 2200, req: { flow: 30 } },
     ];
+
+    // Song components (level = how much it lifts the song)
+    const WRITERS = [
+      { id: 'self', name: 'אני כותב', lvl: null, cost: 0, req: 0 },
+      { id: 'w1', name: 'כותב צעיר מהשכונה', lvl: 25, cost: 800, req: 0 },
+      { id: 'w2', name: 'כותב מקצועי', lvl: 40, cost: 3000, req: 3000 },
+      { id: 'w3', name: 'כותב להיטים', lvl: 55, cost: 9000, req: 20000 },
+      { id: 'w4', name: 'כותב-על', lvl: 70, cost: 25000, req: 80000 },
+    ];
+    const PRODUCER_TIERS = [
+      { id: 'self', name: 'הפקה עצמית / חבר מהשכונה', lvl: 10, cost: 0, req: 0 },
+      { id: 'indie', name: 'מפיק אינדי מוכר', lvl: 30, cost: 1500, req: 0 },
+      { id: 'top', name: 'מפיק צמרת ארצי', lvl: 55, cost: 7000, req: 5000 },
+      { id: 'legend', name: 'מפיק-על בינלאומי', lvl: 75, cost: 20000, req: 50000 },
+    ];
+    const STUDIOS = [
+      { id: 'home', name: 'האולפן הביתי שלי', lvl: 10, cost: 0, req: 0 },
+      { id: 'rent', name: 'אולפן שכור בפלורנטין', lvl: 30, cost: 600, req: 0 },
+      { id: 'pro', name: 'אולפן מקצועי', lvl: 50, cost: 2500, req: 3000 },
+      { id: 'elite', name: 'אולפן צמרת', lvl: 70, cost: 8000, req: 30000 },
+    ];
+
+    // Investments: weekly return ~ mu, volatility vol
+    const INVESTMENTS = [
+      { id: 'bonds', name: 'אג״ח ממשלתי', icon: 'fa-landmark', mu: 0.0008, vol: 0.004, risk: 'נמוך מאוד' },
+      { id: 'index', name: 'קרן מחקה מדד', icon: 'fa-chart-line', mu: 0.0018, vol: 0.02, risk: 'נמוך' },
+      { id: 'tech', name: 'מניות טכנולוגיה', icon: 'fa-microchip', mu: 0.003, vol: 0.05, risk: 'בינוני' },
+      { id: 'crypto', name: 'מטבע קריפטו "מונטה"', icon: 'fa-coins', mu: 0.004, vol: 0.14, risk: 'גבוה מאוד' },
+    ];
+    // Sports teams (fictional): weekly result changes income and value
+    const TEAMS = [
+      { id: 'shchuna', name: 'הפועל השכונה', sport: 'כדורגל, ליגה ג׳', cost: 250000, income: 2500, fans: 60, icon: 'fa-futbol' },
+      { id: 'darom', name: 'מכבי הדרום', sport: 'כדורסל, ליגה לאומית', cost: 900000, income: 9000, fans: 200, icon: 'fa-basketball' },
+      { id: 'yam', name: 'בני הים', sport: 'כדורגל, ליגת העל', cost: 3000000, income: 32000, fans: 700, icon: 'fa-futbol' },
+    ];
+
 
     const DATES = [
       { id: 'coffee', name: 'קפה ברוטשילד', cost: 150, e: 4, l: 15 },
@@ -101,7 +148,8 @@
       { id: 'song1', n: 'הצעד הראשון', d: 'שחרר את השיר הראשון', test: s => s.songs.length >= 1, rw: { m: 300 } },
       { id: 'song5', n: 'מכונת להיטים', d: 'שחרר 5 שירים', test: s => s.songs.length >= 5, rw: { m: 1500 } },
       { id: 'song15', n: 'קטלוג רציני', d: 'שחרר 15 שירים', test: s => s.songs.length >= 15, rw: { m: 8000 } },
-      { id: 'album1', n: 'אלבום בכורה', d: 'שחרר אלבום מלא', test: s => s.songs.some(x => x.isAlbum), rw: { f: 500 } },
+      { id: 'album1', n: 'אלבום בכורה', d: 'שחרר אלבום מלא', test: s => s.songs.some(x => x.isAlbum) || (s.albums || []).some(a => a.released), rw: { f: 500 } },
+      { id: 'album3', n: 'דיסקוגרפיה', d: 'שחרר 3 אלבומים', test: s => (s.albums || []).filter(a => a.released).length >= 3, rw: { f: 5000 } },
       { id: 'st100k', n: '100 אלף השמעות', d: 'צבור 100,000 השמעות בסך הכל', test: s => totalStreams(s) >= 1e5, rw: { m: 2000 } },
       { id: 'st1m', n: 'מיליון השמעות', d: 'צבור מיליון השמעות בסך הכל', test: s => totalStreams(s) >= 1e6, rw: { m: 10000 } },
       { id: 'st10m', n: 'תקליט יהלום', d: 'צבור 10 מיליון השמעות', test: s => totalStreams(s) >= 1e7, rw: { m: 60000 } },
@@ -126,6 +174,10 @@
       { id: 'skillmax', n: 'מאסטר', d: 'הבא כישור אחד למקסימום', test: s => Object.keys(SKILL_CAP).some(k => s.skills[k] >= SKILL_CAP[k]), rw: { m: 3000 } },
       { id: 'year1', n: 'שנה בתעשייה', d: 'שרוד שנה שלמה', test: s => s.totalWeeks >= 53, rw: { m: 5000 } },
       { id: 'rich', n: 'מיליונר', d: 'צבור מיליון ₪ בחשבון', test: s => s.money >= 1e6, rw: { f: 15000 } },
+      { id: 'job1', n: 'חוזה ראשון', d: 'קבל עבודה עם חוזה', test: s => !!s.job || (s.stats.jobs || 0) > 0, rw: { m: 200 } },
+      { id: 'investor', n: 'משקיע', d: 'החזק ₪100,000 בהשקעות', test: s => Object.values(s.investments || {}).reduce((a, b) => a + b, 0) >= 1e5, rw: { m: 5000 } },
+      { id: 'team', n: 'בעל קבוצה', d: 'קנה קבוצת ספורט', test: s => Object.keys(s.teams || {}).length > 0, rw: { f: 3000 } },
+      { id: 'inbox', n: 'תמיד זמין', d: 'ענה ל-20 הודעות בוואטסאפ', test: s => (s.stats.answered || 0) >= 20, rw: { m: 2000 } },
     ];
 
     // ---- Tinder ----
