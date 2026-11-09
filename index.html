@@ -168,7 +168,7 @@
         <div class="space-y-2.5">
           <button onclick="navTo('studio'); openNewSongModal()" class="w-full bg-mustard text-bgDark text-lg py-3.5">🎙️ שיר חדש</button>
           <button onclick="openApp('whatsapp')" class="w-full bg-light text-bgDark text-lg py-3.5" id="home-wa-btn">WhatsApp</button>
-          <button onclick="openEnergy()" class="w-full bg-coral text-bgDark text-lg py-3.5" id="home-energy-btn">⚡ להטעין אנרגיה</button>
+          <button onclick="openEnergy()" class="w-full bg-coral text-bgDark text-lg py-3.5" id="home-energy-btn">⚡ אנרגיה</button>
         </div>
 
         <!-- Genre trend -->
@@ -462,18 +462,7 @@
       { id: 'manager', cat: 'צוות', name: 'מנהל אישי', cost: 25000, eff: { gigPay: 0.25 }, desc: '+25% תשלום בהופעות' },
     ];
 
-    // Ways to recharge energy during the week (values are on the 100-point scale).
-    // once: once a week; cooldown: weeks before it can be used again.
-    const RECHARGE = [
-      { id: 'nap', name: 'שנ״צ ארוך', icon: 'fa-bed', cost: 0, e: 8, desc: 'חינם. מכבים טלפון וישנים.' },
-      { id: 'coffee', name: 'קפה ומאפה', icon: 'fa-mug-hot', cost: 35, e: 6, desc: 'דחיפה קטנה.' },
-      { id: 'meal', name: 'ארוחה טובה', icon: 'fa-utensils', cost: 180, e: 12, desc: 'אוכל אמיתי במקום שווארמה בשתיים בלילה.' },
-      { id: 'gymday', name: 'אימון וסאונה', icon: 'fa-dumbbell', cost: 120, e: 14, desc: 'כואב, אבל אחר כך אתה מרגיש מעולה.' },
-      { id: 'massage', name: 'עיסוי', icon: 'fa-spa', cost: 450, e: 22, desc: 'שעה של שקט.' },
-      { id: 'spa', name: 'יום ספא', icon: 'fa-hot-tub-person', cost: 1500, e: 38, desc: 'בריכה, ג׳קוזי ושינה.' },
-      { id: 'getaway', name: 'סופ״ש בצפון', icon: 'fa-mountain-sun', cost: 4500, e: 65, cooldown: 4, desc: 'צימר בגליל. פעם בחודש.' },
-    ];
-    const ENERGY_OVERCHARGE = 25;   // rest can push energy this far above the weekly max
+    // Energy can't be recharged mid-week: it renews once a week, minus a "tax".
     const FATIGUE_STEP = 8;          // energy tax per week in a row that you ran yourself to zero
 
     // Housing. Costs are per month (charged weekly). energy: weekly energy change,
@@ -614,7 +603,7 @@
         'מחפשת קשר רציני, לא עוד מישהו שנעלם אחרי שבוע', 'אמא שלי אומרת שאני יותר מדי טובה. אולי היא צודקת', 'אוהבת ערבי שישי עם המשפחה ושיחות עד הבוקר', 'אם תבוא לדייט בזמן, כבר ניצחת', 'מאמינה באהבה ממבט ראשון. ובביטים טובים', 'מחפשת את האחד. אם אתה רק בשביל הכיף, תחליק שמאלה', 'מתנדבת בעמותה, אוהבת כלבים ואנשים אמיתיים', 'שבוע עבודה ארוך, מחפשת מישהו לנוח איתו', 'אני מאלה ששומרות על מי שהן אוהבות'] },
       { id: 'influencer', name: 'משפיענית', decay: 8, drama: 2, start: 55, perk: 'מתייגת אותך: עוקבים חדשים כל שבוע', bios: [
         'משפיענית לייפסטייל. אם אין לך וי כחול באינסטגרם אל תפנה 😉', '120K עוקבות. מחפשת מישהו שלא מפחד ממצלמה', 'כל ארוחה שלי היא תוכן. תתרגל', 'שיתופי פעולה בלבד בהודעה פרטית. גם דייטים', 'אם אתה לא בסטורי שלי, זה לא קרה', 'יוצרת תוכן, מחפשת קולאב רומנטי', 'בגדים, איפור ונסיעות. ואתה?', 'המעריצים שלי ירצו לדעת מי אתה', 'ריל ראשון ביחד? אני כבר רואה את הוויראלי'] },
-      { id: 'party', name: 'חיית מסיבות', decay: 7, drama: 1, start: 60, perk: 'דייטים מחזירים יותר אנרגיה', bios: [
+      { id: 'party', name: 'חיית מסיבות', decay: 7, drama: 1, start: 60, perk: 'דייטים מעלים יותר נאמנות', bios: [
         'אם המסיבה נגמרת לפני 5 בבוקר זו לא מסיבה', 'מחפשת מישהו שיביא אותי למאחורי הקלעים 🎧', 'טכנו, ראפ, מזרחית. העיקר שיהיה ווליום', 'הכי טובה בעולם בלשיר בקריוקי', 'חיה מסופ״ש לסופ״ש. כל השאר זה רעש', 'אילת? יאללה. עכשיו?', 'אני זו שגוררת את כולם לרחבה', 'אם אתה רוקד רע, בוא נרקוד רע ביחד', 'פסטיבלים זה הכנסייה שלי'] },
       { id: 'artist', name: 'אמנית', decay: 5, drama: 1, start: 65, perk: 'מופיעה בקליפים: +30% צפיות', bios: [
         'רקדנית קליפים, מחפשת מוזיקאי רציני 💃', 'מאיירת ומעצבת עטיפות אלבומים. אולי גם שלך?', 'שחקנית בתיאטרון, חולמת על קולנוע', 'צלמת. אני אגרום לך להיראות כמו כוכב', 'כותבת שירה בלילות ומוחקת בבוקר', 'מבמאה קליפים ומחפשת השראה', 'סטודנטית לאמנות, מציירת על קירות', 'זמרת ליווי. יודעת להרמן לך את הפזמון', 'סטייליסטית. הלבוש שלך בתמונות? נדבר'] },
@@ -624,7 +613,7 @@
         'אם אתה לא עונה תוך דקה, אני מניחה שבגדת', 'החברות שלי כבר שונאות אותך', 'אקס שלי ראפר. רק אומרת', 'אני לא דרמטית. אני פשוט מרגישה הכל חזק', 'מחפשת מישהו שיילחם בשבילי', 'אם תעלה סטורי בלי לתייג אותי, נגמר', 'יודעת הכל על כולם בסצנה', 'אוהבת בעוצמה. גם כועסת בעוצמה', 'קנאית? אני? בכלל לא. מי זאת בתמונה?'] },
       { id: 'rich', name: 'מבית עשיר', decay: 6, drama: 1, start: 60, perk: 'דייטים בחצי מחיר', bios: [
         'אבא שלי בעל רשת מסעדות. אני משלמת בדייט הראשון', 'גרה בהרצליה פיתוח, נוסעת הרבה לחו״ל', 'יש לי יאכטה. אין לי חבר', 'מנהלת את העסק המשפחתי, מחפשת מישהו עם חלומות', 'אם אתה צריך משקיעה לאלבום, אולי', 'סקי באירופה בחורף, יוון בקיץ', 'קונה אמנות ומחפשת אמן', 'הכסף לא מעניין אותי. כי יש לי', 'מחפשת מישהו אמיתי, לא מישהו שמחפש כסף'] },
-      { id: 'calm', name: 'רגועה', decay: 4, drama: 0, start: 70, perk: 'מורידה לחץ: +8 אנרגיה בכל דייט', bios: [
+      { id: 'calm', name: 'רגועה', decay: 4, drama: 0, start: 70, perk: 'מורידה לחץ: חצי מס עייפות', bios: [
         'יוגה בבוקר, ים בערב, שקט בלב', 'מחפשת מישהו לטייל איתו בגליל', 'קפה טוב, ספר טוב, ואתה?', 'מורה לפילאטיס. אני אלמד אותך לנשום', 'אוהבת זריחות ושירים שקטים', 'בלי משחקים. רק כנות', 'מגדלת צמחים ומבשלת טבעוני', 'הכי טוב לי בבית עם סרט', 'אם אתה לחוץ מהקריירה, אני פה'] },
     ];
 
@@ -826,14 +815,14 @@
         { t: 'מתייצב, ככה זה פה', fx: { e: -8, f: [0.015, 100] }, r: 'כתבת שורות חזקות בשמירות. המעריצים מפרגנים.' },
         { t: 'מעלה סטורי מהבסיס', fx: { e: -8, f: [0.025, 150] }, r: 'הסטורי עם המדים אסף המון לבבות.' }] },
       { id: 'army_reunion', t: '🫡 מפגש מחזור מהצבא', d: 'החבר׳ה מהפלוגה עושים על האש ב{place}.', ch: [
-        { t: 'מגיע', cost: { e: 3 }, fx: { e: 2, f: [0.01, 40] }, r: 'ערב של צחוקים. כולם מבקשים שתשיר.' },
+        { t: 'מגיע', cost: { e: 3 }, fx: { f: [0.01, 40], sk: { charisma: 1 } }, r: 'ערב של צחוקים. כולם מבקשים שתשיר.' },
         { t: 'לא מגיע', fx: {}, r: 'הם יבינו.' }] },
       { id: 'sick', t: '🤒 שפעת', d: 'נפלת למיטה עם חום.', ch: [
         { t: 'נח בבית', fx: { e: -8 }, r: 'השבוע הלך על מרק עוף.' },
         { t: 'ממשיך לעבוד', p: 0.5, win: { fx: { e: -3 }, r: 'החזקת מעמד.' }, lose: { fx: { e: -12, sk: { charisma: -1 } }, r: 'קרסת באמצע השבוע.' } }] },
       { id: 'mom', t: '👩 אמא מתקשרת', d: '"מתי אתה מוצא עבודה אמיתית?"', ch: [
         { t: 'מבטיח לה שזה יצליח', fx: { sk: { charisma: 1 } }, r: 'היא עדיין לא משוכנעת, אבל גאה.' },
-        { t: 'הולך לארוחת שישי', fx: { e: 4 }, r: 'אוכל של אמא. מלא אנרגיה.' }] },
+        { t: 'הולך לארוחת שישי', fx: { m: 200 }, r: 'אוכל של אמא, וגם קצת כסף לדרך.' }] },
       { id: 'grandma_viral', t: '👵 סבתא בטיקטוק', d: 'סבתא שלך צילמה את עצמה רוקדת לשיר שלך.', ch: [
         { t: 'משתף', fx: { f: [0.04, 250] }, r: 'סבתא היא הכוכבת החדשה של המשפחה.' },
         { t: 'מבקש שתמחק', fx: {}, r: 'היא נעלבה קצת.' }] },
@@ -848,13 +837,13 @@
         { t: 'קונה ספוגים לקירות', cost: { m: 350 }, fx: {}, r: 'שקט. וגם סאונד יותר טוב.' }] },
       { id: 'heatwave', t: '🥵 שרב', d: 'שרב כבד. 42 מעלות.', ch: [
         { t: 'נשאר במזגן ומקליט', fx: { sk: { flow: 1 } }, r: 'שבוע פרודוקטיבי.' },
-        { t: 'יוצא לים', fx: { e: 3 }, r: 'אנרגיה חזרה.' }] },
+        { t: 'יוצא לים', fx: { sk: { charisma: 1 } }, r: 'שיזוף והשראה.' }] },
       { id: 'shabbat_fan', t: '🕯️ ארוחת שישי אצל מעריץ', d: 'משפחה מ{city} הזמינה אותך לארוחת שישי בזכות בקשה של הבן שלהם.', ch: [
-        { t: 'מגיע עם פרחים', cost: { e: 3 }, fx: { f: [0.015, 100], e: 3 }, r: 'הסרטון של הבן איתך הפך לוויראלי.' },
+        { t: 'מגיע עם פרחים', cost: { e: 3 }, fx: { f: [0.015, 100] }, r: 'הסרטון של הבן איתך הפך לוויראלי.' },
         { t: 'שולח ברכה מוקלטת', fx: { f: [0.005, 20] }, r: 'הם התרגשו.' }] },
       { id: 'gym', t: '💪 {friend} גורר אותך לחדר כושר', d: '"אחי, כוכב צריך להיראות כמו כוכב."', ch: [
         { t: 'מצטרף', cost: { e: 3 }, fx: { sk: { charisma: 1 } }, r: 'מרגיש טוב יותר על הבמה.' },
-        { t: 'מעדיף לישון', fx: { e: 2 }, r: 'שינה זה גם ספורט.' }] },
+        { t: 'מעדיף לישון', fx: {}, r: 'שינה זה גם ספורט.' }] },
       { id: 'parking_ticket', t: '🅿️ דוח חניה', d: 'חנית באדום-לבן ב{city}. שוב.', ch: [
         { t: 'משלם', fx: { m: -250 }, r: 'כואב.' },
         { t: 'מערער', p: 0.3, win: { fx: {}, r: 'הדוח בוטל!' }, lose: { fx: { m: -500 }, r: 'הערעור נדחה, והקנס הוכפל.' } }] },
@@ -942,7 +931,7 @@
         { t: 'בודק עליו קודם', fx: { sk: { charisma: 1 } }, r: 'מתברר שהוא נוכל ידוע. חסכת כסף.' }] },
       { id: 'industry_party', c: C.f(3000), t: '🥂 מסיבת תעשייה', d: 'הוזמנת למסיבה של {label} עם כל הסצנה.', ch: [
         { t: 'מגיע ומתחבר', cost: { e: 4 }, fx: { f: [0.02, 150], sk: { charisma: 1 } }, r: 'החלפת מספרים עם חצי תעשייה.' },
-        { t: 'נשאר בבית', fx: { e: 2 }, r: 'נחת.' }] },
+        { t: 'נשאר בבית', fx: {}, r: 'נחת.' }] },
       { id: 'tour_abroad', c: C.f(40000), t: '✈️ סיבוב הופעות בחו״ל', d: 'קהילות ישראלים בחו״ל רוצות אותך לשלוש הופעות.', ch: [
         { t: 'טס', fx: { e: -10, ms: 6000, f: [0.04, 2000] }, r: 'הופעות מלאות בשלוש מדינות.' },
         { t: 'דוחה', fx: {}, r: 'אולי בשנה הבאה.' }] },
@@ -999,7 +988,7 @@
         { t: 'כותב לה שיר', cost: { e: 4 }, fx: { rel: 25, sk: { flow: 1 } }, r: 'היא בכתה מהתרגשות.' },
         { t: 'אומר שאני לא כותב שירי אהבה', fx: { rel: -10 }, r: 'אוי.' }] },
       { id: 'rel_fight_tour', c: C.rel, t: '🧳 {partner} רוצה שתישאר', d: 'יש לך הופעה רחוקה, ו{partner} רוצה שתישאר איתה בסופ״ש.', ch: [
-        { t: 'נשאר איתה', fx: { rel: 20, e: 3 }, r: 'סופ״ש מושלם.' },
+        { t: 'נשאר איתה', fx: { rel: 20 }, r: 'סופ״ש מושלם.' },
         { t: 'נוסע להופעה', fx: { rel: -15, ms: 400 }, r: 'הרווחת כסף, היא כועסת.' }] },
       { id: 'rel_drama_post', c: s => s.relationship && TRAITS.find(t => t.id === s.relationship.trait).drama >= 2, t: '📢 {partner} העלתה סטורי עוקצני', d: '{partner} העלתה סטורי שרומז שאתה מזניח אותה.', ch: [
         { t: 'קונה לה מתנה', cost: { m: 600 }, fx: { rel: 25 }, r: 'הסטורי נמחק.' },
@@ -1418,10 +1407,10 @@
             <div class="text-sm font-bold pt-2">לצאת לדייט</div>
             <div class="grid grid-cols-2 gap-2">${DATES.map(d => {
               const cost = tr.id === 'rich' ? Math.floor(d.cost / 2) : d.cost;
-              const dis = state.dateThisWeek || state.money < cost;
-              return `<button onclick="goOnDate('${d.id}')" ${dis ? 'disabled' : ''} class="${dis ? 'bg-gray-800/50 text-gray-500' : 'bg-gray-800 text-white hover:bg-gray-700'} text-xs py-2.5 rounded-xl">${d.name}<br><span class="text-gray-400">₪${fmt(cost)} · +${d.e} ⚡</span></button>`;
+              const dis = state.dateThisWeek || state.money < cost || state.energy < d.e;
+              return `<button onclick="goOnDate('${d.id}')" ${dis ? 'disabled' : ''} class="${dis ? 'bg-gray-800/50 text-gray-500' : 'bg-gray-800 text-white hover:bg-gray-700'} text-xs py-2.5 rounded-xl">${d.name}<br><span class="text-gray-400">₪${fmt(cost)} · −${d.e} ⚡</span></button>`;
             }).join('')}</div>
-            <div class="text-[10px] text-gray-500 text-center">${state.dateThisWeek ? 'כבר יצאתם לדייט השבוע' : 'דייט אחד בשבוע: מחזיר אנרגיה ומעלה נאמנות'}</div>
+            <div class="text-[10px] text-gray-500 text-center">${state.dateThisWeek ? 'כבר יצאתם לדייט השבוע' : 'דייט אחד בשבוע: מעלה נאמנות, אבל לוקח אנרגיה'}</div>
             <button onclick="breakUp()" class="w-full text-red-400 text-xs font-bold py-2">להיפרד</button>
           </div></div>`;
       }
@@ -1635,7 +1624,7 @@
       }, 0) + (key === 'energy' || key === 'social' ? currentHome()[key] : 0);
     }
     function maxEnergy() { return state.baseEnergy + effect('energy'); }
-    function energyCap() { return maxEnergy() + ENERGY_OVERCHARGE; }
+    function energyCap() { return maxEnergy(); }
     function currentHome() { return HOMES.find(h => h.id === state.home) || HOMES[0]; }
     function monthlyCost(h) { return h.rent + h.bills; }
     // Rent and bills are monthly; the game charges the weekly share
@@ -2304,12 +2293,12 @@
       const cost = tr.id === 'rich' ? Math.floor(d.cost / 2) : d.cost;
       if (state.dateThisWeek) { showToast('כבר יצאתם לדייט השבוע!', false); return; }
       if (state.money < cost) { showToast('אין מספיק כסף לדייט!', false); return; }
+      if (!needEnergy(d.e)) return;
       state.money -= cost;
+      state.energy -= d.e;
       state.dateThisWeek = true;
-      const extra = (tr.id === 'party' ? 3 : tr.id === 'calm' ? 2 : 0) * ENERGY_SCALE;
-      state.energy = Math.min(energyCap(), state.energy + d.e + extra);
-      state.relationship.loyalty = Math.min(100, state.relationship.loyalty + d.l);
-      showToast(`יצאתם ל${d.name}! האנרגיה התחדשה 🍷`);
+      state.relationship.loyalty = Math.min(100, state.relationship.loyalty + d.l + (tr.id === 'party' ? 10 : 0));
+      showToast(`יצאתם ל${d.name}! 🍷`);
       updateUI();
     }
     function breakUp() {
@@ -2410,7 +2399,7 @@
       }
       if (fx.m) { earn(fx.m); parts.push(`${fx.m >= 0 ? '+' : '-'}₪${fmt(Math.abs(fx.m))}`); }
       if (fx.ms) { const d = Math.round(fx.ms * moneyScale()); earn(d); parts.push(`${d >= 0 ? '+' : '-'}₪${fmt(Math.abs(d))}`); }
-      if (fx.e) { const before = state.energy; state.energy = clamp(state.energy + fx.e, 0, energyCap()); const d = state.energy - before; if (d) parts.push(`${signed(d)} ⚡`); }
+      if (fx.e && fx.e < 0) { const before = state.energy; state.energy = clamp(state.energy + fx.e, 0, energyCap()); const d = state.energy - before; if (d) parts.push(`${signed(d)} ⚡`); }
       if (fx.l) { const d = Math.round(state.listeners * fx.l[0] + fx.l[1]); state.listeners = Math.max(0, state.listeners + d); parts.push(`${signed(d)} מאזינים`); }
       if (fx.sk) Object.entries(fx.sk).forEach(([k, v]) => {
         const before = state.skills[k];
@@ -2536,7 +2525,7 @@
       const eb = { base: state.baseEnergy, items: effect('energy') - currentHome().energy, home: currentHome().energy, job: 0, fatigue: 0, rest: 0 };
       if (leftover <= 5) state.burnout = (state.burnout || 0) + 1; else state.burnout = 0;
       eb.fatigue = Math.min(3, state.burnout) * FATIGUE_STEP;
-      if (leftover >= 20) eb.rest = Math.min(ENERGY_OVERCHARGE, Math.floor(leftover * 0.3));
+      if (eb.fatigue && partnerTrait() && partnerTrait().id === 'calm') eb.fatigue = Math.floor(eb.fatigue / 2);
       // Job contract: pay for the week that just ended, take this week's energy
       let energy = maxEnergy();
       if (state.job) {
@@ -2557,11 +2546,11 @@
           eb.job = j.e;
         }
       }
-      state.energy = clamp(energy - eb.fatigue + eb.rest, 0, energyCap());
+      state.energy = clamp(energy - eb.fatigue, 0, energyCap());
       eb.total = state.energy;
       state.energyWeek = eb;
       state.rechargeUsed = {};
-      lines.push(`⚡ אנרגיה השבוע: <b class="text-white">${state.energy}</b>${eb.fatigue ? ` <span class="text-coral">(−${eb.fatigue} עייפות: נגמרה לך האנרגיה ${state.burnout === 1 ? 'בשבוע שעבר' : `${state.burnout} שבועות ברצף`})</span>` : ''}${eb.rest ? ` <span class="text-mint">(+${eb.rest} מנוחה)</span>` : ''}`);
+      lines.push(`⚡ אנרגיה השבוע: <b class="text-white">${state.energy}</b>${eb.fatigue ? ` <span class="text-coral">(−${eb.fatigue} עייפות: נגמרה לך האנרגיה ${state.burnout === 1 ? 'בשבוע שעבר' : `${state.burnout} שבועות ברצף`})</span>` : ''}`);
       lines.push(`🏠 ${currentHome().name}: <b class="text-red-400">-₪${fmt(rent)}</b> (שכירות וחשבונות)`);
 
       tickInvestments(lines);
@@ -2641,7 +2630,7 @@
       moneyEl.classList.toggle('text-red-500', state.money < 0);
       moneyEl.classList.toggle('text-spotifyGreen', state.money >= 0);
       $('top-energy').innerHTML = `<i class="fa-solid fa-bolt text-xs ml-0.5"></i>${state.energy}/${maxEnergy()}`;
-      $('home-energy-btn').innerHTML = `⚡ ${state.energy}/${maxEnergy()} · להטעין אנרגיה${state.burnout ? ' · 😵 עייף' : ''}`;
+      $('home-energy-btn').innerHTML = `⚡ אנרגיה ${state.energy}/${maxEnergy()}${state.burnout ? ' · 😵 עייף' : ''}`;
       $('top-date').innerText = `שבוע ${state.week}, ${state.year}`;
       $('top-fame').innerText = `Fame: ${fameRank()}`;
 
@@ -2963,43 +2952,20 @@
         ${row(currentHome().name, eb.home, eb.home > 0 ? 'text-mint' : 'text-coral')}
         ${row('עבודה', -eb.job, 'text-coral')}
         ${row('עייפות מהשבוע שעבר', -eb.fatigue, 'text-coral')}
-        ${row('מנוחה (אנרגיה שחסכת)', eb.rest, 'text-mint')}
         <div class="flex justify-between border-t border-gray-700 pt-1 mt-1 text-sm"><span class="font-extrabold">התחלת את השבוע עם</span><b class="text-white">${eb.total !== undefined ? eb.total : state.energy}</b></div>
       </div>`;
     }
     function openEnergy() {
-      const used = state.rechargeUsed || {};
-      const cooling = r => r.cooldown && state.lastGetaway && state.totalWeeks - state.lastGetaway < r.cooldown;
       showModal({
         title: `⚡ אנרגיה: ${state.energy}/${maxEnergy()}`,
         html: `${energyBreakdown()}
-          <div class="text-[11px] font-bold text-gray-400 mt-3 leading-relaxed">כל שבוע האנרגיה מתחדשת. עבודה ומגורים לוקחים "מס" קבוע. אם תגמור את כל האנרגיה, בשבוע הבא תהיה עייף (−${FATIGUE_STEP} לכל שבוע ברצף). אם תשאיר אנרגיה, חלק ממנה עובר לשבוע הבא (עד +${ENERGY_OVERCHARGE} מעל המקסימום).</div>
-          <div class="font-extrabold text-sm text-white mt-3 mb-2">להטעין אנרגיה</div>
-          <div class="space-y-2">${RECHARGE.map(r => {
-            const done = used[r.id] || cooling(r);
-            const ok = !done && state.money >= r.cost && state.energy < energyCap();
-            return `<div class="flex items-center gap-3 bg-gray-900 rounded-2xl p-2.5">
-              <div class="w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center text-mustard shrink-0"><i class="fa-solid ${r.icon}"></i></div>
-              <div class="flex-1 min-w-0"><div class="font-extrabold text-white text-xs">${r.name} <span class="text-mint">+${r.e} ⚡</span></div><div class="text-[10px] text-gray-400">${r.desc}</div></div>
-              <button ${ok ? `onclick="recharge('${r.id}')"` : 'disabled'} class="${ok ? 'bg-mint text-bgDark' : 'bg-gray-800 text-gray-500'} text-xs font-extrabold px-3 py-2 rounded-full pill3d shrink-0">${done ? (cooling(r) ? `עוד ${r.cooldown - (state.totalWeeks - state.lastGetaway)} שב׳` : '✓ השבוע') : r.cost ? '₪' + fmt(r.cost) : 'חינם'}</button>
-            </div>`;
-          }).join('')}</div>
-          <div class="text-[10px] text-gray-500 mt-2">כל אחד פעם בשבוע. להגדלה קבועה של האנרגיה: רכבים ומאמן כושר בחנות, ודירה טובה יותר.</div>`,
+          <div class="text-[11px] font-bold text-gray-400 mt-3 leading-relaxed">
+            האנרגיה מתחדשת פעם בשבוע, ואי אפשר להטעין אותה באמצע. עבודה ומגורים לוקחים "מס" קבוע.
+            אם תגמור את כל האנרגיה, בשבוע הבא תתחיל עייף: −${FATIGUE_STEP} לכל שבוע ברצף, עד −${FATIGUE_STEP * 3}.
+          </div>
+          <div class="text-[11px] font-bold text-gray-400 mt-2 leading-relaxed">להגדיל את האנרגיה לתמיד: רכבים ומאמן כושר בחנות, ודירה טובה יותר.</div>`,
         buttons: [{ t: 'סגור', primary: false }],
       });
-    }
-    function recharge(id) {
-      const r = RECHARGE.find(x => x.id === id);
-      state.rechargeUsed = state.rechargeUsed || {};
-      if (state.rechargeUsed[id] || state.money < r.cost) return;
-      state.money -= r.cost;
-      state.rechargeUsed[id] = true;
-      if (r.cooldown) state.lastGetaway = state.totalWeeks;
-      const before = state.energy;
-      state.energy = Math.min(energyCap(), state.energy + r.e);
-      showToast(`${r.name}: +${state.energy - before} ⚡`);
-      updateUI();
-      openEnergy();
     }
 
     // ---------- Housing ----------

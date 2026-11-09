@@ -304,10 +304,10 @@
             <div class="text-sm font-bold pt-2">לצאת לדייט</div>
             <div class="grid grid-cols-2 gap-2">${DATES.map(d => {
               const cost = tr.id === 'rich' ? Math.floor(d.cost / 2) : d.cost;
-              const dis = state.dateThisWeek || state.money < cost;
-              return `<button onclick="goOnDate('${d.id}')" ${dis ? 'disabled' : ''} class="${dis ? 'bg-gray-800/50 text-gray-500' : 'bg-gray-800 text-white hover:bg-gray-700'} text-xs py-2.5 rounded-xl">${d.name}<br><span class="text-gray-400">₪${fmt(cost)} · +${d.e} ⚡</span></button>`;
+              const dis = state.dateThisWeek || state.money < cost || state.energy < d.e;
+              return `<button onclick="goOnDate('${d.id}')" ${dis ? 'disabled' : ''} class="${dis ? 'bg-gray-800/50 text-gray-500' : 'bg-gray-800 text-white hover:bg-gray-700'} text-xs py-2.5 rounded-xl">${d.name}<br><span class="text-gray-400">₪${fmt(cost)} · −${d.e} ⚡</span></button>`;
             }).join('')}</div>
-            <div class="text-[10px] text-gray-500 text-center">${state.dateThisWeek ? 'כבר יצאתם לדייט השבוע' : 'דייט אחד בשבוע: מחזיר אנרגיה ומעלה נאמנות'}</div>
+            <div class="text-[10px] text-gray-500 text-center">${state.dateThisWeek ? 'כבר יצאתם לדייט השבוע' : 'דייט אחד בשבוע: מעלה נאמנות, אבל לוקח אנרגיה'}</div>
             <button onclick="breakUp()" class="w-full text-red-400 text-xs font-bold py-2">להיפרד</button>
           </div></div>`;
       }

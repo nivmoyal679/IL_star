@@ -111,7 +111,7 @@
       }, 0) + (key === 'energy' || key === 'social' ? currentHome()[key] : 0);
     }
     function maxEnergy() { return state.baseEnergy + effect('energy'); }
-    function energyCap() { return maxEnergy() + ENERGY_OVERCHARGE; }
+    function energyCap() { return maxEnergy(); }
     function currentHome() { return HOMES.find(h => h.id === state.home) || HOMES[0]; }
     function monthlyCost(h) { return h.rent + h.bills; }
     // Rent and bills are monthly; the game charges the weekly share
@@ -780,12 +780,12 @@
       const cost = tr.id === 'rich' ? Math.floor(d.cost / 2) : d.cost;
       if (state.dateThisWeek) { showToast('כבר יצאתם לדייט השבוע!', false); return; }
       if (state.money < cost) { showToast('אין מספיק כסף לדייט!', false); return; }
+      if (!needEnergy(d.e)) return;
       state.money -= cost;
+      state.energy -= d.e;
       state.dateThisWeek = true;
-      const extra = (tr.id === 'party' ? 3 : tr.id === 'calm' ? 2 : 0) * ENERGY_SCALE;
-      state.energy = Math.min(energyCap(), state.energy + d.e + extra);
-      state.relationship.loyalty = Math.min(100, state.relationship.loyalty + d.l);
-      showToast(`יצאתם ל${d.name}! האנרגיה התחדשה 🍷`);
+      state.relationship.loyalty = Math.min(100, state.relationship.loyalty + d.l + (tr.id === 'party' ? 10 : 0));
+      showToast(`יצאתם ל${d.name}! 🍷`);
       updateUI();
     }
     function breakUp() {
@@ -886,7 +886,7 @@
       }
       if (fx.m) { earn(fx.m); parts.push(`${fx.m >= 0 ? '+' : '-'}₪${fmt(Math.abs(fx.m))}`); }
       if (fx.ms) { const d = Math.round(fx.ms * moneyScale()); earn(d); parts.push(`${d >= 0 ? '+' : '-'}₪${fmt(Math.abs(d))}`); }
-      if (fx.e) { const before = state.energy; state.energy = clamp(state.energy + fx.e, 0, energyCap()); const d = state.energy - before; if (d) parts.push(`${signed(d)} ⚡`); }
+      if (fx.e && fx.e < 0) { const before = state.energy; state.energy = clamp(state.energy + fx.e, 0, energyCap()); const d = state.energy - before; if (d) parts.push(`${signed(d)} ⚡`); }
       if (fx.l) { const d = Math.round(state.listeners * fx.l[0] + fx.l[1]); state.listeners = Math.max(0, state.listeners + d); parts.push(`${signed(d)} מאזינים`); }
       if (fx.sk) Object.entries(fx.sk).forEach(([k, v]) => {
         const before = state.skills[k];
@@ -1012,7 +1012,7 @@
       const eb = { base: state.baseEnergy, items: effect('energy') - currentHome().energy, home: currentHome().energy, job: 0, fatigue: 0, rest: 0 };
       if (leftover <= 5) state.burnout = (state.burnout || 0) + 1; else state.burnout = 0;
       eb.fatigue = Math.min(3, state.burnout) * FATIGUE_STEP;
-      if (leftover >= 20) eb.rest = Math.min(ENERGY_OVERCHARGE, Math.floor(leftover * 0.3));
+      if (eb.fatigue && partnerTrait() && partnerTrait().id === 'calm') eb.fatigue = Math.floor(eb.fatigue / 2);
       // Job contract: pay for the week that just ended, take this week's energy
       let energy = maxEnergy();
       if (state.job) {
@@ -1033,11 +1033,11 @@
           eb.job = j.e;
         }
       }
-      state.energy = clamp(energy - eb.fatigue + eb.rest, 0, energyCap());
+      state.energy = clamp(energy - eb.fatigue, 0, energyCap());
       eb.total = state.energy;
       state.energyWeek = eb;
       state.rechargeUsed = {};
-      lines.push(`⚡ אנרגיה השבוע: <b class="text-white">${state.energy}</b>${eb.fatigue ? ` <span class="text-coral">(−${eb.fatigue} עייפות: נגמרה לך האנרגיה ${state.burnout === 1 ? 'בשבוע שעבר' : `${state.burnout} שבועות ברצף`})</span>` : ''}${eb.rest ? ` <span class="text-mint">(+${eb.rest} מנוחה)</span>` : ''}`);
+      lines.push(`⚡ אנרגיה השבוע: <b class="text-white">${state.energy}</b>${eb.fatigue ? ` <span class="text-coral">(−${eb.fatigue} עייפות: נגמרה לך האנרגיה ${state.burnout === 1 ? 'בשבוע שעבר' : `${state.burnout} שבועות ברצף`})</span>` : ''}`);
       lines.push(`🏠 ${currentHome().name}: <b class="text-red-400">-₪${fmt(rent)}</b> (שכירות וחשבונות)`);
 
       tickInvestments(lines);
@@ -1117,7 +1117,7 @@
       moneyEl.classList.toggle('text-red-500', state.money < 0);
       moneyEl.classList.toggle('text-spotifyGreen', state.money >= 0);
       $('top-energy').innerHTML = `<i class="fa-solid fa-bolt text-xs ml-0.5"></i>${state.energy}/${maxEnergy()}`;
-      $('home-energy-btn').innerHTML = `⚡ ${state.energy}/${maxEnergy()} · להטעין אנרגיה${state.burnout ? ' · 😵 עייף' : ''}`;
+      $('home-energy-btn').innerHTML = `⚡ אנרגיה ${state.energy}/${maxEnergy()}${state.burnout ? ' · 😵 עייף' : ''}`;
       $('top-date').innerText = `שבוע ${state.week}, ${state.year}`;
       $('top-fame').innerText = `Fame: ${fameRank()}`;
 
@@ -1439,43 +1439,20 @@
         ${row(currentHome().name, eb.home, eb.home > 0 ? 'text-mint' : 'text-coral')}
         ${row('עבודה', -eb.job, 'text-coral')}
         ${row('עייפות מהשבוע שעבר', -eb.fatigue, 'text-coral')}
-        ${row('מנוחה (אנרגיה שחסכת)', eb.rest, 'text-mint')}
         <div class="flex justify-between border-t border-gray-700 pt-1 mt-1 text-sm"><span class="font-extrabold">התחלת את השבוע עם</span><b class="text-white">${eb.total !== undefined ? eb.total : state.energy}</b></div>
       </div>`;
     }
     function openEnergy() {
-      const used = state.rechargeUsed || {};
-      const cooling = r => r.cooldown && state.lastGetaway && state.totalWeeks - state.lastGetaway < r.cooldown;
       showModal({
         title: `⚡ אנרגיה: ${state.energy}/${maxEnergy()}`,
         html: `${energyBreakdown()}
-          <div class="text-[11px] font-bold text-gray-400 mt-3 leading-relaxed">כל שבוע האנרגיה מתחדשת. עבודה ומגורים לוקחים "מס" קבוע. אם תגמור את כל האנרגיה, בשבוע הבא תהיה עייף (−${FATIGUE_STEP} לכל שבוע ברצף). אם תשאיר אנרגיה, חלק ממנה עובר לשבוע הבא (עד +${ENERGY_OVERCHARGE} מעל המקסימום).</div>
-          <div class="font-extrabold text-sm text-white mt-3 mb-2">להטעין אנרגיה</div>
-          <div class="space-y-2">${RECHARGE.map(r => {
-            const done = used[r.id] || cooling(r);
-            const ok = !done && state.money >= r.cost && state.energy < energyCap();
-            return `<div class="flex items-center gap-3 bg-gray-900 rounded-2xl p-2.5">
-              <div class="w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center text-mustard shrink-0"><i class="fa-solid ${r.icon}"></i></div>
-              <div class="flex-1 min-w-0"><div class="font-extrabold text-white text-xs">${r.name} <span class="text-mint">+${r.e} ⚡</span></div><div class="text-[10px] text-gray-400">${r.desc}</div></div>
-              <button ${ok ? `onclick="recharge('${r.id}')"` : 'disabled'} class="${ok ? 'bg-mint text-bgDark' : 'bg-gray-800 text-gray-500'} text-xs font-extrabold px-3 py-2 rounded-full pill3d shrink-0">${done ? (cooling(r) ? `עוד ${r.cooldown - (state.totalWeeks - state.lastGetaway)} שב׳` : '✓ השבוע') : r.cost ? '₪' + fmt(r.cost) : 'חינם'}</button>
-            </div>`;
-          }).join('')}</div>
-          <div class="text-[10px] text-gray-500 mt-2">כל אחד פעם בשבוע. להגדלה קבועה של האנרגיה: רכבים ומאמן כושר בחנות, ודירה טובה יותר.</div>`,
+          <div class="text-[11px] font-bold text-gray-400 mt-3 leading-relaxed">
+            האנרגיה מתחדשת פעם בשבוע, ואי אפשר להטעין אותה באמצע. עבודה ומגורים לוקחים "מס" קבוע.
+            אם תגמור את כל האנרגיה, בשבוע הבא תתחיל עייף: −${FATIGUE_STEP} לכל שבוע ברצף, עד −${FATIGUE_STEP * 3}.
+          </div>
+          <div class="text-[11px] font-bold text-gray-400 mt-2 leading-relaxed">להגדיל את האנרגיה לתמיד: רכבים ומאמן כושר בחנות, ודירה טובה יותר.</div>`,
         buttons: [{ t: 'סגור', primary: false }],
       });
-    }
-    function recharge(id) {
-      const r = RECHARGE.find(x => x.id === id);
-      state.rechargeUsed = state.rechargeUsed || {};
-      if (state.rechargeUsed[id] || state.money < r.cost) return;
-      state.money -= r.cost;
-      state.rechargeUsed[id] = true;
-      if (r.cooldown) state.lastGetaway = state.totalWeeks;
-      const before = state.energy;
-      state.energy = Math.min(energyCap(), state.energy + r.e);
-      showToast(`${r.name}: +${state.energy - before} ⚡`);
-      updateUI();
-      openEnergy();
     }
 
     // ---------- Housing ----------
